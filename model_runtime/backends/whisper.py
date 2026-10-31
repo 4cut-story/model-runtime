@@ -42,20 +42,19 @@ class WhisperBackend:
         torch.cuda.empty_cache()
 
     def transcribe(self, audio_urls: list[str], language: str | None) -> dict[str, Any]:
-        import numpy as np
         import whisperx
 
         self.load()
+        # 조각은 한 녹음(또는 한 파일)을 순서대로 자른 바이트다. 브라우저 MediaRecorder 조각은
+        # 첫 조각에만 컨테이너 헤더가 있으므로 하나로 이어 붙인 뒤 한 번에 디코딩한다.
         with tempfile.TemporaryDirectory() as tmp:
-            parts = []
-            with httpx.Client(timeout=120.0) as client:
-                for i, url in enumerate(audio_urls):
-                    path = Path(tmp) / f"chunk-{i:02d}"
+            path = Path(tmp) / "audio"
+            with httpx.Client(timeout=120.0) as client, path.open("wb") as out:
+                for url in audio_urls:
                     response = client.get(url)
                     response.raise_for_status()
-                    path.write_bytes(response.content)
-                    parts.append(whisperx.load_audio(str(path)))
-            audio = np.concatenate(parts) if parts else np.zeros(0, dtype=np.float32)
+                    out.write(response.content)
+            audio = whisperx.load_audio(str(path))
         result = self._model.transcribe(audio, batch_size=8, language=language)
         detected = result.get("language") or language or "ko"
         align_model, metadata = whisperx.load_align_model(
