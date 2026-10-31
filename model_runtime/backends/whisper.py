@@ -31,7 +31,7 @@ class WhisperBackend:
         if self._diarize is None and self.hf_token:
             from whisperx.diarize import DiarizationPipeline
 
-            self._diarize = DiarizationPipeline(use_auth_token=self.hf_token, device=self.device)
+            self._diarize = DiarizationPipeline(token=self.hf_token, device=self.device)
 
     def unload(self) -> None:
         import torch

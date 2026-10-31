@@ -12,7 +12,8 @@ dependencies = ["httpx>=0.27"]
 [project.optional-dependencies]
 # GPU PC에서만 설치한다 (CUDA 12.8 PyTorch는 따로 설치: README 참고)
 gpu = [
-    "whisperx>=3.3",
+    # 3.8부터 DiarizationPipeline 인자가 token=이다. pyannote는 whisperx가 맞춰 끌어온다
+    "whisperx>=3.8.6,<3.9",
     "diffusers>=0.32",
     "transformers>=4.46",
     "accelerate>=1.1",
