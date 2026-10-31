@@ -11,3 +11,4 @@ models/
 *.wav
 *.mp3
 *.m4a
+.coverage

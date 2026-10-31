@@ -1,15 +1,16 @@
 # model-runtime
 
-모델 실행 전용 Python FastAPI 서버. `/transcribe`(WhisperX large-v3 + pyannote), `/images`(SDXL 만화풍 + IP-Adapter). 상태·DB·비즈니스 로직은 두지 않는다. `eval/`에 Phase 0 품질 검증(G1~G6) 스크립트와 점수를 둔다.
+GPU PC에서 도는 Python 작업 워커. conversation-service `/internal/gpu-jobs`에서 작업을 가져가(풀링, 들어오는 포트 없음) TRANSCRIBE(WhisperX + pyannote), LLM(로컬 Ollama), IMAGE(SDXL)를 실행한다. 상태·DB·비즈니스 로직은 두지 않는다. `eval/`에 Phase 0 품질 검증(G1~G6) 스크립트와 점수를 둔다.
 
 ## 기준
 - 상위 원칙: `docs`의 `.specify/memory/constitution.md`
 - 아키텍처: `docs`의 `docs/architecture.md` (v3.0)
 - **계약 기준 버전: common `v0.1.0`** — 계약은 이 버전에 고정해 쓰고, 올릴 때 이 줄을 함께 고친다.
-- 포트: 8001 (`common/service-catalog.yaml`)
+- 포트: 없음 (워커가 밖으로만 연결한다)
+- GPU PC: Windows 설치형 Ollama(`OLLAMA_URL=http://localhost:11434`), venv `D:\4cut\gpu-runtime\.venv`(CUDA 12.8 PyTorch). SDXL 1024px은 16GB 중 약 15.9GB를 써서 VAE tiling·CPU offload를 기본으로 켠다. `HF_TOKEN`이 없으면 화자 분리 없이 전사한다.
 
 ## 기술
-Python, FastAPI, pytest + TestClient, Schemathesis. 모델은 테스트에서 가짜 객체로 대체한다.
+Python 3.11+, httpx, pytest + respx. 모델은 테스트에서 가짜 백엔드(`backends/fake.py`)로 대체한다. GPU 의존성은 `[gpu]` extra.
 
 ## 규칙
 - 서비스 간 통신은 `common/contracts`의 OpenAPI대로만 한다. API를 바꾸려면 `common` PR → 태그가 먼저다.

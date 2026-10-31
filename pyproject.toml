@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "model-runtime"
+version = "0.1.0"
+description = "4cut GPU 워커: conversation-service에서 작업을 가져가 Whisper·Ollama·SDXL로 실행한다"
+requires-python = ">=3.11"
+dependencies = ["httpx>=0.27"]
+
+[project.optional-dependencies]
+# GPU PC에서만 설치한다 (CUDA 12.8 PyTorch는 따로 설치: README 참고)
+gpu = [
+    "whisperx>=3.3",
+    "diffusers>=0.32",
+    "transformers>=4.46",
+    "accelerate>=1.1",
+    "safetensors>=0.4",
+]
+dev = ["ruff>=0.8", "mypy>=1.13", "pytest>=8.3", "pytest-cov>=6.0", "respx>=0.22"]
+
+[project.scripts]
+model-runtime = "model_runtime.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["model_runtime*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# GPU 전용 모듈은 torch·diffusers·whisperx 타입이 없다
+module = ["model_runtime.backends.whisper", "model_runtime.backends.sdxl"]
+disallow_untyped_calls = false
+warn_return_any = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+# GPU와 모델 가중치가 있어야 도는 모듈은 CI에서 잴 수 없다. GPU PC에서 eval/로 검증한다
+omit = ["model_runtime/backends/whisper.py", "model_runtime/backends/sdxl.py"]
