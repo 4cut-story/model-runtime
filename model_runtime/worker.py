@@ -29,10 +29,10 @@ class Heartbeat(threading.Thread):
         self.job = job
         self.interval = interval
         self.lost = threading.Event()
-        self._stop = threading.Event()
+        self._stopped = threading.Event()
 
     def run(self) -> None:
-        while not self._stop.wait(self.interval):
+        while not self._stopped.wait(self.interval):
             try:
                 self.api.heartbeat(self.job)
             except LeaseLostError:
@@ -43,7 +43,7 @@ class Heartbeat(threading.Thread):
                 log.warning("heartbeat 실패, 다음에 다시: %s", e)
 
     def stop(self) -> None:
-        self._stop.set()
+        self._stopped.set()
 
 
 class Worker:
