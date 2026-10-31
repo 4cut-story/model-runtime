@@ -1,0 +1,20 @@
+# pyproject.toml이 생기기 전에는 돌지 않는다.
+# dev 의존성: ruff, mypy, pytest, pytest-cov. 커버리지 80% 미만이면 실패.
+name: ci
+
+on:
+  pull_request:
+    paths: [pyproject.toml, 'model_runtime/**', 'tests/**', Dockerfile]
+  push:
+    branches: [main]
+    paths: [pyproject.toml, 'model_runtime/**', 'tests/**', Dockerfile]
+
+jobs:
+  ci:
+    uses: 4cut-story/common/.github/workflows/python-service.yml@main
+    with:
+      app-name: model-runtime
+      package: model_runtime
+    permissions:
+      contents: read
+      packages: write
