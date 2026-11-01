@@ -12,6 +12,7 @@
 4. LLM: Ollama 모델 내린 뒤 처음 부르기(load_duration)와 이어 부르기
 5. 그림: SDXL 올리기, 4장 그리기
 6. Whisper와 SDXL을 함께 올렸을 때 VRAM (둘 다 올려 둘 수 있는지)
+7. 정렬·화자 분리를 CPU에서 돌렸을 때 시간 (작은 모델만 CPU로 옮기는 안)
 
 전사 글은 --out 옆 *.text.txt에만 남는다. 녹음·전사는 커밋하지 않는다.
 """
@@ -115,6 +116,7 @@ def measure_stt(s: Any, audio_path: Path, turbo: bool, out: Path) -> dict[str, A
         )
     cold: dict[str, Any] = {}
     base = transcribe_parts(whisper, audio, 8, cold)
+    base_result = whisper._model.transcribe(audio, batch_size=8, language="ko")["segments"]
     report["cold"] = cold
     report["vramWhisper"] = vram()
     for batch in (8, 16):
@@ -137,8 +139,34 @@ def measure_stt(s: Any, audio_path: Path, turbo: bool, out: Path) -> dict[str, A
         ratio = difflib.SequenceMatcher(None, base_text, turbo_text, autojunk=False).ratio()
         report["turboSameAsLargeV3"] = round(ratio, 3)
         del model
+    report["cpu"] = measure_cpu_small(s, audio, base_result)
     whisper.unload()
     report["vramAfterUnload"] = vram()
+    return report
+
+
+def measure_cpu_small(s: Any, audio: Any, segments: list[Any]) -> dict[str, Any]:
+    """정렬(wav2vec2)과 화자 분리(pyannote)를 CPU에서 돌린다. 받아쓰기는 GPU 결과를 쓴다."""
+    import torch
+    import whisperx
+
+    report: dict[str, Any] = {"threads": torch.get_num_threads()}
+    start = time.perf_counter()
+    align, meta = whisperx.load_align_model(language_code="ko", device="cpu")
+    report["alignLoadSec"] = round(time.perf_counter() - start, 2)
+    start = time.perf_counter()
+    whisperx.align(segments, align, meta, audio, "cpu")
+    report["alignSec"] = round(time.perf_counter() - start, 2)
+    del align
+    if s.hf_token:
+        from whisperx.diarize import DiarizationPipeline
+
+        start = time.perf_counter()
+        diarize = DiarizationPipeline(token=s.hf_token, device="cpu")
+        report["diarizeLoadSec"] = round(time.perf_counter() - start, 2)
+        start = time.perf_counter()
+        diarize(audio)
+        report["diarizeSec"] = round(time.perf_counter() - start, 2)
     return report
 
 
