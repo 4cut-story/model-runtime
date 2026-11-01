@@ -461,17 +461,41 @@ def scrubbed(script: dict[str, Any], text: str) -> dict[str, Any]:
 MAX_VOICE_CHARS = 40
 
 
-def with_voice(script: dict[str, Any]) -> dict[str, Any]:
-    """확인을 마친 대사를 컨셉 말투 문장으로 바꾼다 (ComicScript.withVoice).
+DIGITS = re.compile(r"\d+")
 
-    원래 대사는 said에 남긴다.
-    """
+
+def keeps_facts(original: str, voiced: str) -> bool:
+    """말투 문장이 원래 대사의 숫자를 그대로 갖고 말풍선에 들어가는지 (ComicScript.keepsFacts)."""
+    if not voiced or not voiced.strip() or len(voiced) > MAX_VOICE_CHARS:
+        return False
+    return DIGITS.findall(original) == DIGITS.findall(voiced)
+
+
+def line_texts(script: dict[str, Any]) -> list[str]:
+    return [x["text"] for p in script.get("panels") or [] for x in p.get("lines") or []]
+
+
+def voice_prompt(script: dict[str, Any]) -> str:
+    """말투 바꾸기 입력 (ReviewHandler.prompt)."""
+    lines = line_texts(script)
+    body = "".join(f"{i + 1}. {t}\n" for i, t in enumerate(lines))
+    return f"제목: {script.get('title')}\n대사:\n{body}"
+
+
+def with_voices(script: dict[str, Any], title: str, voices: list[str]) -> dict[str, Any]:
+    """대사를 말투 문장으로 바꾼다 (ComicScript.withVoices). 원래 대사는 said에 남긴다."""
+    if len(voices) != len(line_texts(script)):
+        return script
+    it = iter(voices)
     for p in script.get("panels") or []:
         for line in p.get("lines") or []:
-            voice = (line.pop("voice", None) or "").strip()
-            if voice and len(voice) <= MAX_VOICE_CHARS:
+            v = re.sub(r",\s*$", "", re.sub(r'[{}"]', "", next(it) or "")).strip()
+            if keeps_facts(line["text"], v):
                 line["said"] = line["text"]
-                line["text"] = re.sub(r",\s*$", "", re.sub(r'[{}"]', "", voice)).strip()
+                line["text"] = v
+    if title and title.strip() and len(title.strip()) <= 20:
+        script["originalTitle"] = script.get("title")
+        script["title"] = title.strip()
     return script
 
 
@@ -896,7 +920,6 @@ def make_script(
             seed + attempt,
             args.model,
             concept["scriptSystem"] if concept else None,
-            concept.get("scriptSchema") if concept else None,
         )
         res = timer.run("script", lambda job=job: llm.chat(job))
         try:
@@ -911,7 +934,6 @@ def make_script(
                     line["text"] = snap(line.get("text"), source)
                 # 장면 밖 대화에서 가져온 대사는 버린다 (ScriptHandler.withLinesWhere)
                 p["lines"] = [x for x in p.get("lines") or [] if inside(x["text"], in_scene)]
-            s = with_voice(s)
             if concept and concept["id"] == "ANIMALS":
                 s = with_animals(s, animals(seed))
             v = violation(s)
@@ -925,6 +947,30 @@ def make_script(
     report["scriptFailures"] = failures
     if script is None:
         report["result"] = "SCRIPT_FAILED"
+        return script
+    # 말투가 있는 컨셉은 콘티와 따로 제목·대사만 바꾼다 (ReviewHandler)
+    if concept and concept.get("voiceSystem") and line_texts(script):
+        job = llm_job(
+            bundle,
+            "voice",
+            voice_prompt(script),
+            seed,
+            args.model,
+            concept["voiceSystem"],
+        )
+        res = timer.run("voice", lambda job=job: llm.chat(job))
+        try:
+            out = content_json(res["content"])
+            before = violation(script)
+            voiced = with_voices(
+                json.loads(json.dumps(script)), out.get("title", ""), out.get("lines") or []
+            )
+            if violation(voiced) is None or before is not None:
+                script = voiced
+            else:
+                report["voiceFailure"] = violation(voiced)
+        except (ValueError, KeyError, TypeError) as e:
+            report["voiceFailure"] = f"파싱 실패: {e}"
     return script
 
 
