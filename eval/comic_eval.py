@@ -952,6 +952,11 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--out", type=Path, default=Path("eval-out"))
     p.add_argument("--model", default="qwen3:8b")
     p.add_argument("--ollama", default="http://localhost:11434")
+    p.add_argument(
+        "--llm", choices=["ollama", "gemini"], default="ollama",
+        help="장면 추출·콘티 LLM. gemini는 GEMINI_API_KEY 환경 변수(.env)를 쓴다",
+    )
+    p.add_argument("--thinking", default=None, help="gemini thinkingLevel (minimal/low/medium/high)")
     p.add_argument("--language", default="ko")
     p.add_argument("--skip-images", action="store_true", help="LLM 단계만 돌린다")
     p.add_argument(
@@ -999,7 +1004,13 @@ def main(argv: list[str] | None = None) -> int:
         t = load_transcript(args.transcript)
     summary["audioSec"] = round(max(u["end"] for u in t["utterances"]), 1)
 
-    llm = OllamaClient.create(args.ollama)
+    if args.llm == "gemini":
+        from model_runtime.backends.gemini import GeminiClient
+
+        llm = GeminiClient.create(thinking=args.thinking)
+        summary["llm"] = {"backend": "gemini", "model": args.model, "thinking": args.thinking}
+    else:
+        llm = OllamaClient.create(args.ollama)
     sdxl = None
     if not args.skip_images:
         from model_runtime.backends.sdxl import SdxlBackend
@@ -1025,6 +1036,8 @@ def main(argv: list[str] | None = None) -> int:
         summary.setdefault("runSec", []).append(round(time.perf_counter() - start, 2))
         if sdxl is not None:
             sdxl.unload()
+    if getattr(llm, "usage", None) is not None:
+        summary["usage"] = llm.usage
     (root / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1), "utf-8")
     print(f"결과: {root}")
     return 0
