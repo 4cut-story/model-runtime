@@ -13,6 +13,8 @@
 5. 그림: SDXL 올리기, 4장 그리기
 6. Whisper와 SDXL을 함께 올렸을 때 VRAM (둘 다 올려 둘 수 있는지)
 7. 정렬·화자 분리를 CPU에서 돌렸을 때 시간 (작은 모델만 CPU로 옮기는 안)
+8. 모두 올려 두기: SDXL + Whisper(--resident-whisper, 기본 large-v3-turbo int8) + Ollama LLM을
+   한꺼번에 VRAM에 두고, 갈아 끼우지 않은 채 받아쓰기·LLM·그림 4장이 되는지와 시간
 
 전사 글은 --out 옆 *.text.txt에만 남는다. 녹음·전사는 커밋하지 않는다.
 """
@@ -138,7 +140,6 @@ def measure_stt(s: Any, audio_path: Path, turbo: bool, out: Path) -> dict[str, A
         Path(f"{out}.turbo.text.txt").write_text(turbo_text, "utf-8")
         ratio = difflib.SequenceMatcher(None, base_text, turbo_text, autojunk=False).ratio()
         report["turboSameAsLargeV3"] = round(ratio, 3)
-        del model
     report["cpu"] = measure_cpu_small(s, audio, base_result)
     whisper.unload()
     report["vramAfterUnload"] = vram()
@@ -220,6 +221,72 @@ def measure_sdxl(s: Any, with_whisper: bool) -> dict[str, Any]:
     return report
 
 
+def measure_resident(
+    s: Any, audio_path: Path, ollama_url: str, llm: str, whisper_name: str, compute: str
+) -> dict[str, Any]:
+    """세 묶음을 함께 올려 둔다. VRAM이 넘치면 어디서 넘쳤는지 남긴다."""
+    import torch
+    import whisperx
+
+    from model_runtime.backends.sdxl import SdxlBackend
+
+    report: dict[str, Any] = {"whisper": f"{whisper_name} {compute}", "llm": llm}
+    sdxl = SdxlBackend(s.sdxl_model, s.sdxl_cpu_offload, s.sdxl_lora, s.sdxl_steps, s.sdxl_guidance)
+    client = httpx.Client(base_url=ollama_url, timeout=300.0)
+    step = "sdxl load"
+    try:
+        sdxl.load()
+        report["vramSdxl"] = vram()
+        step = "whisper load"
+        model = whisperx.load_model(whisper_name, "cuda", compute_type=compute)
+        report["vramSdxlWhisper"] = vram()
+        step = "llm load"
+        body = {
+            "model": llm,
+            "messages": [{"role": "user", "content": "한 문장으로 오늘 날씨 이야기를 지어 줘."}],
+            "stream": False,
+            "think": False,
+            "keep_alive": "10m",
+        }
+        client.post("/api/chat", json=body).raise_for_status()
+        report["vramAll"] = vram()
+        report["ollamaPs"] = [
+            {
+                "name": m["name"],
+                "vramMB": round(m.get("size_vram", 0) / 2**20),
+                "totalMB": round(m.get("size", 0) / 2**20),
+            }
+            for m in client.get("/api/ps").json().get("models", [])
+        ]
+        audio = whisperx.load_audio(str(audio_path))
+        for round_no in (1, 2):
+            r: dict[str, Any] = {}
+            step = f"round {round_no} transcribe"
+            _, r["transcribeSec"] = timed(
+                lambda: model.transcribe(audio, batch_size=16, language="ko")
+            )
+            step = f"round {round_no} llm"
+            start = time.perf_counter()
+            data = client.post("/api/chat", json=body).json()
+            r["llmSec"] = round(time.perf_counter() - start, 2)
+            r["llmLoadSec"] = round(data.get("load_duration", 0) / 1e9, 2)
+            step = f"round {round_no} draw"
+            r["imageSec"] = [
+                timed(lambda i=i: sdxl.draw({"prompt": PROMPT, "seed": i}))[1] for i in range(4)
+            ]
+            report[f"round{round_no}"] = r
+        report["vramPeakMB"] = round(torch.cuda.max_memory_reserved() / 2**20)
+        report["ok"] = True
+    except Exception as e:
+        report["ok"] = False
+        report["failedAt"] = step
+        report["error"] = f"{type(e).__name__}: {str(e)[:300]}"
+    finally:
+        sdxl.unload()
+        client.post("/api/generate", json={"model": llm, "keep_alive": 0, "prompt": ""})
+    return report
+
+
 def main() -> int:
     p = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -228,6 +295,9 @@ def main() -> int:
     p.add_argument("--out", type=Path, default=Path("stage_timing.json"))
     p.add_argument("--model", default="qwen3:8b")
     p.add_argument("--turbo", action="store_true", help="large-v3-turbo도 재 본다")
+    p.add_argument("--resident-whisper", default="large-v3-turbo")
+    p.add_argument("--resident-compute", default="int8_float16")
+    p.add_argument("--only-resident", action="store_true", help="8번(모두 올려 두기)만 잰다")
     args = p.parse_args()
 
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -238,10 +308,21 @@ def main() -> int:
     s = Settings.from_env({"GPU_WORKER_API_URL": "x", "GPU_WORKER_TOKEN": "x", **env})
 
     report: dict[str, Any] = {"vramStart": vram()}
-    report["stt"] = measure_stt(s, args.audio, args.turbo, args.out)
-    report["llm"] = measure_llm(s.ollama_url, args.model)
-    report["sdxl"] = measure_sdxl(s, with_whisper=True)
-    args.out.write_text(json.dumps(report, ensure_ascii=False, indent=1), "utf-8")
+
+    def save() -> None:
+        args.out.write_text(json.dumps(report, ensure_ascii=False, indent=1), "utf-8")
+
+    if not args.only_resident:
+        report["stt"] = measure_stt(s, args.audio, args.turbo, args.out)
+        save()
+        report["llm"] = measure_llm(s.ollama_url, args.model)
+        save()
+        report["sdxl"] = measure_sdxl(s, with_whisper=True)
+        save()
+    report["resident"] = measure_resident(
+        s, args.audio, s.ollama_url, args.model, args.resident_whisper, args.resident_compute
+    )
+    save()
     print(json.dumps(report, ensure_ascii=False, indent=1))
     return 0
 
