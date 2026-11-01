@@ -78,6 +78,10 @@ def clean(text: str | None) -> str:
 
 def compact(utterances: list[dict[str, Any]]) -> str:
     """같은 화자가 2초 안에 이어 말하면 합치고 군말을 지운다 (TranscriptText)."""
+    return lines(merge(utterances))
+
+
+def merge(utterances: list[dict[str, Any]]) -> list[dict[str, Any]]:
     merged: list[dict[str, Any]] = []
     for u in utterances:
         text = clean(u["text"])
@@ -87,7 +91,39 @@ def compact(utterances: list[dict[str, Any]]) -> str:
             merged[-1] = {**merged[-1], "end": u["end"], "text": merged[-1]["text"] + " " + text}
             continue
         merged.append({**u, "text": text})
-    return lines(merged)
+    return merged
+
+
+def tag_seconds(tag: Any) -> int:
+    """ "04:11" → 251, 형식이 다르면 -1 (SceneTimes.seconds)."""
+    m = re.fullmatch(r"(\d+):(\d+)", str(tag or "").strip())
+    if not m or int(m.group(2)) >= 60:
+        return -1
+    return int(m.group(1)) * 60 + int(m.group(2))
+
+
+def resolve_times(c: dict[str, Any], rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """from/to 줄 표시를 실제 발화 시각으로 바꾼다. 30초~3분으로 맞춘다 (SceneTimes)."""
+    if "from" not in c:
+        return c
+
+    def index(sec: int) -> int:
+        if sec < 0:
+            return -1
+        for i, u in enumerate(rows):
+            if int(u["start"]) == sec:
+                return i
+        return next((i for i, u in enumerate(rows) if u["start"] <= sec <= u["end"]), -1)
+
+    out = {k: v for k, v in c.items() if k not in ("from", "to")}
+    first, last = index(tag_seconds(c.get("from"))), index(tag_seconds(c.get("to")))
+    if first < 0 or last < first:
+        return {**out, "start": 0, "end": 0}
+    start, end = rows[first]["start"], rows[last]["end"]
+    while end - start < 30 and last + 1 < len(rows):
+        last += 1
+        end = rows[last]["end"]
+    return {**out, "start": start, "end": min(end, start + 180), "tags": [c["from"], c["to"]]}
 
 
 def spoken(t: dict[str, Any]) -> str:
@@ -512,7 +548,12 @@ def snap(line: str | None, source: list[str]) -> str | None:
 COUNTS = ["one", "two", "three", "four"]
 
 
-def draw_prompt(style: str, script: dict[str, Any], panel: dict[str, Any]) -> str:
+def draw_prompt(
+    style: str,
+    script: dict[str, Any],
+    panel: dict[str, Any],
+    concept: dict[str, Any] | None = None,
+) -> str:
     """DrawHandler.prompt: 그림체 → 구도 → 인원 → 장면."""
     scene = panel["scene"].strip()
     legacy = "{" not in scene
@@ -525,9 +566,10 @@ def draw_prompt(style: str, script: dict[str, Any], panel: dict[str, Any]) -> st
         elif mark in scene:
             people += 1
             scene = scene.replace(mark, "(" + c["look"].strip() + ")")
-    scene = re.sub(r"\{[A-Z]\}", "a friend", scene)
+    crowd = (concept or {}).get("crowd", "people")
+    scene = re.sub(r"\{[A-Z]\}", (concept or {}).get("friend", "a friend"), scene)
     shot = panel["shot"].replace("-", " ") + " shot, " if panel.get("shot") else ""
-    count = COUNTS[min(people, len(COUNTS)) - 1] + " people, " if people >= 2 else ""
+    count = f"{COUNTS[min(people, len(COUNTS)) - 1]} {crowd}, " if people >= 2 else ""
     return f"{style}, {shot}{count}{scene}{cast}"
 
 
@@ -546,7 +588,7 @@ def draw_images(
     return [
         {
             "name": f"panel-{i + 1}",
-            "prompt": draw_prompt(style, script, p),
+            "prompt": draw_prompt(style, script, p, concept),
             "negativePrompt": negative,
             "seed": seed if same_seed else seed + i,  # 서버는 같은 시드 (DrawHandler)
             "width": d["imageSize"],
@@ -687,7 +729,9 @@ def run_once(
         found_names = merge_names(
             found_names, body.get("names", []), spoken(t), bundle["castNames"]
         )
-        candidates += [c for c in map(scored, found) if valid_candidate(c)]
+        rows = merge(part)
+        resolved = [scored(resolve_times(c, rows)) for c in found]
+        candidates += [c for c in resolved if valid_candidate(c)]
     (out / "candidates.json").write_text(
         json.dumps({"candidates": candidates, "names": found_names}, ensure_ascii=False, indent=1),
         "utf-8",
