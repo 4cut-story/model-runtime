@@ -535,6 +535,40 @@ def similarity(a: str, b: str) -> float:
     return 1.0 if m == 0 else 1 - distance(a, b) / m
 
 
+ANIMAL_POOL = ["rabbit", "deer", "fox", "bear", "cat", "dog", "squirrel", "panda"]
+SCENE_SLACK_SEC = 5
+
+
+def scene_text(t: dict[str, Any], scene: dict[str, Any]) -> str:
+    """ScriptHandler.sceneText: 장면 구간(앞뒤 5초 여유)의 대화."""
+    lo, hi = scene["start"] - SCENE_SLACK_SEC, scene["end"] + SCENE_SLACK_SEC
+    return "".join(u["text"] + "\n" for u in t["utterances"] if lo <= u["start"] <= hi)
+
+
+def inside(line: str, scene_sentences: list[str]) -> bool:
+    """SpokenLines.inside: 첫 문장이 장면 대화에 있는 말인지."""
+    parts = sentences(line)
+    if not parts:
+        return False
+    first = parts[0]
+    return any(first in s or similarity(first, s) >= MIN_SIMILARITY for s in scene_sentences)
+
+
+def animals(seed: int) -> list[str]:
+    start = seed % len(ANIMAL_POOL)
+    return ANIMAL_POOL[start:] + ANIMAL_POOL[:start]
+
+
+def with_animals(s: dict[str, Any], pool: list[str]) -> dict[str, Any]:
+    """ComicScript.withAnimals: 외모 첫 단어를 코드로 정한 동물로."""
+    cast = []
+    for i, c in enumerate(s.get("characters") or []):
+        look = (c.get("look") or "").strip()
+        rest = look[look.index(",") :] if "," in look else ""
+        cast.append({**c, "look": pool[i % len(pool)] + rest})
+    return {**s, "characters": cast}
+
+
 def snap(line: str | None, source: list[str]) -> str | None:
     """대사를 원문 문장으로 맞추고 말풍선 길이를 넘는 뒷문장을 버린다 (SpokenLines.snap)."""
     if line is None:
@@ -847,9 +881,14 @@ def make_script(
             rename = real_name_replacements(whose(found_names, t), cast)
             s = scrubbed(replaced(s, rename), spoken(t))
             source = sentences(replace_all(spoken(t), rename))
+            in_scene = sentences(replace_all(scene_text(t, scene), rename))
             for p in s.get("panels") or []:
                 for line in p.get("lines") or []:
                     line["text"] = snap(line.get("text"), source)
+                # 장면 밖 대화에서 가져온 대사는 버린다 (ScriptHandler.withLinesWhere)
+                p["lines"] = [x for x in p.get("lines") or [] if inside(x["text"], in_scene)]
+            if concept and concept["id"] == "ANIMALS":
+                s = with_animals(s, animals(seed))
             v = violation(s)
             if v is None:
                 script = s
