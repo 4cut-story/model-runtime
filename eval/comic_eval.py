@@ -449,6 +449,47 @@ def violation(s: dict[str, Any]) -> str | None:
 # ---------- 그림 (DrawHandler) ----------
 
 
+MAX_LINE_CHARS = 40
+MIN_SIMILARITY = 0.75
+
+
+def sentences(text: str | None) -> list[str]:
+    return [x.strip() for x in re.split(r"(?<=[.?!])\s+", (text or "").strip()) if x.strip()]
+
+
+def distance(a: str, b: str) -> int:
+    prev = list(range(len(b) + 1))
+    for i in range(1, len(a) + 1):
+        cur = [i] + [0] * len(b)
+        for j in range(1, len(b) + 1):
+            cost = 0 if a[i - 1] == b[j - 1] else 1
+            cur[j] = min(cur[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost)
+        prev = cur
+    return prev[len(b)]
+
+
+def similarity(a: str, b: str) -> float:
+    m = max(len(a), len(b))
+    return 1.0 if m == 0 else 1 - distance(a, b) / m
+
+
+def snap(line: str | None, source: list[str]) -> str | None:
+    """대사를 원문 문장으로 맞추고 말풍선 길이를 넘는 뒷문장을 버린다 (SpokenLines.snap)."""
+    if line is None:
+        return None
+    out = ""
+    for s in sentences(line):
+        best, score = s, MIN_SIMILARITY
+        for c in source:
+            sim = similarity(s, c)
+            if sim >= score:
+                best, score = c, sim
+        if out and len(out) + 1 + len(best) > MAX_LINE_CHARS:
+            break
+        out = f"{out} {best}" if out else best
+    return out or line.strip()
+
+
 COUNTS = ["one", "two", "three", "four"]
 
 
@@ -480,7 +521,7 @@ def draw_images(
             "name": f"panel-{i + 1}",
             "prompt": draw_prompt(d["style"], script, p),
             "negativePrompt": d["negativePrompt"],
-            "seed": seed if same_seed else seed + i,
+            "seed": seed if same_seed else seed + i,  # 서버는 같은 시드 (DrawHandler)
             "width": d["imageSize"],
             "height": d["imageSize"],
         }
@@ -642,9 +683,12 @@ def run_once(
         try:
             s = normalized(content_json(res["content"]))
             s = with_fictional_names(with_names(s, cast), spoken(t), bundle["castNames"])
-            s = scrubbed(
-                replaced(s, real_name_replacements(whose(found_names, t), cast)), spoken(t)
-            )
+            rename = real_name_replacements(whose(found_names, t), cast)
+            s = scrubbed(replaced(s, rename), spoken(t))
+            source = sentences(replace_all(spoken(t), rename))
+            for p in s.get("panels") or []:
+                for line in p.get("lines") or []:
+                    line["text"] = snap(line.get("text"), source)
             v = violation(s)
             if v is None:
                 script = s
@@ -659,7 +703,7 @@ def run_once(
         report["timings"] = timer.times
         return report
     (out / "script.json").write_text(json.dumps(script, ensure_ascii=False, indent=1), "utf-8")
-    images = draw_images(bundle, script, seed * 10, args.same_seed)
+    images = draw_images(bundle, script, seed * 10, not args.per_panel_seed)
     (out / "draw.json").write_text(json.dumps(images, ensure_ascii=False, indent=1), "utf-8")
     report["title"] = script["title"]
     if sdxl is not None:
@@ -705,7 +749,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--language", default="ko")
     p.add_argument("--skip-images", action="store_true", help="LLM 단계만 돌린다")
     p.add_argument(
-        "--same-seed", action="store_true", help="네 컷을 같은 시드로 그린다(인물 일관성 비교용)"
+        "--per-panel-seed", action="store_true", help="컷마다 시드를 달리한다(예전 방식 비교용)"
     )
     args = p.parse_args(argv)
 
