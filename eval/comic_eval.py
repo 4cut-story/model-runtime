@@ -29,8 +29,9 @@ from typing import Any
 
 ROLES = ["기", "승", "전", "결"]
 SHOTS = {"wide", "medium", "close-up"}
-STOPWORDS = {"a", "an", "the", "and", "at", "in", "on", "of", "with", "to", "is", "are"}
+STOPWORDS = {"a", "an", "the", "and", "at", "in", "on", "of", "with", "to", "is", "are", "nearby"}
 MAX_SCENE_OVERLAP = 0.8
+UNKNOWN = "친구"
 FILLER = re.compile(r"(?<!\S)(?:어+|음+|으+음+|에+|uh+|um+|hmm+)[.,…!?~]*(?=\s|$)", re.IGNORECASE)
 
 
@@ -139,16 +140,127 @@ def cast_names(t: dict[str, Any], pool: list[str], seed: int) -> dict[str, str]:
     return {sp: free[(start + i) % len(free)] for i, sp in enumerate(t["speakers"][: len(free)])}
 
 
+TITLES = set(
+    [
+        "팀장",
+        "부장",
+        "과장",
+        "차장",
+        "대리",
+        "사원",
+        "사장",
+        "실장",
+        "선배",
+        "후배",
+        "막내",
+        "총무",
+        "언니",
+        "오빠",
+        "누나",
+        "형님",
+        "엄마",
+        "아빠",
+        "친구",
+        "선생",
+        "교수",
+        "이모",
+        "삼촌",
+        "고모",
+        "할머니",
+        "할아버지",
+    ]
+)
+
+
+def plausible(word: str, text: str, pool: list[str]) -> bool:
+    """실명으로 볼 만한 단어 (RealNames.plausible)."""
+    return (
+        re.fullmatch(r"[가-힣]{2,4}", word or "") is not None
+        and word in text
+        and not word.endswith("님")
+        and word not in TITLES
+        and word not in pool
+    )
+
+
+def merge_names(known: list[str], found: list[Any], text: str, pool: list[str]) -> list[str]:
+    """구간마다 찾은 실명을 합친다 (ExtractHandler.mergeNames)."""
+    names = list(known)
+    for n in found or []:
+        word = (n if isinstance(n, str) else "").strip()
+        if plausible(word, text, pool) and word not in names:
+            names.append(word)
+    return names
+
+
+def whose(names: list[str], t: dict[str, Any]) -> dict[str, str]:
+    """실명 → 그 이름으로 불리는 화자 (RealNames.whose)."""
+    out = {}
+    speakers = t["speakers"]
+    for name in names:
+        who = ""
+        if len(speakers) == 2:
+            voc = re.compile(re.escape(name) + r"(?:야|아)(?![가-힣])")
+            callers = {u["speaker"] for u in t["utterances"] if voc.search(u["text"])}
+            if len(callers) == 1:
+                caller = callers.pop()
+                who = speakers[1] if speakers[0] == caller else speakers[0]
+        out[name] = who
+    return out
+
+
+def has_final(word: str) -> bool:
+    if not word:
+        return False
+    c = ord(word[-1])
+    return 0xAC00 <= c <= 0xD7A3 and (c - 0xAC00) % 28 != 0
+
+
+def real_name_replacements(found: dict[str, str], cast: dict[str, str]) -> dict[str, str]:
+    """실명 → 화자 가명(모르면 친구), 받침에 맞춘 호격·조사 (RealNames.replacements)."""
+    out: dict[str, str] = {}
+    for name, speaker in found.items():
+        n = (name or "").strip()
+        if len(n) < 2 or n in cast or n in cast.values():
+            continue
+        alias = cast.get((speaker or "").strip(), UNKNOWN)
+        alias_final = has_final(alias)
+        vocative = alias + ("아" if alias_final else "야")
+        out[n + "야"] = vocative
+        out[n + "아"] = vocative
+        if has_final(n):
+            out[n + "이"] = alias + "이" if alias_final else alias
+            out[n] = alias
+        else:
+            out[n] = alias + "이" if alias_final and alias != UNKNOWN else alias
+    return out
+
+
+def section(t: dict[str, Any], keep: Any, rename: dict[str, str]) -> str:
+    part = [u for u in t["utterances"] if keep(u)]
+    return replace_all(compact(part), rename) or "" if part else "(없음)"
+
+
 def script_prompt(
-    t: dict[str, Any], scene: dict[str, Any], context: float, cast: dict[str, str]
+    t: dict[str, Any],
+    scene: dict[str, Any],
+    context: float,
+    cast: dict[str, str],
+    found: dict[str, str],
 ) -> str:
-    part = between(t, scene["start"] - context, scene["end"] + context)
+    rename = real_name_replacements(found, cast)
+    a, b = scene["start"], scene["end"]
+    before = section(t, lambda u: u["start"] < a and u["end"] >= a - context, rename)
+    during = section(t, lambda u: a <= u["start"] <= b, rename)
+    after = section(t, lambda u: b < u["start"] <= b + context, rename)
     names = ", ".join(f"{k}={v}" for k, v in cast.items())
     return (
         f"대화 언어: {t['language']}\n화자: {', '.join(t['speakers'])}\n인물 가명: {names}\n"
-        f"장면 종류: {scene['kind']}\n장면 요약: {scene['summary']}\n"
-        f"고른 이유: {scene['reason']}\n\n"
-        f"장면 앞뒤 대화:\n{compact(part)}"
+        f"장면 종류: {scene['kind']}\n장면 요약: {replace_all(scene['summary'], rename)}\n"
+        f"고른 이유: {replace_all(scene['reason'], rename)}\n\n"
+        f"[장면 앞 대화 (참고만)]\n{before}\n\n"
+        f"[장면 대화 (대사는 여기서 고른다)]\n{during}\n\n"
+        f"[장면 뒤 대화 (참고만)]\n{after}"
     )
 
 
@@ -179,7 +291,19 @@ def normalized(script: dict[str, Any]) -> dict[str, Any]:
         for line in p.get("lines") or []:
             sp = (line.get("speaker") or "").strip()
             line["speaker"] = by_name.get(sp, sp)
+        speakers_in_scene(p)
     return script
+
+
+def speakers_in_scene(p: dict[str, Any]) -> None:
+    """대사를 하는 인물이 장면 설명에 없으면 붙인다 (ComicScript.withSpeakersInScene)."""
+    if p.get("scene") is None or p.get("lines") is None:
+        return
+    scene = p["scene"].strip()
+    for sp in dict.fromkeys(line.get("speaker") for line in p["lines"]):
+        if sp and "{" + sp + "}" not in scene:
+            scene += ", {" + sp + "} nearby"
+    p["scene"] = scene
 
 
 def names_found_in(script: dict[str, Any], text: str) -> list[str]:
@@ -242,16 +366,29 @@ def replace_all(text: str | None, rename: dict[str, str]) -> str | None:
     return text
 
 
-def scrubbed(script: dict[str, Any]) -> dict[str, Any]:
-    """nameWarnings 실명을 대사·제목에서 "친구"로 바꾸고 JSON 조각을 지운다 (ComicScript)."""
+def replaced(script: dict[str, Any], rename: dict[str, str]) -> dict[str, Any]:
+    for p in script.get("panels") or []:
+        for line in p.get("lines") or []:
+            line["text"] = replace_all(line.get("text"), rename)
+    script["title"] = replace_all(script.get("title"), rename)
+    return script
+
+
+def called(word: str, text: str) -> bool:
+    """대화에서 "민수야"처럼 불린 적이 있는 말인지 (RealNames.called)."""
+    return len(word) >= 2 and re.search(re.escape(word) + r"(?:야|아)(?![가-힣])", text) is not None
+
+
+def scrubbed(script: dict[str, Any], text: str) -> dict[str, Any]:
+    """nameWarnings 중 대화에서 불린 이름만 대사·제목에서 "친구"로 바꾸고 JSON 조각을 지운다."""
     rename: dict[str, str] = {}
     for w in script.get("nameWarnings") or []:
         word = (w or "").strip()
-        if len(word) < 2:
+        stem = word[:-1] if len(word) > 2 and word.endswith("이") else word
+        if len(stem) < 2 or not (called(word, text) or called(stem, text)):
             continue
-        rename[word] = "친구"
-        if len(word) > 2 and word.endswith("이"):
-            rename[word[:-1]] = "친구"
+        rename[word] = UNKNOWN
+        rename[stem] = UNKNOWN
     for p in script.get("panels") or []:
         for line in p.get("lines") or []:
             text = replace_all(line.get("text"), rename) or ""
@@ -454,6 +591,7 @@ def run_once(
     size = bundle["windowSec"]
     last = int(max(u["end"] for u in t["utterances"])) // size
     candidates: list[dict[str, Any]] = []
+    found_names: list[str] = []
     for w in range(last + 1):
         part = between(t, w * size, (w + 1) * size)
         if not part:
@@ -461,12 +599,17 @@ def run_once(
         job = llm_job(bundle, "extract", extract_prompt(t, w, size, part), seed + w, args.model)
         res = timer.run("extract", lambda job=job: llm.chat(job))
         try:
-            found = content_json(res["content"]).get("candidates", [])
+            body = content_json(res["content"])
         except ValueError:
-            found = []
+            body = {}
+        found = body.get("candidates", [])
+        found_names = merge_names(
+            found_names, body.get("names", []), spoken(t), bundle["castNames"]
+        )
         candidates += [c for c in found if valid_candidate(c)]
     (out / "candidates.json").write_text(
-        json.dumps(candidates, ensure_ascii=False, indent=1), "utf-8"
+        json.dumps({"candidates": candidates, "names": found_names}, ensure_ascii=False, indent=1),
+        "utf-8",
     )
     if not candidates:
         report["result"] = "NO_SCENE"
@@ -480,7 +623,7 @@ def run_once(
         job = llm_job(
             bundle,
             "script",
-            script_prompt(t, scene, bundle["contextSec"], cast),
+            script_prompt(t, scene, bundle["contextSec"], cast, whose(found_names, t)),
             seed + attempt,
             args.model,
         )
@@ -488,7 +631,9 @@ def run_once(
         try:
             s = normalized(content_json(res["content"]))
             s = with_fictional_names(with_names(s, cast), spoken(t), bundle["castNames"])
-            s = scrubbed(s)
+            s = scrubbed(
+                replaced(s, real_name_replacements(whose(found_names, t), cast)), spoken(t)
+            )
             v = violation(s)
             if v is None:
                 script = s
@@ -520,6 +665,13 @@ def run_once(
     report["result"] = "DONE"
     report["timings"] = timer.times
     return report
+
+
+def env_set() -> dict[str, str]:
+    """값이 빈 환경 변수(.env의 "GPU_WORKER_TOKEN=")는 없는 것으로 본다."""
+    import os
+
+    return {k: v for k, v in os.environ.items() if v}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -556,9 +708,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.audio:
         from model_runtime.backends.whisper import WhisperBackend
 
-        env = Settings.from_env(
-            {"GPU_WORKER_API_URL": "x", "GPU_WORKER_TOKEN": "x", **dict(__import__("os").environ)}
-        )
+        env = Settings.from_env({"GPU_WORKER_API_URL": "x", "GPU_WORKER_TOKEN": "x", **env_set()})
         whisper = WhisperBackend(env.whisper_model, env.hf_token)
         start = time.perf_counter()
         raw = whisper.transcribe_file(str(args.audio), args.language)
@@ -577,9 +727,7 @@ def main(argv: list[str] | None = None) -> int:
     if not args.skip_images:
         from model_runtime.backends.sdxl import SdxlBackend
 
-        s = Settings.from_env(
-            {"GPU_WORKER_API_URL": "x", "GPU_WORKER_TOKEN": "x", **dict(__import__("os").environ)}
-        )
+        s = Settings.from_env({"GPU_WORKER_API_URL": "x", "GPU_WORKER_TOKEN": "x", **env_set()})
         sdxl = SdxlBackend(
             s.sdxl_model, s.sdxl_cpu_offload, s.sdxl_lora, s.sdxl_steps, s.sdxl_guidance
         )
