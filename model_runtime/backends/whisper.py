@@ -42,9 +42,6 @@ class WhisperBackend:
         torch.cuda.empty_cache()
 
     def transcribe(self, audio_urls: list[str], language: str | None) -> dict[str, Any]:
-        import whisperx
-
-        self.load()
         # 조각은 한 녹음(또는 한 파일)을 순서대로 자른 바이트다. 브라우저 MediaRecorder 조각은
         # 첫 조각에만 컨테이너 헤더가 있으므로 하나로 이어 붙인 뒤 한 번에 디코딩한다.
         with tempfile.TemporaryDirectory() as tmp:
@@ -54,7 +51,14 @@ class WhisperBackend:
                     response = client.get(url)
                     response.raise_for_status()
                     out.write(response.content)
-            audio = whisperx.load_audio(str(path))
+            return self.transcribe_file(str(path), language)
+
+    def transcribe_file(self, path: str, language: str | None) -> dict[str, Any]:
+        """로컬 파일 하나를 전사한다 (eval에서 녹음 파일을 바로 넣을 때도 쓴다)."""
+        import whisperx
+
+        self.load()
+        audio = whisperx.load_audio(path)
         result = self._model.transcribe(audio, batch_size=8, language=language)
         detected = result.get("language") or language or "ko"
         align_model, metadata = whisperx.load_align_model(
