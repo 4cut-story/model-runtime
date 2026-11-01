@@ -106,12 +106,17 @@ def content_json(content: str) -> dict[str, Any]:
 
 
 def llm_job(
-    bundle: dict[str, Any], step: str, prompt: str, seed: int, model: str
+    bundle: dict[str, Any],
+    step: str,
+    prompt: str,
+    seed: int,
+    model: str,
+    system: str | None = None,
 ) -> dict[str, Any]:
     spec = bundle[step]
     return {
         "model": model,
-        "system": spec["system"],
+        "system": system or spec["system"],
         "prompt": prompt,
         "jsonSchema": spec["schema"],
         "options": {
@@ -527,14 +532,22 @@ def draw_prompt(style: str, script: dict[str, Any], panel: dict[str, Any]) -> st
 
 
 def draw_images(
-    bundle: dict[str, Any], script: dict[str, Any], seed: int, same_seed: bool = False
+    bundle: dict[str, Any],
+    script: dict[str, Any],
+    seed: int,
+    same_seed: bool = False,
+    concept: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     d = bundle["draw"]
+    style = concept["style"] if concept else d["style"]
+    negative = d["negativePrompt"]
+    if concept and concept.get("negative"):
+        negative += ", " + concept["negative"]
     return [
         {
             "name": f"panel-{i + 1}",
-            "prompt": draw_prompt(d["style"], script, p),
-            "negativePrompt": d["negativePrompt"],
+            "prompt": draw_prompt(style, script, p),
+            "negativePrompt": negative,
             "seed": seed if same_seed else seed + i,  # 서버는 같은 시드 (DrawHandler)
             "width": d["imageSize"],
             "height": d["imageSize"],
@@ -650,7 +663,9 @@ def run_once(
     sdxl: Any,
     out: Path,
     seed: int,
-) -> dict[str, Any]:
+    concepts: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    """한 번 실행: 장면 추출·선정은 한 번, 콘티·그림은 컨셉마다 (컨셉이 없으면 기본 하나)."""
     out.mkdir(parents=True, exist_ok=True)
     timer = Timer()
     report: dict[str, Any] = {"seed": seed, "promptVersion": bundle["promptVersion"]}
@@ -680,10 +695,71 @@ def run_once(
     if not candidates:
         report["result"] = "NO_SCENE"
         report["timings"] = timer.times
-        return report
+        report["dir"] = str(out.relative_to(out.parent))
+        return [report]
     scene = max(candidates, key=lambda c: c["score"])
     report["scene"] = {k: scene.get(k) for k in ("kind", "start", "end", "summary", "score")}
     cast = cast_names(t, bundle["castNames"], seed)
+    reports = []
+    for concept in concepts or [None]:
+        cdir = out / concept["id"] if concept else out
+        cdir.mkdir(parents=True, exist_ok=True)
+        r = {**report, "timings": dict(timer.times), "dir": cdir}
+        if concept:
+            r["concept"] = concept["id"]
+            r["conceptLabel"] = concept["label"]
+        stimer = Timer()
+        script = make_script(
+            args, bundle, t, llm, scene, cast, found_names, seed, concept, stimer, r
+        )
+        r["timings"]["script"] = stimer.times.get("script", 0)
+        r["script"] = script
+        reports.append(r)
+    for r in reports:
+        script = r.pop("script")
+        if script is None:
+            continue
+        cdir = r["dir"]
+        concept = next((c for c in concepts or [] if c["id"] == r.get("concept")), None)
+        (cdir / "script.json").write_text(json.dumps(script, ensure_ascii=False, indent=1), "utf-8")
+        images = draw_images(bundle, script, seed * 10, not args.per_panel_seed, concept)
+        (cdir / "draw.json").write_text(json.dumps(images, ensure_ascii=False, indent=1), "utf-8")
+        r["title"] = script["title"]
+        if sdxl is not None:
+            from PIL import Image
+
+            llm.unload()
+            dtimer = Timer()
+            pngs = []
+            for img in images:
+                data = dtimer.run("draw", lambda img=img: sdxl.draw(img))
+                path = cdir / f"{img['name']}.png"
+                path.write_bytes(data)
+                pngs.append(Image.open(path).convert("RGB"))
+            dtimer.run(
+                "compose",
+                lambda s=script, ps=pngs, d=cdir: compose(s, ps, d / "comic.png"),
+            )
+            r["timings"].update(dtimer.times)
+        r["result"] = "DONE"
+    for r in reports:
+        r["dir"] = str(Path(r["dir"]).relative_to(out.parent))
+    return reports
+
+
+def make_script(
+    args: argparse.Namespace,
+    bundle: dict[str, Any],
+    t: dict[str, Any],
+    llm: Any,
+    scene: dict[str, Any],
+    cast: dict[str, str],
+    found_names: list[str],
+    seed: int,
+    concept: dict[str, Any] | None,
+    timer: Any,
+    report: dict[str, Any],
+) -> dict[str, Any] | None:
     script = None
     failures = []
     for attempt in range(3):
@@ -693,6 +769,7 @@ def run_once(
             script_prompt(t, scene, bundle["contextSec"], cast, whose(found_names, t)),
             seed + attempt,
             args.model,
+            concept["scriptSystem"] if concept else None,
         )
         res = timer.run("script", lambda job=job: llm.chat(job))
         try:
@@ -715,26 +792,7 @@ def run_once(
     report["scriptFailures"] = failures
     if script is None:
         report["result"] = "SCRIPT_FAILED"
-        report["timings"] = timer.times
-        return report
-    (out / "script.json").write_text(json.dumps(script, ensure_ascii=False, indent=1), "utf-8")
-    images = draw_images(bundle, script, seed * 10, not args.per_panel_seed)
-    (out / "draw.json").write_text(json.dumps(images, ensure_ascii=False, indent=1), "utf-8")
-    report["title"] = script["title"]
-    if sdxl is not None:
-        from PIL import Image
-
-        llm.unload()
-        pngs = []
-        for img in images:
-            data = timer.run("draw", lambda img=img: sdxl.draw(img))
-            path = out / f"{img['name']}.png"
-            path.write_bytes(data)
-            pngs.append(Image.open(path).convert("RGB"))
-        timer.run("compose", lambda: compose(script, pngs, out / "comic.png"))
-    report["result"] = "DONE"
-    report["timings"] = timer.times
-    return report
+    return script
 
 
 def env_set() -> dict[str, str]:
@@ -764,6 +822,11 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--language", default="ko")
     p.add_argument("--skip-images", action="store_true", help="LLM 단계만 돌린다")
     p.add_argument(
+        "--concepts",
+        default="",
+        help="쉼표로 나눈 컨셉 id(DAILY,INSECTS,…) 또는 all. 장면은 한 번, 콘티·그림은 컨셉마다",
+    )
+    p.add_argument(
         "--per-panel-seed", action="store_true", help="컷마다 시드를 달리한다(예전 방식 비교용)"
     )
     args = p.parse_args(argv)
@@ -774,6 +837,9 @@ def main(argv: list[str] | None = None) -> int:
 
     load_env_file(Path(".env"))
     bundle = json.loads(args.bundle.read_text(encoding="utf-8"))
+    all_concepts = bundle.get("concepts", [])
+    wanted = [c.strip() for c in args.concepts.split(",") if c.strip()]
+    concepts = [c for c in all_concepts if args.concepts == "all" or c["id"] in wanted]
     root = args.out / datetime.now().strftime("%Y%m%d-%H%M%S")
     root.mkdir(parents=True, exist_ok=True)
     summary: dict[str, Any] = {"promptVersion": bundle["promptVersion"], "runs": []}
@@ -810,13 +876,15 @@ def main(argv: list[str] | None = None) -> int:
         seed = args.seed + i * 100
         run_dir = root / f"run-{i + 1:02d}"
         start = time.perf_counter()
-        report = run_once(args, bundle, t, llm, sdxl, run_dir, seed)
-        report["totalSec"] = round(time.perf_counter() - start, 2)
-        (run_dir / "timings.json").write_text(
-            json.dumps(report, ensure_ascii=False, indent=1), "utf-8"
-        )
-        summary["runs"].append(report)
-        print(json.dumps(report, ensure_ascii=False), flush=True)
+        reports = run_once(args, bundle, t, llm, sdxl, run_dir, seed, concepts)
+        for report in reports:
+            report["totalSec"] = round(sum(report.get("timings", {}).values()), 2)
+            (root / report["dir"] / "timings.json").write_text(
+                json.dumps(report, ensure_ascii=False, indent=1), "utf-8"
+            )
+            summary["runs"].append(report)
+            print(json.dumps(report, ensure_ascii=False), flush=True)
+        summary.setdefault("runSec", []).append(round(time.perf_counter() - start, 2))
         if sdxl is not None:
             sdxl.unload()
     (root / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1), "utf-8")

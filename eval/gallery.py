@@ -52,9 +52,11 @@ def run_card(run_dir: Path, report: dict[str, Any]) -> str:
         else ""
     )
     heading = html.escape(report.get("title") or report.get("result", ""))
+    if report.get("conceptLabel"):
+        heading = f"[{html.escape(report['conceptLabel'])}] {heading}"
     return f"""
 <section class="run">
-  <h3>{html.escape(run_dir.name)} · {heading}</h3>
+  <h3>{html.escape(report.get("dir") or run_dir.name)} · {heading}</h3>
   <table><tr><th>추출</th><th>콘티</th><th>그림</th><th>합성</th><th>합계</th></tr>
   <tr>{cells}<td>{report.get("totalSec", "-")}</td></tr></table>
   <p class="meta">결과 {html.escape(report.get("result", ""))} · 콘티 시도
@@ -69,7 +71,8 @@ def batch(root: Path) -> str:
     summary = json.loads((root / "summary.json").read_text(encoding="utf-8"))
     note = (root / "NOTE.md").read_text(encoding="utf-8") if (root / "NOTE.md").exists() else ""
     runs = "".join(
-        run_card(root / f"run-{i + 1:02d}", r) for i, r in enumerate(summary.get("runs", []))
+        run_card(root / r["dir"] if r.get("dir") else root / f"run-{i + 1:02d}", r)
+        for i, r in enumerate(summary.get("runs", []))
     )
     sdxl = html.escape(json.dumps(summary.get("sdxl", {}), ensure_ascii=False))
     return f"""
