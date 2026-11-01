@@ -449,27 +449,38 @@ def violation(s: dict[str, Any]) -> str | None:
 # ---------- 그림 (DrawHandler) ----------
 
 
+COUNTS = ["one", "two", "three", "four"]
+
+
 def draw_prompt(style: str, script: dict[str, Any], panel: dict[str, Any]) -> str:
+    """DrawHandler.prompt: 그림체 → 구도 → 인원 → 장면."""
     scene = panel["scene"].strip()
     legacy = "{" not in scene
     cast = ""
+    people = 0
     for c in script["characters"]:
+        mark = "{" + c["speaker"] + "}"
         if legacy:
             cast += "; " + c["look"].strip()
-        else:
-            scene = scene.replace("{" + c["speaker"] + "}", "(" + c["look"].strip() + ")")
+        elif mark in scene:
+            people += 1
+            scene = scene.replace(mark, "(" + c["look"].strip() + ")")
+    scene = re.sub(r"\{[A-Z]\}", "a friend", scene)
     shot = panel["shot"].replace("-", " ") + " shot, " if panel.get("shot") else ""
-    return f"{style}, {shot}{scene}{cast}"
+    count = COUNTS[min(people, len(COUNTS)) - 1] + " people, " if people >= 2 else ""
+    return f"{style}, {shot}{count}{scene}{cast}"
 
 
-def draw_images(bundle: dict[str, Any], script: dict[str, Any], seed: int) -> list[dict[str, Any]]:
+def draw_images(
+    bundle: dict[str, Any], script: dict[str, Any], seed: int, same_seed: bool = False
+) -> list[dict[str, Any]]:
     d = bundle["draw"]
     return [
         {
             "name": f"panel-{i + 1}",
             "prompt": draw_prompt(d["style"], script, p),
             "negativePrompt": d["negativePrompt"],
-            "seed": seed + i,
+            "seed": seed if same_seed else seed + i,
             "width": d["imageSize"],
             "height": d["imageSize"],
         }
@@ -648,7 +659,7 @@ def run_once(
         report["timings"] = timer.times
         return report
     (out / "script.json").write_text(json.dumps(script, ensure_ascii=False, indent=1), "utf-8")
-    images = draw_images(bundle, script, seed * 10)
+    images = draw_images(bundle, script, seed * 10, args.same_seed)
     (out / "draw.json").write_text(json.dumps(images, ensure_ascii=False, indent=1), "utf-8")
     report["title"] = script["title"]
     if sdxl is not None:
@@ -693,6 +704,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--ollama", default="http://localhost:11434")
     p.add_argument("--language", default="ko")
     p.add_argument("--skip-images", action="store_true", help="LLM 단계만 돌린다")
+    p.add_argument(
+        "--same-seed", action="store_true", help="네 컷을 같은 시드로 그린다(인물 일관성 비교용)"
+    )
     args = p.parse_args(argv)
 
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
