@@ -15,7 +15,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-STEPS = ["extract", "script", "draw", "compose"]
+STEPS = ["extract", "script", "voice", "draw", "compose"]
 
 
 def jpeg(path: Path, width: int) -> str:
@@ -60,18 +60,22 @@ def run_card(run_dir: Path, report: dict[str, Any]) -> str:
         if x.get("said") and x["said"] != x.get("text")
     ]
     voice = '<p class="meta">대화 → 컨셉 말투<br>' + "<br>".join(said) + "</p>" if said else ""
+    rejected = "; ".join(report.get("voiceRejections") or [])
+    if report.get("voiceFailure"):
+        rejected = f"{report['voiceFailure']} {rejected}".strip()
     heading = html.escape(report.get("title") or report.get("result", ""))
     if report.get("conceptLabel"):
         heading = f"[{html.escape(report['conceptLabel'])}] {heading}"
     return f"""
 <section class="run">
   <h3>{html.escape(report.get("dir") or run_dir.name)} · {heading}</h3>
-  <table><tr><th>추출</th><th>콘티</th><th>그림</th><th>합성</th><th>합계</th></tr>
+  <table><tr><th>추출</th><th>콘티</th><th>말투</th><th>그림</th><th>합성</th><th>합계</th></tr>
   <tr>{cells}<td>{report.get("totalSec", "-")}</td></tr></table>
   <p class="meta">결과 {html.escape(report.get("result", ""))} · 콘티 시도
   {report.get("scriptAttempts", "-")} · 인물 {cast}</p>
   {scene}
   {voice}
+  {f'<p class="fail">말투 못 쓴 대사: {html.escape(rejected)}</p>' if rejected else ""}
   {f'<p class="fail">콘티 재시도 사유: {html.escape(fails)}</p>' if fails else ""}
   {img}
 </section>"""

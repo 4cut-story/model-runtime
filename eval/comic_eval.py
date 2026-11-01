@@ -165,6 +165,27 @@ def llm_job(
     }
 
 
+def chat(llm: Any, job: dict[str, Any], think: bool = False) -> dict[str, Any]:
+    """워커와 같은 Ollama 호출. think이면 생각 모드를 켜서 직접 부른다(워커는 늘 끈다)."""
+    if not think:
+        return llm.chat(job)  # type: ignore[no-any-return]
+    body = {
+        "model": job["model"],
+        "messages": [
+            {"role": "system", "content": job["system"]},
+            {"role": "user", "content": job["prompt"]},
+        ],
+        "format": job["jsonSchema"],
+        "options": {**job["options"], "num_predict": 4000},
+        "stream": False,
+        "think": True,
+    }
+    r = llm._client.post("/api/chat", json=body)
+    r.raise_for_status()
+    msg = r.json().get("message", {})
+    return {"content": msg.get("content", ""), "thinking": msg.get("thinking", "")}
+
+
 def extract_prompt(t: dict[str, Any], window: int, size: int, part: list[dict[str, Any]]) -> str:
     return (
         f"대화 언어: {t['language']}\n화자: {', '.join(t['speakers'])}\n\n"
@@ -482,6 +503,32 @@ def voice_prompt(script: dict[str, Any]) -> str:
     return f"제목: {script.get('title')}\n대사:\n{body}"
 
 
+def voice_schema(bundle: dict[str, Any], n: int) -> dict[str, Any]:
+    """대사 개수를 못 박은 말투 스키마 (Prompts.voiceSchema)."""
+    schema = json.loads(json.dumps(bundle["voice"]["schema"]))
+    schema["properties"]["lines"]["minItems"] = n
+    schema["properties"]["lines"]["maxItems"] = n
+    return schema
+
+
+def voice_rejections(script: dict[str, Any], voices: list[str]) -> list[str]:
+    """쓰지 못한 말투 문장과 까닭 (ComicScript.voiceRejections)."""
+    original = line_texts(script)
+    if len(voices) != len(original):
+        return [f"대사 수 {len(voices)} ≠ {len(original)}"]
+    out = []
+    for i, (o, v) in enumerate(zip(original, voices, strict=True)):
+        v = clean_voice(v)
+        if not keeps_facts(o, v):
+            why = "빈 대사" if not v else "너무 김" if len(v) > MAX_VOICE_CHARS else "숫자 다름"
+            out.append(f"{i + 1}번 {why}")
+    return out
+
+
+def clean_voice(v: str | None) -> str:
+    return re.sub(r",\s*$", "", re.sub(r'[{}"]', "", v or "")).strip()
+
+
 def with_voices(script: dict[str, Any], title: str, voices: list[str]) -> dict[str, Any]:
     """대사를 말투 문장으로 바꾼다 (ComicScript.withVoices). 원래 대사는 said에 남긴다."""
     if len(voices) != len(line_texts(script)):
@@ -489,7 +536,7 @@ def with_voices(script: dict[str, Any], title: str, voices: list[str]) -> dict[s
     it = iter(voices)
     for p in script.get("panels") or []:
         for line in p.get("lines") or []:
-            v = re.sub(r",\s*$", "", re.sub(r'[{}"]', "", next(it) or "")).strip()
+            v = clean_voice(next(it))
             if keeps_facts(line["text"], v):
                 line["said"] = line["text"]
                 line["text"] = v
@@ -846,7 +893,9 @@ def run_once(
         script = make_script(
             args, bundle, t, llm, scene, cast, found_names, seed, concept, stimer, r
         )
-        r["timings"]["script"] = stimer.times.get("script", 0)
+        for k in ("script", "voice"):
+            if k in stimer.times:
+                r["timings"][k] = stimer.times[k]
         r["script"] = script
         reports.append(r)
     for r in reports:
@@ -955,12 +1004,15 @@ def make_script(
             "voice",
             voice_prompt(script),
             seed,
-            args.model,
+            args.voice_model or args.model,
             concept["voiceSystem"],
+            voice_schema(bundle, len(line_texts(script))),
         )
-        res = timer.run("voice", lambda job=job: llm.chat(job))
+        res = timer.run("voice", lambda job=job: chat(llm, job, args.voice_think))
+        report["voiceRaw"] = res["content"]
         try:
             out = content_json(res["content"])
+            report["voiceRejections"] = voice_rejections(script, out.get("lines") or [])
             before = violation(script)
             voiced = with_voices(
                 json.loads(json.dumps(script)), out.get("title", ""), out.get("lines") or []
@@ -1010,6 +1062,8 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="장면 추출이 고른 컨셉도 그린다(사용자가 컨셉을 고르지 않았을 때와 같다)",
     )
+    p.add_argument("--voice-model", default="", help="말투 바꾸기에만 쓸 모델(비우면 --model)")
+    p.add_argument("--voice-think", action="store_true", help="말투 바꾸기에 생각 모드를 켠다")
     p.add_argument(
         "--per-panel-seed", action="store_true", help="컷마다 시드를 달리한다(예전 방식 비교용)"
     )
