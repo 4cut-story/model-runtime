@@ -535,7 +535,7 @@ def similarity(a: str, b: str) -> float:
     return 1.0 if m == 0 else 1 - distance(a, b) / m
 
 
-ANIMAL_POOL = ["rabbit", "deer", "fox", "bear", "cat", "dog", "squirrel", "panda"]
+ANIMAL_POOL = ["rabbit", "bear", "fox", "panda", "cat", "deer", "dog", "squirrel"]
 SCENE_SLACK_SEC = 5
 
 
