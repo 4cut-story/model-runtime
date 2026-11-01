@@ -22,8 +22,21 @@ class WhisperBackend:
         self.device = device
         self._model: Any = None
         self._diarize: Any = None
+        self._tf32: tuple[bool, bool] | None = None
+
+    def _restore_tf32(self) -> None:
+        """pyannote는 재현성을 위해 TF32를 끄고 되돌리지 않는다. 같은 프로세스의 SDXL이 장당 약 13%
+        느려지므로(1.33초 → 1.5초, GPU PC 측정) 불러오기 전 값으로 되돌린다."""
+        import torch
+
+        if self._tf32 is not None:
+            torch.backends.cuda.matmul.allow_tf32, torch.backends.cudnn.allow_tf32 = self._tf32
 
     def load(self) -> None:
+        import torch
+
+        if self._tf32 is None:
+            self._tf32 = (torch.backends.cuda.matmul.allow_tf32, torch.backends.cudnn.allow_tf32)
         import whisperx
 
         if self._model is None:
@@ -32,12 +45,14 @@ class WhisperBackend:
             from whisperx.diarize import DiarizationPipeline
 
             self._diarize = DiarizationPipeline(token=self.hf_token, device=self.device)
+        self._restore_tf32()
 
     def unload(self) -> None:
         import torch
 
         self._model = None
         self._diarize = None
+        self._restore_tf32()
         gc.collect()
         torch.cuda.empty_cache()
 
@@ -63,7 +78,10 @@ class WhisperBackend:
         result = whisperx.align(result["segments"], align_model, metadata, audio, self.device)
         del align_model
         if self._diarize is not None:
-            speakers = self._diarize(audio)
+            try:
+                speakers = self._diarize(audio)
+            finally:
+                self._restore_tf32()
             result = whisperx.assign_word_speakers(speakers, result)
         segments = [
             {
