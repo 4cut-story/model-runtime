@@ -698,10 +698,12 @@ def run_once(
         report["dir"] = str(out.relative_to(out.parent))
         return [report]
     scene = max(candidates, key=lambda c: c["score"])
-    report["scene"] = {k: scene.get(k) for k in ("kind", "start", "end", "summary", "score")}
+    report["scene"] = {
+        k: scene.get(k) for k in ("kind", "start", "end", "summary", "score", "concept")
+    }
     cast = cast_names(t, bundle["castNames"], seed)
     reports = []
-    for concept in concepts or [None]:
+    for concept in with_auto(concepts, bundle, scene, args.auto_concept):
         cdir = out / concept["id"] if concept else out
         cdir.mkdir(parents=True, exist_ok=True)
         r = {**report, "timings": dict(timer.times), "dir": cdir}
@@ -745,6 +747,22 @@ def run_once(
     for r in reports:
         r["dir"] = str(Path(r["dir"]).relative_to(out.parent))
     return reports
+
+
+def with_auto(
+    concepts: list[dict[str, Any]] | None,
+    bundle: dict[str, Any],
+    scene: dict[str, Any],
+    auto: bool,
+) -> list[dict[str, Any] | None]:
+    """--auto-concept면 장면 추출이 고른 컨셉을 더한다 (서버 Concept.chosen처럼 모르면 DAILY)."""
+    out: list[dict[str, Any] | None] = list(concepts or [])
+    if auto:
+        known = {c["id"]: c for c in bundle.get("concepts", [])}
+        suggested = known.get(str(scene.get("concept") or "").upper(), known.get("DAILY"))
+        if suggested is not None and all(c is None or c["id"] != suggested["id"] for c in out):
+            out.append(suggested)
+    return out or [None]
 
 
 def make_script(
@@ -825,6 +843,11 @@ def main(argv: list[str] | None = None) -> int:
         "--concepts",
         default="",
         help="쉼표로 나눈 컨셉 id(DAILY,INSECTS,…) 또는 all. 장면은 한 번, 콘티·그림은 컨셉마다",
+    )
+    p.add_argument(
+        "--auto-concept",
+        action="store_true",
+        help="장면 추출이 고른 컨셉도 그린다(사용자가 컨셉을 고르지 않았을 때와 같다)",
     )
     p.add_argument(
         "--per-panel-seed", action="store_true", help="컷마다 시드를 달리한다(예전 방식 비교용)"

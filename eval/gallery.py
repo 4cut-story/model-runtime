@@ -47,7 +47,8 @@ def run_card(run_dir: Path, report: dict[str, Any]) -> str:
     scene = (
         f'<p class="meta">장면 {html.escape(str(sc.get("kind")))} '
         f"{sc.get('start')}~{sc.get('end')}초"
-        f" · 점수 {sc.get('score')} · {html.escape(str(sc.get('summary')))}</p>"
+        f" · 점수 {sc.get('score')} · 추천 컨셉 {html.escape(str(sc.get('concept') or '-'))}"
+        f" · {html.escape(str(sc.get('summary')))}</p>"
         if sc
         else ""
     )

@@ -1,11 +1,11 @@
 {
-  "promptVersion" : "2026-11-01.8",
+  "promptVersion" : "2026-11-01.9",
   "windowSec" : 600,
   "contextSec" : 60,
   "numCtx" : 16384,
   "temperature" : 0.4,
   "extract" : {
-    "system" : "대화 전사에서 4컷 만화로 만들 장면 후보를 고른다. 만화 한 편에 담을 짧은 이야기를 찾는 것이다.\n- kind: CORE(이 대화가 가장 오래·깊게 다룬 주제), FUNNY(웃음, 반전, 엉뚱한 말, 티격태격),\n  IMPORTANT(결정, 약속, 소식, 감정이 크게 움직인 순간).\n- 최대 3개, 서로 겹치지 않게. 없으면 빈 목록. 욕설·민감한 주제(건강, 정치, 성, 혐오, 개인정보)가 중심이면 고르지 않는다.\n- start, end는 대화 시작부터의 초. 장면 길이는 30초~3분.\n- summary 한 줄(무슨 일이 일어나는지), reason 한 줄(왜 만화로 좋은지). 사람은 이름 대신 화자 표시(A, B…)로 쓴다.\n- 항목 점수 1~5:\n  story 이야기성: 상황 → 사건 → 반응 → 결말이 이 구간 안에 다 나오는가.\n  visual 그림: 행동, 장소, 물건이 있어 그림으로 보여 줄 수 있는가.\n  relatable 공감: 대화한 사람들이 보고 \"맞아, 이랬지\" 할 장면인가.\n- intro: 인사, 안부, 자리 잡기, 늦은 사과처럼 본론 전 도입부면 true.\n- names: 대화에서 사람 이름(실명·별명)으로 쓰인 단어만 최대 6개. 조사·호격을 뺀 형태로 쓴다(민지야 → 민지,\n  준호는 → 준호). 직함·호칭(팀장, 사장님, 언니), 음식, 물건, 장소, 가게 이름은 넣지 않는다. 없으면 빈 목록.\n- 대화와 같은 언어로 쓴다.",
+    "system" : "대화 전사에서 4컷 만화로 만들 장면 후보를 고른다. 만화 한 편에 담을 짧은 이야기를 찾는 것이다.\n- kind: CORE(이 대화가 가장 오래·깊게 다룬 주제), FUNNY(웃음, 반전, 엉뚱한 말, 티격태격),\n  IMPORTANT(결정, 약속, 소식, 감정이 크게 움직인 순간).\n- 최대 3개, 서로 겹치지 않게. 없으면 빈 목록. 욕설·민감한 주제(건강, 정치, 성, 혐오, 개인정보)가 중심이면 고르지 않는다.\n- start, end는 대화 시작부터의 초. 장면 길이는 30초~3분.\n- summary 한 줄(무슨 일이 일어나는지), reason 한 줄(왜 만화로 좋은지). 사람은 이름 대신 화자 표시(A, B…)로 쓴다.\n- 항목 점수 1~5:\n  story 이야기성: 상황 → 사건 → 반응 → 결말이 이 구간 안에 다 나오는가.\n  visual 그림: 행동, 장소, 물건이 있어 그림으로 보여 줄 수 있는가.\n  relatable 공감: 대화한 사람들이 보고 \"맞아, 이랬지\" 할 장면인가.\n- intro: 인사, 안부, 자리 잡기, 늦은 사과처럼 본론 전 도입부면 true.\n- concept: 이 장면에 어울리는 그림 컨셉 하나. DAILY(일상 웹툰: 친구·회사·일상 이야기), INSECTS(곤충 친구들:\n  바쁘게 일하거나 모여 사는 이야기), ANIMALS(동물 친구들: 귀엽고 가벼운 다툼·먹는 이야기), WATERCOLOR(수채화\n  애니메이션: 추억, 여행, 계절, 따뜻한 감정), PICTURE_BOOK(어린이 그림책: 가족, 아이, 소박한 하루),\n  NEWSPAPER(흑백 신문 만화: 풍자, 회사·사회 이야기, 어이없는 반전).\n- names: 대화에서 사람 이름(실명·별명)으로 쓰인 단어만 최대 6개. 조사·호격을 뺀 형태로 쓴다(민지야 → 민지,\n  준호는 → 준호). 직함·호칭(팀장, 사장님, 언니), 음식, 물건, 장소, 가게 이름은 넣지 않는다. 없으면 빈 목록.\n- 대화와 같은 언어로 쓴다.",
     "schema" : {
       "type" : "object",
       "required" : [ "candidates", "names" ],
@@ -15,7 +15,7 @@
           "maxItems" : 3,
           "items" : {
             "type" : "object",
-            "required" : [ "kind", "start", "end", "summary", "reason", "story", "visual", "relatable", "intro" ],
+            "required" : [ "kind", "start", "end", "summary", "reason", "story", "visual", "relatable", "intro", "concept" ],
             "properties" : {
               "kind" : {
                 "type" : "string",
@@ -50,6 +50,10 @@
               },
               "intro" : {
                 "type" : "boolean"
+              },
+              "concept" : {
+                "type" : "string",
+                "enum" : [ "DAILY", "INSECTS", "ANIMALS", "WATERCOLOR", "PICTURE_BOOK", "NEWSPAPER" ]
               }
             }
           }
