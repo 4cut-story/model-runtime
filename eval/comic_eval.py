@@ -494,6 +494,13 @@ def violation(s: dict[str, Any]) -> str | None:
                 return f"{i + 1}번 컷 대사의 화자나 내용이 틀렸다"
     if len({p.get("shot") for p in panels}) == 1:
         return "네 컷의 구도가 모두 같다"
+    said: set[str] = set()
+    for p in panels:
+        for line in p.get("lines") or []:
+            key = re.sub(r"\s+", "", line["text"])
+            if key in said:
+                return "같은 대사가 두 번 나온다: " + line["text"]
+            said.add(key)
     for i in range(4):
         for j in range(i + 1, 4):
             if overlap(panels[i]["scene"], panels[j]["scene"]) >= MAX_SCENE_OVERLAP:
