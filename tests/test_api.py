@@ -55,3 +55,52 @@ def test_결과와_실패를_보고한다(api: WorkerApi) -> None:
     with pytest.raises(httpx.HTTPStatusError):
         api.heartbeat(job)
     api.close()
+
+
+def quick_api(slept: list[float]) -> WorkerApi:
+    client = httpx.Client(base_url=BASE)
+    return WorkerApi(client, retry_delays=(1.0, 2.0), sleep=slept.append)
+
+
+@respx.mock
+def test_결과_보고는_통신_오류와_5xx를_다시_보낸다() -> None:
+    slept: list[float] = []
+    route = respx.post(f"{BASE}/j1/result").mock(
+        side_effect=[httpx.ConnectError("down"), httpx.Response(503), httpx.Response(200)]
+    )
+    quick_api(slept).result(Job("j1", "LLM", "lt", {}), {}, {}, 1)
+    assert route.call_count == 3
+    assert slept == [1.0, 2.0]
+
+
+@respx.mock
+def test_실패_보고도_429면_다시_보낸다() -> None:
+    slept: list[float] = []
+    route = respx.post(f"{BASE}/j1/fail").mock(
+        side_effect=[httpx.Response(429), httpx.Response(200)]
+    )
+    quick_api(slept).fail(Job("j1", "LLM", "lt", {}), "MODEL_ERROR", "x", False)
+    assert route.call_count == 2 and slept == [1.0]
+
+
+@respx.mock
+def test_보고는_정해진_횟수만큼_다시_보내고_그래도_안되면_올린다() -> None:
+    slept: list[float] = []
+    route = respx.post(f"{BASE}/j1/result").mock(return_value=httpx.Response(502))
+    with pytest.raises(httpx.HTTPStatusError):
+        quick_api(slept).result(Job("j1", "LLM", "lt", {}), {}, {}, 1)
+    assert route.call_count == 3 and slept == [1.0, 2.0]
+
+
+@respx.mock
+def test_보고의_409와_4xx는_다시_보내지_않는다() -> None:
+    slept: list[float] = []
+    api = quick_api(slept)
+    job = Job("j1", "LLM", "lt", {})
+    respx.post(f"{BASE}/j1/result").mock(return_value=httpx.Response(409))
+    with pytest.raises(LeaseLostError):
+        api.result(job, {}, {}, 1)
+    respx.post(f"{BASE}/j1/fail").mock(return_value=httpx.Response(400))
+    with pytest.raises(httpx.HTTPStatusError):
+        api.fail(job, "BAD_INPUT", "x", False)
+    assert slept == []

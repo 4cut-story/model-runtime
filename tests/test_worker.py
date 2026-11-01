@@ -173,3 +173,14 @@ def test_가짜_PNG는_올바른_PNG_머리를_가진다() -> None:
     png = tiny_png(4, 2)
     assert png.startswith(b"\x89PNG\r\n\x1a\n")
     assert b"IHDR" in png and png.endswith(b"IEND\xaeB`\x82")
+
+
+def test_결과를_끝내_보내지_못해도_다음_작업으로_넘어간다() -> None:
+    class Unreachable(FakeApi):
+        def result(self, job: Job, result: dict[str, Any], info: dict[str, Any], ms: int) -> None:
+            raise httpx.ConnectError("down")
+
+    api = Unreachable([Job("j", "LLM", "lt", {"messages": []}), None])
+    w = worker(api)
+    assert w.run_once()
+    assert not w.run_once()

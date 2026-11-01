@@ -110,15 +110,22 @@ class Worker:
             log.exception("작업 실패: job=%s", job.job_id)
             self._report_fail(job, heartbeat, "MODEL_ERROR", f"{type(e).__name__}: {e}", False)
             return True
-        heartbeat.stop()
         if heartbeat.lost.is_set():
+            heartbeat.stop()
             return True
         duration = int((time.monotonic() - started) * 1000)
+        # 보고를 다시 보내는 동안에도 임대가 끝나지 않게 heartbeat는 보고 뒤에 멈춘다.
         try:
             self.api.result(job, result, self.backends.model_info(model), duration)
             log.info("작업 완료: job=%s %dms", job.job_id, duration)
         except LeaseLostError:
             log.warning("결과를 냈지만 임대가 넘어갔다: job=%s", job.job_id)
+        except httpx.HTTPError as e:
+            log.error(
+                "결과를 보내지 못했다. 임대가 끝나면 다시 배정된다: job=%s (%s)", job.job_id, e
+            )
+        finally:
+            heartbeat.stop()
         return True
 
     def execute(self, job: Job) -> tuple[dict[str, Any], str]:
