@@ -15,6 +15,9 @@
 7. 정렬·화자 분리를 CPU에서 돌렸을 때 시간 (작은 모델만 CPU로 옮기는 안)
 8. 모두 올려 두기: SDXL + Whisper(--resident-whisper, 기본 large-v3-turbo int8) + Ollama LLM을
    한꺼번에 VRAM에 두고, 갈아 끼우지 않은 채 받아쓰기·LLM·그림 4장이 되는지와 시간
+9. 빠른 갈아 끼우기: 모델을 시스템 RAM에 둔 채 GPU ↔ RAM으로만 옮기는 시간
+   (SDXL .to, Whisper CTranslate2 unload_model(to_cpu=True), Ollama는 내린 뒤 다시 올리기)과
+   그때 쓰는 시스템 RAM
 
 전사 글은 --out 옆 *.text.txt에만 남는다. 녹음·전사는 커밋하지 않는다.
 """
@@ -287,6 +290,80 @@ def measure_resident(
     return report
 
 
+def ram() -> dict[str, Any]:
+    try:
+        import psutil
+    except ImportError:
+        return {"error": "psutil 없음"}
+    vm = psutil.virtual_memory()
+    rss = psutil.Process().memory_info().rss
+    return {
+        "totalMB": vm.total // 2**20,
+        "availableMB": vm.available // 2**20,
+        "rssMB": rss // 2**20,
+    }
+
+
+def measure_warm_swap(s: Any, ollama_url: str, llm: str) -> dict[str, Any]:
+    """디스크에서 다시 읽지 않고 RAM ↔ GPU로만 옮길 때 걸리는 시간."""
+    import torch
+    import whisperx
+
+    from model_runtime.backends.sdxl import SdxlBackend
+
+    report: dict[str, Any] = {"ramStart": ram()}
+    sdxl = SdxlBackend(s.sdxl_model, s.sdxl_cpu_offload, s.sdxl_lora, s.sdxl_steps, s.sdxl_guidance)
+    _, report["sdxlColdLoadSec"] = timed(sdxl.load)
+    pipe = sdxl._pipe
+    sdxl_swap = []
+    for _ in range(2):
+        _, to_cpu = timed(lambda: pipe.to("cpu"))
+        torch.cuda.empty_cache()
+        free_mb = round(torch.cuda.mem_get_info()[0] / 2**20)
+        _, to_gpu = timed(lambda: pipe.to("cuda"))
+        sdxl_swap.append({"toCpuSec": to_cpu, "toGpuSec": to_gpu, "freeMBWhileOnCpu": free_mb})
+    report["sdxlSwap"] = sdxl_swap
+    report["sdxlImageAfterSwapSec"] = timed(lambda: sdxl.draw({"prompt": PROMPT, "seed": 0}))[1]
+    pipe.to("cpu")
+    torch.cuda.empty_cache()
+    report["ramWithSdxl"] = ram()
+
+    model, report["whisperColdLoadSec"] = timed(
+        lambda: whisperx.load_model(s.whisper_model, "cuda", compute_type="float16")
+    )
+    try:
+        ct2 = model.model.model  # FasterWhisperPipeline → WhisperModel → ctranslate2.Whisper
+        whisper_swap = []
+        for _ in range(2):
+            _, to_cpu = timed(lambda: ct2.unload_model(to_cpu=True))
+            _, to_gpu = timed(ct2.load_model)
+            whisper_swap.append({"toCpuSec": to_cpu, "toGpuSec": to_gpu})
+        report["whisperSwap"] = whisper_swap
+        ct2.unload_model(to_cpu=True)
+    except Exception as e:
+        report["whisperSwapError"] = f"{type(e).__name__}: {str(e)[:200]}"
+    report["ramWithSdxlWhisper"] = ram()
+
+    client = httpx.Client(base_url=ollama_url, timeout=300.0)
+    body = {
+        "model": llm,
+        "messages": [{"role": "user", "content": "안녕"}],
+        "stream": False,
+        "think": False,
+        "keep_alive": "5m",
+    }
+    reloads = []
+    for _ in range(2):
+        client.post("/api/generate", json={"model": llm, "keep_alive": 0, "prompt": ""})
+        data = client.post("/api/chat", json=body).json()
+        reloads.append(round(data.get("load_duration", 0) / 1e9, 2))
+    report["ollamaReloadFromPageCacheSec"] = reloads
+    client.post("/api/generate", json={"model": llm, "keep_alive": 0, "prompt": ""})
+    report["ramEnd"] = ram()
+    sdxl.unload()
+    return report
+
+
 def main() -> int:
     p = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -298,6 +375,7 @@ def main() -> int:
     p.add_argument("--resident-whisper", default="large-v3-turbo")
     p.add_argument("--resident-compute", default="int8_float16")
     p.add_argument("--only-resident", action="store_true", help="8번(모두 올려 두기)만 잰다")
+    p.add_argument("--only-swap", action="store_true", help="9번(빠른 갈아 끼우기)만 잰다")
     args = p.parse_args()
 
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -319,10 +397,14 @@ def main() -> int:
         save()
         report["sdxl"] = measure_sdxl(s, with_whisper=True)
         save()
-    report["resident"] = measure_resident(
-        s, args.audio, s.ollama_url, args.model, args.resident_whisper, args.resident_compute
-    )
-    save()
+    if not args.only_swap:
+        report["resident"] = measure_resident(
+            s, args.audio, s.ollama_url, args.model, args.resident_whisper, args.resident_compute
+        )
+        save()
+    if not args.only_resident:
+        report["warmSwap"] = measure_warm_swap(s, s.ollama_url, args.model)
+        save()
     print(json.dumps(report, ensure_ascii=False, indent=1))
     return 0
 
