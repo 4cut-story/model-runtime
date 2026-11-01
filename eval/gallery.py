@@ -72,7 +72,9 @@ def batch(root: Path) -> str:
     summary = json.loads((root / "summary.json").read_text(encoding="utf-8"))
     note = (root / "NOTE.md").read_text(encoding="utf-8") if (root / "NOTE.md").exists() else ""
     runs = "".join(
-        run_card(root / r["dir"] if r.get("dir") else root / f"run-{i + 1:02d}", r)
+        run_card(
+            root / r["dir"].replace("\\", "/") if r.get("dir") else root / f"run-{i + 1:02d}", r
+        )
         for i, r in enumerate(summary.get("runs", []))
     )
     sdxl = html.escape(json.dumps(summary.get("sdxl", {}), ensure_ascii=False))
