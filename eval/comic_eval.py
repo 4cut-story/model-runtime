@@ -165,8 +165,39 @@ def llm_job(
     }
 
 
+def gemini_chat(job: dict[str, Any]) -> dict[str, Any]:
+    """서버 GeminiClient와 같은 요청. 키는 GEMINI_API_KEY 환경 변수로만 받는다."""
+    import os
+
+    import httpx
+
+    model = job["model"].removeprefix("gemini:") or "gemini-3.5-flash-lite"
+    body = {
+        "systemInstruction": {"parts": [{"text": job["system"]}]},
+        "contents": [{"role": "user", "parts": [{"text": job["prompt"]}]}],
+        "generationConfig": {
+            "temperature": job["options"]["temperature"],
+            "seed": job["options"]["seed"],
+            "responseMimeType": "application/json",
+            "responseJsonSchema": job["jsonSchema"],
+        },
+    }
+    r = httpx.post(
+        f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+        headers={"x-goog-api-key": os.environ["GEMINI_API_KEY"]},
+        json=body,
+        timeout=60,
+    )
+    r.raise_for_status()
+    parts = r.json()["candidates"][0]["content"]["parts"]
+    return {"content": "".join(p.get("text", "") for p in parts if not p.get("thought"))}
+
+
 def chat(llm: Any, job: dict[str, Any], think: bool = False) -> dict[str, Any]:
-    """워커와 같은 Ollama 호출. think이면 생각 모드를 켜서 직접 부른다(워커는 늘 끈다)."""
+    """워커와 같은 Ollama 호출. think이면 생각 모드를 켜서 직접 부른다(워커는 늘 끈다).
+    모델이 "gemini:"로 시작하면 Gemini를 부른다(서버는 LLM 작업을 Gemini에 먼저 보낸다)."""
+    if job["model"].startswith("gemini"):
+        return gemini_chat(job)
     if not think:
         return llm.chat(job)  # type: ignore[no-any-return]
     body = {
@@ -487,7 +518,7 @@ DIGITS = re.compile(r"\d+")
 
 def keeps_facts(original: str, voiced: str) -> bool:
     """말투 문장이 원래 대사의 숫자를 그대로 갖고 말풍선에 들어가는지 (ComicScript.keepsFacts)."""
-    if not voiced or not voiced.strip() or len(voiced) > MAX_VOICE_CHARS:
+    if not voiced or not voiced.strip() or len(voiced) > voice_limit(original):
         return False
     return DIGITS.findall(original) == DIGITS.findall(voiced)
 
@@ -520,13 +551,19 @@ def voice_rejections(script: dict[str, Any], voices: list[str]) -> list[str]:
     for i, (o, v) in enumerate(zip(original, voices, strict=True)):
         v = clean_voice(v)
         if not keeps_facts(o, v):
-            why = "빈 대사" if not v else "너무 김" if len(v) > MAX_VOICE_CHARS else "숫자 다름"
+            why = "빈 대사" if not v else "너무 김" if len(v) > voice_limit(o) else "숫자 다름"
             out.append(f"{i + 1}번 {why}")
     return out
 
 
 def clean_voice(v: str | None) -> str:
-    return re.sub(r",\s*$", "", re.sub(r'[{}"]', "", v or "")).strip()
+    """ComicScript.cleanVoice: JSON 찌꺼기와 따라 쓴 입력 번호("3. ")를 지운다."""
+    v = re.sub(r",\s*$", "", re.sub(r'[{}"]', "", v or "")).strip()
+    return re.sub(r"^\d+[.)]\s+", "", v).strip()
+
+
+def voice_limit(original: str) -> int:
+    return max(MAX_VOICE_CHARS, len(original) + 10)
 
 
 def with_voices(script: dict[str, Any], title: str, voices: list[str]) -> dict[str, Any]:

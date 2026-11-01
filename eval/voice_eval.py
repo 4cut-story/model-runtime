@@ -5,7 +5,9 @@ ReviewHandler와 같은 말투 바꾸기를 부르고, 대사별 결과와 버�
 
 예:
     python eval/voice_eval.py C:/claude-work/4cut/eval-out/20261101-231145 \
-        --variants qwen3:8b,qwen3:8b+think,qwen3:14b --out voice-compare.html
+        --variants qwen3:8b,qwen3:8b+think,qwen3:14b,gemini: --out voice-compare.html
+
+"gemini:"(또는 "gemini:<모델>")은 GEMINI_API_KEY 환경 변수가 있어야 한다.
 """
 
 from __future__ import annotations
@@ -77,13 +79,25 @@ def run_one(
         voice_schema(bundle, n),
     )
     t0 = time.perf_counter()
-    res = chat(llm, job, think)
+    try:
+        res = chat(llm, job, think)
+    except Exception as e:
+        sec = round(time.perf_counter() - t0, 2)
+        return {
+            "variant": spec,
+            "sec": sec,
+            "raw": "",
+            "error": f"호출 실패: {e}",
+            "lines": [],
+            "used": [False] * n,
+            "title": "",
+        }
     sec = round(time.perf_counter() - t0, 2)
     r: dict[str, Any] = {"variant": spec, "sec": sec, "raw": res["content"]}
     try:
         out = content_json(res["content"])
     except ValueError as e:
-        return {**r, "error": f"파싱 실패: {e}", "lines": [], "used": [], "title": ""}
+        return {**r, "error": f"파싱 실패: {e}", "lines": [], "used": [False] * n, "title": ""}
     lines = [clean_voice(x) for x in out.get("lines") or []]
     origin = line_texts(script)
     used = (
