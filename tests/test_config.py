@@ -28,6 +28,24 @@ def test_기본값과_환경변수를_읽는다() -> None:
     assert s.hf_token is None
 
 
+def test_SDXL은_Lightning_8step_768용_기본값을_쓰고_환경변수로_바꾼다() -> None:
+    base = {"GPU_WORKER_API_URL": "https://4cut.example", "GPU_WORKER_TOKEN": "t"}
+    s = Settings.from_env(base)
+    assert s.sdxl_cpu_offload is False
+    assert s.sdxl_lora == "ByteDance/SDXL-Lightning:sdxl_lightning_8step_lora.safetensors"
+    assert (s.sdxl_steps, s.sdxl_guidance) == (8, 0.0)
+    s = Settings.from_env(
+        {
+            **base,
+            "SDXL_LORA": "",
+            "SDXL_STEPS": "30",
+            "SDXL_GUIDANCE": "6",
+            "SDXL_CPU_OFFLOAD": "true",
+        }
+    )
+    assert (s.sdxl_lora, s.sdxl_steps, s.sdxl_guidance, s.sdxl_cpu_offload) == ("", 30, 6.0, True)
+
+
 def test_env_파일은_없는_값만_채운다(tmp_path: Path) -> None:
     env_file = tmp_path / ".env"
     env_file.write_text('# 주석\nA=1\nB="two"\nbad line\nC=3\n', encoding="utf-8")

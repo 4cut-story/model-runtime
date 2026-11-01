@@ -18,6 +18,8 @@ gpu = [
     "transformers>=4.46",
     "accelerate>=1.1",
     "safetensors>=0.4",
+    # SDXL-Lightning LoRA를 올릴 때 diffusers가 쓴다
+    "peft>=0.13",
 ]
 dev = ["ruff>=0.8", "mypy>=1.13", "pytest>=8.3", "pytest-cov>=6.0", "respx>=0.22"]
 

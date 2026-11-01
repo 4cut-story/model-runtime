@@ -1,6 +1,8 @@
 """SDXL 만화풍 그림 (GPU PC 전용).
 
-16GB 카드에서 1024px은 약 15.9GB까지 쓰므로 VAE tiling·slicing과 CPU offload를 기본으로 켠다.
+기본은 SDXL-Lightning 8 step LoRA로 그린다 (30 step 대비 약 7배 빠름). Lightning은 guidance 0으로
+그리므로 negative prompt가 효과가 없다. 768px은 16GB에 다 올라가 CPU offload 없이 돈다.
+VAE tiling·slicing은 1024px로 되돌려도 VRAM이 넘치지 않게 켜 둔다.
 """
 
 from __future__ import annotations
@@ -11,20 +13,40 @@ from typing import Any
 
 
 class SdxlBackend:
-    def __init__(self, model_name: str, cpu_offload: bool = True) -> None:
+    def __init__(
+        self,
+        model_name: str,
+        cpu_offload: bool = False,
+        lora: str = "",
+        steps: int = 8,
+        guidance: float = 0.0,
+    ) -> None:
         self.model_name = model_name
         self.cpu_offload = cpu_offload
+        self.lora = lora
+        self.steps = steps
+        self.guidance = guidance
         self._pipe: Any = None
 
     def load(self) -> None:
         if self._pipe is not None:
             return
         import torch
-        from diffusers import StableDiffusionXLPipeline
+        from diffusers import EulerDiscreteScheduler, StableDiffusionXLPipeline
 
         pipe = StableDiffusionXLPipeline.from_pretrained(
             self.model_name, torch_dtype=torch.float16, variant="fp16", use_safetensors=True
         )
+        if self.lora:
+            from huggingface_hub import hf_hub_download
+
+            repo, _, filename = self.lora.partition(":")
+            pipe.load_lora_weights(hf_hub_download(repo, filename))
+            pipe.fuse_lora()
+            # Lightning은 trailing timestep으로 학습됐다
+            pipe.scheduler = EulerDiscreteScheduler.from_config(
+                pipe.scheduler.config, timestep_spacing="trailing"
+            )
         pipe.enable_vae_tiling()
         pipe.enable_vae_slicing()
         if self.cpu_offload:
@@ -45,13 +67,14 @@ class SdxlBackend:
 
         self.load()
         generator = torch.Generator(device="cpu").manual_seed(int(image.get("seed", 0)))
+        negative = image.get("negativePrompt") if self.guidance > 1 else None
         result = self._pipe(
             prompt=image["prompt"],
-            negative_prompt=image.get("negativePrompt"),
-            width=int(image.get("width", 1024)),
-            height=int(image.get("height", 1024)),
-            num_inference_steps=30,
-            guidance_scale=6.0,
+            negative_prompt=negative,
+            width=int(image.get("width", 768)),
+            height=int(image.get("height", 768)),
+            num_inference_steps=self.steps,
+            guidance_scale=self.guidance,
             generator=generator,
         ).images[0]
         out = io.BytesIO()
@@ -59,4 +82,10 @@ class SdxlBackend:
         return out.getvalue()
 
     def model_info(self) -> dict[str, Any]:
-        return {"sdxl": self.model_name, "cpuOffload": self.cpu_offload}
+        return {
+            "sdxl": self.model_name,
+            "lora": self.lora or None,
+            "steps": self.steps,
+            "guidance": self.guidance,
+            "cpuOffload": self.cpu_offload,
+        }

@@ -32,7 +32,13 @@ def build_backends(settings: Settings) -> Backends:
     ollama.unload()
     return RealBackends(
         WhisperBackend(settings.whisper_model, settings.hf_token),
-        SdxlBackend(settings.sdxl_model, settings.sdxl_cpu_offload),
+        SdxlBackend(
+            settings.sdxl_model,
+            settings.sdxl_cpu_offload,
+            lora=settings.sdxl_lora,
+            steps=settings.sdxl_steps,
+            guidance=settings.sdxl_guidance,
+        ),
         ollama,
     )
 

@@ -6,7 +6,7 @@ GPU PC에서 도는 **작업 워커**. 들어오는 포트 없이 conversation-s
 |---|---|---|
 | TRANSCRIBE | WHISPER | WhisperX large-v3 + pyannote 화자 분리 (`HF_TOKEN` 없으면 화자 분리 생략) |
 | LLM | LLM | 같은 PC의 Ollama(`http://localhost:11434`)에 프롬프트·JSON 스키마를 그대로 넘김 |
-| IMAGE | SDXL | SDXL, VAE tiling·slicing + CPU offload 기본. PNG를 사전 서명 PUT 주소로 올림 |
+| IMAGE | SDXL | SDXL + Lightning 8 step LoRA(guidance 0), 768px, CPU offload 끔. `SDXL_LORA`·`SDXL_STEPS`·`SDXL_GUIDANCE`·`SDXL_CPU_OFFLOAD`로 바꾼다. PNG를 사전 서명 PUT 주소로 올림 |
 
 - 한 번에 작업 하나, 모델 묶음 하나만 VRAM에 둔다. 다른 종류 작업을 받으면 들고 있던 묶음을 먼저 내린다 (Ollama는 `keep_alive: 0`).
 - 모델을 올리기 전에 남은 VRAM이 모자라면 `VRAM_BUSY`(재시도 가능)로 보고한다.

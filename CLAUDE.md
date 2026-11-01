@@ -7,7 +7,7 @@ GPU PC에서 도는 Python 작업 워커. conversation-service `/internal/gpu-jo
 - 아키텍처: `docs`의 `docs/architecture.md` (v3.0)
 - **계약 기준 버전: common `v0.1.0`** — 계약은 이 버전에 고정해 쓰고, 올릴 때 이 줄을 함께 고친다.
 - 포트: 없음 (워커가 밖으로만 연결한다)
-- GPU PC: Windows 설치형 Ollama(`OLLAMA_URL=http://localhost:11434`), venv `D:\4cut\gpu-runtime\.venv`(CUDA 12.8 PyTorch). SDXL 1024px은 16GB 중 약 15.9GB를 써서 VAE tiling·CPU offload를 기본으로 켠다. `HF_TOKEN`이 없으면 화자 분리 없이 전사한다.
+- GPU PC: Windows 설치형 Ollama(`OLLAMA_URL=http://localhost:11434`), venv `D:\4cut\gpu-runtime\.venv`(CUDA 12.8 PyTorch). SDXL은 Lightning 8 step LoRA로 768px을 그리고 CPU offload는 끈다(1024px로 되돌리면 약 15.9GB를 써서 `SDXL_CPU_OFFLOAD=true`가 필요하다). 처음 실행 때 LoRA(약 400MB)를 Hugging Face에서 받는다. `HF_TOKEN`이 없으면 화자 분리 없이 전사한다.
 
 ## 기술
 Python 3.11+, httpx, pytest + respx. 모델은 테스트에서 가짜 백엔드(`backends/fake.py`)로 대체한다. GPU 의존성은 `[gpu]` extra.
