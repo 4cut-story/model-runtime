@@ -43,6 +43,14 @@ def run_card(run_dir: Path, report: dict[str, Any]) -> str:
     comic = run_dir / "comic.png"
     img = f'<img src="{jpeg(comic, 520)}" alt="comic">' if comic.exists() else ""
     fails = "; ".join(report.get("scriptFailures") or [])
+    sc = report.get("scene") or {}
+    scene = (
+        f'<p class="meta">장면 {html.escape(str(sc.get("kind")))} '
+        f"{sc.get('start')}~{sc.get('end')}초"
+        f" · 점수 {sc.get('score')} · {html.escape(str(sc.get('summary')))}</p>"
+        if sc
+        else ""
+    )
     heading = html.escape(report.get("title") or report.get("result", ""))
     return f"""
 <section class="run">
@@ -51,6 +59,7 @@ def run_card(run_dir: Path, report: dict[str, Any]) -> str:
   <tr>{cells}<td>{report.get("totalSec", "-")}</td></tr></table>
   <p class="meta">결과 {html.escape(report.get("result", ""))} · 콘티 시도
   {report.get("scriptAttempts", "-")} · 인물 {cast}</p>
+  {scene}
   {f'<p class="fail">콘티 재시도 사유: {html.escape(fails)}</p>' if fails else ""}
   {img}
 </section>"""

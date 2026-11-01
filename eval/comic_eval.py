@@ -264,9 +264,23 @@ def script_prompt(
     )
 
 
+def scored(c: dict[str, Any]) -> dict[str, Any]:
+    """항목 점수로 score를 계산한다 (SceneCandidate.scored)."""
+    if any(not isinstance(c.get(k), int) for k in ("story", "visual", "relatable")):
+        return c
+
+    def clamp(v: int) -> int:
+        return max(1, min(5, v))
+
+    s = (0.4 * clamp(c["story"]) + 0.3 * clamp(c["visual"]) + 0.3 * clamp(c["relatable"])) / 5
+    if c.get("intro") is True:
+        s -= 0.3
+    return {**c, "score": round(max(0.0, s), 2)}
+
+
 def valid_candidate(c: dict[str, Any]) -> bool:
     return (
-        c.get("kind") in ("FUNNY", "IMPORTANT")
+        c.get("kind") in ("CORE", "FUNNY", "IMPORTANT")
         and c.get("end", 0) > c.get("start", 0)
         and bool((c.get("summary") or "").strip())
         and 0 <= c.get("score", -1) <= 1
@@ -658,7 +672,7 @@ def run_once(
         found_names = merge_names(
             found_names, body.get("names", []), spoken(t), bundle["castNames"]
         )
-        candidates += [c for c in found if valid_candidate(c)]
+        candidates += [c for c in map(scored, found) if valid_candidate(c)]
     (out / "candidates.json").write_text(
         json.dumps({"candidates": candidates, "names": found_names}, ensure_ascii=False, indent=1),
         "utf-8",
@@ -668,6 +682,7 @@ def run_once(
         report["timings"] = timer.times
         return report
     scene = max(candidates, key=lambda c: c["score"])
+    report["scene"] = {k: scene.get(k) for k in ("kind", "start", "end", "summary", "score")}
     cast = cast_names(t, bundle["castNames"], seed)
     script = None
     failures = []
