@@ -1,6 +1,10 @@
 """WhisperX large-v3 전사 + pyannote 화자 분리 (GPU PC 전용).
 
 HF_TOKEN이 없으면 화자 분리를 건너뛰고 모든 발화를 한 화자(SPEAKER_00)로 낸다.
+
+정렬 모델(wav2vec2)은 언어별로 한 번만 불러 두고 다시 쓴다 (GPU PC 측정: 매번 새로 올리면 3~33초).
+keep_in_ram이면 내릴 때 정렬 모델을 시스템 RAM으로 옮겨 둔다. Whisper 본체는 RAM 32GB에서
+Ollama 모델 파일 캐시가 밀려나지 않도록 지금처럼 내린다.
 """
 
 from __future__ import annotations
@@ -16,11 +20,19 @@ SAMPLE_RATE = 16000
 
 
 class WhisperBackend:
-    def __init__(self, model_name: str, hf_token: str | None, device: str = "cuda") -> None:
+    def __init__(
+        self,
+        model_name: str,
+        hf_token: str | None,
+        device: str = "cuda",
+        keep_in_ram: bool = False,
+    ) -> None:
         self.model_name = model_name
         self.hf_token = hf_token
         self.device = device
+        self.keep_in_ram = keep_in_ram
         self._model: Any = None
+        self._align: dict[str, tuple[Any, Any]] = {}
         self._diarize: Any = None
         self._tf32: tuple[bool, bool] | None = None
 
@@ -52,6 +64,11 @@ class WhisperBackend:
 
         self._model = None
         self._diarize = None
+        if self.keep_in_ram:
+            for align_model, _ in self._align.values():
+                align_model.to("cpu")
+        else:
+            self._align.clear()
         self._restore_tf32()
         gc.collect()
         torch.cuda.empty_cache()
@@ -72,11 +89,8 @@ class WhisperBackend:
             audio = whisperx.load_audio(str(path))
         result = self._model.transcribe(audio, batch_size=8, language=language)
         detected = result.get("language") or language or "ko"
-        align_model, metadata = whisperx.load_align_model(
-            language_code=detected, device=self.device
-        )
+        align_model, metadata = self._align_model(detected)
         result = whisperx.align(result["segments"], align_model, metadata, audio, self.device)
-        del align_model
         if self._diarize is not None:
             try:
                 speakers = self._diarize(audio)
@@ -93,6 +107,18 @@ class WhisperBackend:
             for s in result["segments"]
         ]
         return {"segments": segments, "language": detected}
+
+    def _align_model(self, language: str) -> tuple[Any, Any]:
+        """언어별 정렬 모델. 처음 한 번만 불러 오고, RAM에 옮겨 둔 것은 GPU로 다시 옮긴다."""
+        import whisperx
+
+        if language not in self._align:
+            self._align[language] = whisperx.load_align_model(
+                language_code=language, device=self.device
+            )
+        align_model, metadata = self._align[language]
+        align_model.to(self.device)
+        return align_model, metadata
 
     def model_info(self) -> dict[str, Any]:
         return {"whisper": self.model_name, "diarization": self._diarize is not None}

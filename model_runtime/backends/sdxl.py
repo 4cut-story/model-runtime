@@ -3,6 +3,9 @@
 기본은 SDXL-Lightning 8 step LoRA로 그린다 (30 step 대비 약 7배 빠름). Lightning은 guidance 0으로
 그리므로 negative prompt가 효과가 없다. 768px은 16GB에 다 올라가 CPU offload 없이 돈다.
 VAE tiling·slicing은 1024px로 되돌려도 VRAM이 넘치지 않게 켜 둔다.
+
+keep_in_ram이면 내릴 때 지우지 않고 시스템 RAM으로 옮겨 둔다. 다음 그림 작업은 디스크에서 다시
+읽지 않고 GPU로 옮기기만 한다 (GPU PC 측정: 디스크에서 86~194초 → RAM에서 1.2~1.4초, RAM 약 5.5GB).
 """
 
 from __future__ import annotations
@@ -20,16 +23,23 @@ class SdxlBackend:
         lora: str = "",
         steps: int = 8,
         guidance: float = 0.0,
+        keep_in_ram: bool = False,
     ) -> None:
         self.model_name = model_name
         self.cpu_offload = cpu_offload
         self.lora = lora
         self.steps = steps
         self.guidance = guidance
+        # CPU offload는 이미 컷마다 GPU↔CPU를 오가므로 RAM에 따로 둘 필요가 없다
+        self.keep_in_ram = keep_in_ram and not cpu_offload
         self._pipe: Any = None
+        self._on_gpu = False
 
     def load(self) -> None:
         if self._pipe is not None:
+            if not self._on_gpu:
+                self._pipe.to("cuda")
+                self._on_gpu = True
             return
         import torch
         from diffusers import EulerDiscreteScheduler, StableDiffusionXLPipeline
@@ -54,11 +64,16 @@ class SdxlBackend:
         else:
             pipe.to("cuda")
         self._pipe = pipe
+        self._on_gpu = True
 
     def unload(self) -> None:
         import torch
 
-        self._pipe = None
+        if self.keep_in_ram and self._pipe is not None:
+            self._pipe.to("cpu")
+        else:
+            self._pipe = None
+        self._on_gpu = False
         gc.collect()
         torch.cuda.empty_cache()
 

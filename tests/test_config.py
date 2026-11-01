@@ -46,6 +46,12 @@ def test_SDXL은_Lightning_8step_768용_기본값을_쓰고_환경변수로_바�
     assert (s.sdxl_lora, s.sdxl_steps, s.sdxl_guidance, s.sdxl_cpu_offload) == ("", 30, 6.0, True)
 
 
+def test_모델을_RAM에_옮겨_두는_설정은_기본으로_켜고_환경변수로_끈다() -> None:
+    base = {"GPU_WORKER_API_URL": "https://4cut.example", "GPU_WORKER_TOKEN": "t"}
+    assert Settings.from_env(base).keep_in_ram is True
+    assert Settings.from_env({**base, "MODEL_KEEP_IN_RAM": "false"}).keep_in_ram is False
+
+
 def test_env_파일은_없는_값만_채운다(tmp_path: Path) -> None:
     env_file = tmp_path / ".env"
     env_file.write_text('# 주석\nA=1\nB="two"\nbad line\nC=3\n', encoding="utf-8")
