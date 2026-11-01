@@ -148,13 +148,14 @@ def llm_job(
     seed: int,
     model: str,
     system: str | None = None,
+    schema: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     spec = bundle[step]
     return {
         "model": model,
         "system": system or spec["system"],
         "prompt": prompt,
-        "jsonSchema": spec["schema"],
+        "jsonSchema": schema or spec["schema"],
         "options": {
             "num_ctx": bundle["numCtx"],
             "temperature": bundle["temperature"],
@@ -425,6 +426,8 @@ def replaced(script: dict[str, Any], rename: dict[str, str]) -> dict[str, Any]:
     for p in script.get("panels") or []:
         for line in p.get("lines") or []:
             line["text"] = replace_all(line.get("text"), rename)
+            if line.get("voice"):
+                line["voice"] = replace_all(line["voice"], rename)
     script["title"] = replace_all(script.get("title"), rename)
     return script
 
@@ -446,9 +449,29 @@ def scrubbed(script: dict[str, Any], text: str) -> dict[str, Any]:
         rename[stem] = UNKNOWN
     for p in script.get("panels") or []:
         for line in p.get("lines") or []:
-            text = replace_all(line.get("text"), rename) or ""
-            line["text"] = re.sub(r",\s*$", "", re.sub(r'[{}"]', "", text)).strip()
+            for key in ("text", "voice"):
+                if key == "voice" and not line.get("voice"):
+                    continue
+                text = replace_all(line.get(key), rename) or ""
+                line[key] = re.sub(r",\s*$", "", re.sub(r'[{}"]', "", text)).strip()
     script["title"] = replace_all(script.get("title"), rename)
+    return script
+
+
+MAX_VOICE_CHARS = 40
+
+
+def with_voice(script: dict[str, Any]) -> dict[str, Any]:
+    """확인을 마친 대사를 컨셉 말투 문장으로 바꾼다 (ComicScript.withVoice).
+
+    원래 대사는 said에 남긴다.
+    """
+    for p in script.get("panels") or []:
+        for line in p.get("lines") or []:
+            voice = (line.pop("voice", None) or "").strip()
+            if voice and len(voice) <= MAX_VOICE_CHARS:
+                line["said"] = line["text"]
+                line["text"] = re.sub(r",\s*$", "", re.sub(r'[{}"]', "", voice)).strip()
     return script
 
 
@@ -873,6 +896,7 @@ def make_script(
             seed + attempt,
             args.model,
             concept["scriptSystem"] if concept else None,
+            concept.get("scriptSchema") if concept else None,
         )
         res = timer.run("script", lambda job=job: llm.chat(job))
         try:
@@ -887,6 +911,7 @@ def make_script(
                     line["text"] = snap(line.get("text"), source)
                 # 장면 밖 대화에서 가져온 대사는 버린다 (ScriptHandler.withLinesWhere)
                 p["lines"] = [x for x in p.get("lines") or [] if inside(x["text"], in_scene)]
+            s = with_voice(s)
             if concept and concept["id"] == "ANIMALS":
                 s = with_animals(s, animals(seed))
             v = violation(s)
@@ -932,7 +957,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument(
         "--concepts",
         default="",
-        help="쉼표로 나눈 컨셉 id(DAILY,INSECTS,…) 또는 all. 장면은 한 번, 콘티·그림은 컨셉마다",
+        help="쉼표로 나눈 컨셉 id(DAILY,JOSEON,…) 또는 all. 장면은 한 번, 콘티·그림은 컨셉마다",
     )
     p.add_argument(
         "--auto-concept",

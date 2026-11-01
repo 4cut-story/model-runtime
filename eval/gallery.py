@@ -34,6 +34,7 @@ def run_card(run_dir: Path, report: dict[str, Any]) -> str:
     cells = "".join(f"<td>{t.get(s, '-')}</td>" for s in STEPS)
     script_path = run_dir / "script.json"
     cast = ""
+    script: dict[str, Any] = {}
     if script_path.exists():
         script = json.loads(script_path.read_text(encoding="utf-8"))
         cast = ", ".join(
@@ -52,6 +53,13 @@ def run_card(run_dir: Path, report: dict[str, Any]) -> str:
         if sc
         else ""
     )
+    said = [
+        f"{html.escape(x['said'])} → <b>{html.escape(x['text'])}</b>"
+        for p in script.get("panels", [])
+        for x in p.get("lines") or []
+        if x.get("said") and x["said"] != x.get("text")
+    ]
+    voice = '<p class="meta">대화 → 컨셉 말투<br>' + "<br>".join(said) + "</p>" if said else ""
     heading = html.escape(report.get("title") or report.get("result", ""))
     if report.get("conceptLabel"):
         heading = f"[{html.escape(report['conceptLabel'])}] {heading}"
@@ -63,6 +71,7 @@ def run_card(run_dir: Path, report: dict[str, Any]) -> str:
   <p class="meta">결과 {html.escape(report.get("result", ""))} · 콘티 시도
   {report.get("scriptAttempts", "-")} · 인물 {cast}</p>
   {scene}
+  {voice}
   {f'<p class="fail">콘티 재시도 사유: {html.escape(fails)}</p>' if fails else ""}
   {img}
 </section>"""
