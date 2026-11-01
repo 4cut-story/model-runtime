@@ -31,13 +31,14 @@ def build_backends(settings: Settings) -> Backends:
     # 이전 실행이 남긴 모델을 내리고 시작한다
     ollama.unload()
     return RealBackends(
-        WhisperBackend(settings.whisper_model, settings.hf_token),
+        WhisperBackend(settings.whisper_model, settings.hf_token, keep_in_ram=settings.keep_in_ram),
         SdxlBackend(
             settings.sdxl_model,
             settings.sdxl_cpu_offload,
             lora=settings.sdxl_lora,
             steps=settings.sdxl_steps,
             guidance=settings.sdxl_guidance,
+            keep_in_ram=settings.keep_in_ram,
         ),
         ollama,
     )

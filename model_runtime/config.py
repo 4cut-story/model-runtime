@@ -39,6 +39,8 @@ class Settings:
     sdxl_lora: str = DEFAULT_SDXL_LORA
     sdxl_steps: int = 8
     sdxl_guidance: float = 0.0
+    # 모델을 내릴 때 지우지 않고 시스템 RAM에 옮겨 둔다 (SDXL, 정렬 모델). RAM 약 7GB를 더 쓴다
+    keep_in_ram: bool = True
     poll_min: float = 2.0
     poll_max: float = 10.0
     heartbeat_interval: float = 30.0
@@ -63,4 +65,5 @@ class Settings:
             sdxl_lora=env.get("SDXL_LORA", DEFAULT_SDXL_LORA).strip(),
             sdxl_steps=int(env.get("SDXL_STEPS", "8")),
             sdxl_guidance=float(env.get("SDXL_GUIDANCE", "0")),
+            keep_in_ram=env.get("MODEL_KEEP_IN_RAM", "true").lower() == "true",
         )
