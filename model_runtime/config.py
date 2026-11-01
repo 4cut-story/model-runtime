@@ -20,6 +20,9 @@ def load_env_file(path: Path, environ: dict[str, str] | None = None) -> None:
         target.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 
+DEFAULT_SDXL_LORA = "ByteDance/SDXL-Lightning:sdxl_lightning_8step_lora.safetensors"
+
+
 @dataclass(frozen=True)
 class Settings:
     api_url: str
@@ -30,7 +33,12 @@ class Settings:
     whisper_model: str = "large-v3"
     sdxl_model: str = "stabilityai/stable-diffusion-xl-base-1.0"
     hf_token: str | None = None
-    sdxl_cpu_offload: bool = True
+    # 768px은 16GB에 다 올라간다. offload는 컷마다 GPU↔CPU 이동이 커서 느리다
+    sdxl_cpu_offload: bool = False
+    # 적은 step용 LoRA "<HF 레포>:<파일>". 비우면 SDXL base만 쓴다 (steps 30, guidance 6 권장)
+    sdxl_lora: str = DEFAULT_SDXL_LORA
+    sdxl_steps: int = 8
+    sdxl_guidance: float = 0.0
     poll_min: float = 2.0
     poll_max: float = 10.0
     heartbeat_interval: float = 30.0
@@ -51,5 +59,8 @@ class Settings:
             whisper_model=env.get("WHISPER_MODEL", "large-v3"),
             sdxl_model=env.get("SDXL_MODEL", "stabilityai/stable-diffusion-xl-base-1.0"),
             hf_token=env.get("HF_TOKEN") or None,
-            sdxl_cpu_offload=env.get("SDXL_CPU_OFFLOAD", "true").lower() != "false",
+            sdxl_cpu_offload=env.get("SDXL_CPU_OFFLOAD", "false").lower() == "true",
+            sdxl_lora=env.get("SDXL_LORA", DEFAULT_SDXL_LORA).strip(),
+            sdxl_steps=int(env.get("SDXL_STEPS", "8")),
+            sdxl_guidance=float(env.get("SDXL_GUIDANCE", "0")),
         )
