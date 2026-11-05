@@ -34,8 +34,22 @@ class RealBackends:
         self.ollama = ollama
         self._vram = vram
 
-    def transcribe(self, audio_urls: list[str], language: str | None) -> dict[str, Any]:
-        result: dict[str, Any] = self.whisper.transcribe(audio_urls, language)
+    def transcribe(
+        self,
+        audio_urls: list[str],
+        language: str | None,
+        prefix: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        if prefix is None:
+            result: dict[str, Any] = self.whisper.transcribe(audio_urls, language)
+        else:
+            result = self.whisper.transcribe(audio_urls, language, prefix)
+        return result
+
+    def transcribe_part(
+        self, audio_urls: list[str], language: str | None, from_sec: float
+    ) -> dict[str, Any]:
+        result: dict[str, Any] = self.whisper.transcribe_part(audio_urls, language, from_sec)
         return result
 
     def chat(self, job_input: dict[str, Any]) -> dict[str, Any]:

@@ -14,8 +14,20 @@ class JobInputError(Exception):
 
 
 class Backends(Protocol):
-    def transcribe(self, audio_urls: list[str], language: str | None) -> dict[str, Any]:
-        """{segments: [{speaker, start, end, text}], language}"""
+    def transcribe(
+        self,
+        audio_urls: list[str],
+        language: str | None,
+        prefix: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """{segments: [{speaker, start, end, text}], language}. prefix는 녹음 중 미리 전사한 앞부분
+        ({cut, language, segments: [{start, end, text, words}]}). 있으면 cut 뒤만 전사해 잇는다."""
+        ...
+
+    def transcribe_part(
+        self, audio_urls: list[str], language: str | None, from_sec: float
+    ) -> dict[str, Any]:
+        """녹음 중 구간 전사 (FR-015). {segments(단어 포함), cut, language, durationSec, skipped}"""
         ...
 
     def chat(self, job_input: dict[str, Any]) -> dict[str, Any]:

@@ -31,8 +31,48 @@ class FakeBackends:
         self.loaded: list[str] = []
         self.unloaded: list[str] = []
 
-    def transcribe(self, audio_urls: list[str], language: str | None) -> dict[str, Any]:
+    def transcribe_part(
+        self, audio_urls: list[str], language: str | None, from_sec: float
+    ) -> dict[str, Any]:
+        """조각마다 1분이라고 보고, 앞 경계 뒤 단어 하나를 낸다."""
+        end = 60.0 * len(audio_urls)
+        cut = end - 10.0
+        if cut <= from_sec:
+            return {
+                "segments": [],
+                "cut": from_sec,
+                "language": language or "ko",
+                "durationSec": end,
+                "skipped": True,
+            }
+        word = {"word": f"조각{len(audio_urls)}", "start": from_sec + 1.0, "end": from_sec + 2.0}
+        segment = {
+            "start": word["start"],
+            "end": word["end"],
+            "text": word["word"],
+            "words": [word],
+        }
+        return {
+            "segments": [segment],
+            "cut": cut,
+            "language": language or "ko",
+            "durationSec": end,
+            "skipped": False,
+        }
+
+    def transcribe(
+        self,
+        audio_urls: list[str],
+        language: str | None,
+        prefix: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         lang = language or "ko"
+        if prefix and prefix.get("segments"):
+            joined = [
+                {"speaker": "SPEAKER_00", "start": s["start"], "end": s["end"], "text": s["text"]}
+                for s in prefix["segments"]
+            ]
+            return {"segments": joined, "language": prefix.get("language") or lang}
         segments = [
             {"speaker": "SPEAKER_00", "start": 1.0, "end": 3.0, "text": "내 접시 누가 다 먹었어?"},
             {"speaker": "SPEAKER_01", "start": 3.5, "end": 5.0, "text": "나 아니야, 진짜로."},
