@@ -11,7 +11,7 @@ from typing import Any
 import httpx
 
 from .api import Job, LeaseLostError, WorkerApi
-from .backends import Backends, JobInputError, VramBusyError
+from .backends import REGIONS, Backends, JobInputError, Reference, VramBusyError
 from .backends.ollama import OllamaUnavailableError
 
 log = logging.getLogger(__name__)
@@ -168,14 +168,75 @@ class Worker:
 
     def draw_all(self, images: list[dict[str, Any]]) -> dict[str, Any]:
         uploaded = []
+        embeds: dict[str, bytes | None] = {}
+        computed: list[str] = []
         for image in images:
-            png = self.backends.draw(image)
+            refs = self.references(image.get("references") or [], embeds, computed)
+            png = self.backends.draw(image, refs)
             response = self.uploader.put(
                 image["uploadUrl"], content=png, headers={"Content-Type": "image/png"}
             )
             response.raise_for_status()
             uploaded.append(image["name"])
-        return {"uploaded": uploaded}
+        result: dict[str, Any] = {"uploaded": uploaded}
+        if computed:
+            result["embeds"] = computed
+        return result
+
+    def references(
+        self, items: list[dict[str, Any]], embeds: dict[str, bytes | None], computed: list[str]
+    ) -> list[Reference]:
+        """컷의 캐릭터 참조. 같은 작업에서 한 캐릭터는 한 번만 받거나 계산한다.
+
+        embedUrl이 있으면 저장해 둔 embedding을 받는다. 없으면 참조 그림(imageUrl)으로 계산해
+        embedUploadUrl에 올린다. 받거나 계산하지 못한 참조는 빼고 텍스트만으로 그린다.
+        """
+        refs = []
+        for item in items:
+            character = str(item["character"])
+            if character not in embeds:
+                embeds[character] = self._embed(item, computed)
+            embed = embeds[character]
+            if embed is None:
+                continue
+            region = str(item.get("region") or "full")
+            if region not in REGIONS:
+                raise JobInputError(f"참조 위치는 full, left, right 중 하나다: {region}")
+            scale = min(max(float(item.get("scale", 0.6)), 0.0), 1.0)
+            refs.append(Reference(character, embed, scale, region))
+        return refs
+
+    def _embed(self, item: dict[str, Any], computed: list[str]) -> bytes | None:
+        character = item["character"]
+        try:
+            if item.get("embedUrl"):
+                response = self.uploader.get(item["embedUrl"])
+                response.raise_for_status()
+                return response.content
+            if not item.get("imageUrl"):
+                return None
+            response = self.uploader.get(item["imageUrl"])
+            response.raise_for_status()
+        except httpx.HTTPError as e:
+            log.warning("캐릭터 참조를 받지 못해 빼고 그린다: %s (%s)", character, e)
+            return None
+        embed = self.backends.encode_reference(response.content)
+        if embed is None:
+            return None
+        if item.get("embedUploadUrl"):
+            try:
+                put = self.uploader.put(
+                    item["embedUploadUrl"],
+                    content=embed,
+                    headers={"Content-Type": "application/octet-stream"},
+                )
+                put.raise_for_status()
+                computed.append(character)
+            except httpx.HTTPError as e:
+                log.warning(
+                    "embedding을 올리지 못했다. 다음 그림 때 다시 계산한다: %s (%s)", character, e
+                )
+        return embed
 
     def _report_fail(
         self, job: Job, heartbeat: Heartbeat, code: str, message: str, retryable: bool

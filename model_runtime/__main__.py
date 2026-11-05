@@ -39,6 +39,7 @@ def build_backends(settings: Settings) -> Backends:
             steps=settings.sdxl_steps,
             guidance=settings.sdxl_guidance,
             keep_in_ram=settings.keep_in_ram,
+            ip_adapter=settings.sdxl_ip_adapter,
         ),
         ollama,
     )

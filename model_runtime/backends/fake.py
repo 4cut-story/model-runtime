@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import struct
 import zlib
 from typing import Any
+
+from . import Reference
 
 
 def tiny_png(width: int = 8, height: int = 8, rgb: tuple[int, int, int] = (240, 220, 180)) -> bytes:
@@ -30,6 +33,8 @@ class FakeBackends:
     def __init__(self) -> None:
         self.loaded: list[str] = []
         self.unloaded: list[str] = []
+        self.drawn: list[tuple[str, list[Reference]]] = []
+        self.encoded = 0
 
     def transcribe_part(
         self, audio_urls: list[str], language: str | None, from_sec: float
@@ -103,8 +108,14 @@ class FakeBackends:
             content = _script()
         return {"content": json.dumps(content, ensure_ascii=False), "evalCount": 0}
 
-    def draw(self, image: dict[str, Any]) -> bytes:
+    def draw(self, image: dict[str, Any], references: list[Reference] | None = None) -> bytes:
+        self.drawn.append((str(image.get("name")), list(references or [])))
         return tiny_png()
+
+    def encode_reference(self, image: bytes) -> bytes | None:
+        """참조 그림 내용에 따라 정해지는 가짜 embedding."""
+        self.encoded += 1
+        return b"fake-embed:" + hashlib.sha256(image).hexdigest().encode()
 
     def prepare(self, model: str) -> None:
         self.loaded.append(model)
