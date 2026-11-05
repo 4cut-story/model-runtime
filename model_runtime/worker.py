@@ -135,10 +135,26 @@ class Worker:
         self.switch_to(model)
         data = job.input
         if job.type == "TRANSCRIBE":
-            return self.backends.transcribe(data["audioUrls"], data.get("language")), model
+            return self.transcribe(data), model
         if job.type == "LLM":
             return self.backends.chat(data), model
         return self.draw_all(data["images"]), model
+
+    def transcribe(self, data: dict[str, Any]) -> dict[str, Any]:
+        """mode=part면 녹음 중 구간 전사(FR-015).
+
+        아니면 전체 전사이고, prefixUrl이 있으면 미리 전사한 앞부분을 받아 잇는다.
+        """
+        urls = data["audioUrls"]
+        language = data.get("language")
+        if data.get("mode") == "part":
+            return self.backends.transcribe_part(urls, language, float(data.get("fromSec") or 0.0))
+        prefix = None
+        if data.get("prefixUrl"):
+            response = self.uploader.get(data["prefixUrl"])
+            response.raise_for_status()
+            prefix = response.json()
+        return self.backends.transcribe(urls, language, prefix)
 
     def switch_to(self, model: str) -> None:
         """다른 모델 묶음이 올라가 있으면 먼저 내린다 (16GB VRAM에 하나만)."""

@@ -184,3 +184,34 @@ def test_결과를_끝내_보내지_못해도_다음_작업으로_넘어간다()
     w = worker(api)
     assert w.run_once()
     assert not w.run_once()
+
+
+def test_구간_전사_작업은_화자_분리_없이_다음_경계를_낸다() -> None:
+    job = Job(
+        "7",
+        "TRANSCRIBE",
+        "t",
+        {"mode": "part", "audioUrls": ["a", "b", "c"], "fromSec": 0, "language": "ko"},
+    )
+    api = FakeApi([job])
+    worker(api).run_once()
+    result = api.results[0][1]
+    assert result["cut"] == 170.0
+    assert result["segments"][0]["words"]
+    assert not result["skipped"]
+
+
+@respx.mock
+def test_전체_전사는_미리_전사한_앞부분을_받아_잇는다() -> None:
+    prefix = {
+        "cut": 50.0,
+        "language": "en",
+        "segments": [{"start": 1.0, "end": 2.0, "text": "hi", "words": []}],
+    }
+    respx.get("http://minio/prefix").mock(return_value=httpx.Response(200, json=prefix))
+    job = Job("8", "TRANSCRIBE", "t", {"audioUrls": ["a"], "prefixUrl": "http://minio/prefix"})
+    api = FakeApi([job])
+    worker(api).run_once()
+    result = api.results[0][1]
+    assert result["language"] == "en"
+    assert result["segments"][0]["text"] == "hi"

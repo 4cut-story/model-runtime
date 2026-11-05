@@ -16,7 +16,12 @@ from typing import Any
 
 import httpx
 
+from .. import segments
+
 SAMPLE_RATE = 16000
+
+# 구간 전사는 새로 쌓인 음성이 이만큼은 돼야 한다. 모자라면 다음 조각 때 한다.
+MIN_NEW_SEC = 45.0
 
 
 class WhisperBackend:
@@ -73,10 +78,73 @@ class WhisperBackend:
         gc.collect()
         torch.cuda.empty_cache()
 
-    def transcribe(self, audio_urls: list[str], language: str | None) -> dict[str, Any]:
+    def transcribe(
+        self,
+        audio_urls: list[str],
+        language: str | None,
+        prefix: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """전체 전사 + 화자 분리.
+
+        prefix(녹음 중 미리 전사한 앞부분)가 있으면 그 경계 뒤만 전사해 잇는다 (FR-015).
+        """
         import whisperx
 
         self.load()
+        audio = self._load_audio(audio_urls)
+        if prefix and prefix.get("segments") is not None:
+            cut = float(prefix.get("cut") or 0.0)
+            detected = prefix.get("language") or language
+            lo = max(0.0, cut - segments.OVERLAP_SEC)
+            tail, detected = self._asr(audio[int(lo * SAMPLE_RATE) :], detected)
+            tail = segments.keep_between(segments.shift(tail, lo), cut, float("inf"))
+            prior = segments.shift(prefix["segments"], 0.0)
+            merged = prior + tail
+        else:
+            merged, detected = self._asr(audio, language)
+            merged = segments.shift(merged, 0.0)
+        result: dict[str, Any] = {"segments": merged}
+        if self._diarize is not None:
+            try:
+                speakers = self._diarize(audio)
+            finally:
+                self._restore_tf32()
+            result = whisperx.assign_word_speakers(speakers, result)
+        return {"segments": segments.to_output(result["segments"]), "language": detected}
+
+    def transcribe_part(
+        self, audio_urls: list[str], language: str | None, from_sec: float
+    ) -> dict[str, Any]:
+        """녹음 중 구간 전사 (화자 분리 없음).
+
+        지금까지 녹음된 음성에서 from_sec 뒤를 전사하고 다음 경계(cut)를 정한다.
+        """
+        self.load()
+        audio = self._load_audio(audio_urls)
+        duration = len(audio) / SAMPLE_RATE
+        if duration - from_sec < MIN_NEW_SEC:
+            return {
+                "segments": [],
+                "cut": from_sec,
+                "language": language,
+                "durationSec": duration,
+                "skipped": True,
+            }
+        lo = max(0.0, from_sec - segments.OVERLAP_SEC)
+        part, detected = self._asr(audio[int(lo * SAMPLE_RATE) :], language)
+        part = segments.shift(part, lo)
+        cut = segments.choose_cut(part, duration)
+        return {
+            "segments": segments.keep_between(part, from_sec, cut),
+            "cut": cut,
+            "language": detected,
+            "durationSec": duration,
+            "skipped": False,
+        }
+
+    def _load_audio(self, audio_urls: list[str]) -> Any:
+        import whisperx
+
         # 조각은 한 녹음(또는 한 파일)을 순서대로 자른 바이트다. 브라우저 MediaRecorder 조각은
         # 첫 조각에만 컨테이너 헤더가 있으므로 하나로 이어 붙인 뒤 한 번에 디코딩한다.
         with tempfile.TemporaryDirectory() as tmp:
@@ -86,27 +154,17 @@ class WhisperBackend:
                     response = client.get(url)
                     response.raise_for_status()
                     out.write(response.content)
-            audio = whisperx.load_audio(str(path))
+            return whisperx.load_audio(str(path))
+
+    def _asr(self, audio: Any, language: str | None) -> tuple[list[dict[str, Any]], str]:
+        """전사 + 단어 정렬. 시각은 audio 시작 기준."""
+        import whisperx
+
         result = self._model.transcribe(audio, batch_size=8, language=language)
         detected = result.get("language") or language or "ko"
         align_model, metadata = self._align_model(detected)
-        result = whisperx.align(result["segments"], align_model, metadata, audio, self.device)
-        if self._diarize is not None:
-            try:
-                speakers = self._diarize(audio)
-            finally:
-                self._restore_tf32()
-            result = whisperx.assign_word_speakers(speakers, result)
-        segments = [
-            {
-                "speaker": s.get("speaker", "SPEAKER_00"),
-                "start": float(s["start"]),
-                "end": float(s["end"]),
-                "text": s.get("text", "").strip(),
-            }
-            for s in result["segments"]
-        ]
-        return {"segments": segments, "language": detected}
+        aligned = whisperx.align(result["segments"], align_model, metadata, audio, self.device)
+        return list(aligned["segments"]), detected
 
     def _align_model(self, language: str) -> tuple[Any, Any]:
         """언어별 정렬 모델. 처음 한 번만 불러 오고, RAM에 옮겨 둔 것은 GPU로 다시 옮긴다."""
