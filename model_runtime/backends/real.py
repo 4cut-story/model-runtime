@@ -7,7 +7,7 @@ import shutil
 import subprocess
 from typing import Any
 
-from . import VramBusyError
+from . import Reference, VramBusyError
 from .ollama import OllamaClient
 
 GIB = 1024**3
@@ -107,8 +107,12 @@ class RealBackends:
     def chat(self, job_input: dict[str, Any]) -> dict[str, Any]:
         return self.ollama.chat(job_input)
 
-    def draw(self, image: dict[str, Any]) -> bytes:
-        data: bytes = self.sdxl.draw(image)
+    def draw(self, image: dict[str, Any], references: list[Reference] | None = None) -> bytes:
+        data: bytes = self.sdxl.draw(image, references)
+        return data
+
+    def encode_reference(self, image: bytes) -> bytes | None:
+        data: bytes | None = self.sdxl.encode_reference(image)
         return data
 
     def prepare(self, model: str) -> None:

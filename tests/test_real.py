@@ -16,8 +16,12 @@ class Stub:
     def transcribe(self, urls: list[str], language: str | None) -> dict[str, Any]:
         return {"segments": [], "language": language}
 
-    def draw(self, image: dict[str, Any]) -> bytes:
+    def draw(self, image: dict[str, Any], references: Any = None) -> bytes:
+        self.references = references
         return b"png"
+
+    def encode_reference(self, image: bytes) -> bytes | None:
+        return b"embed:" + image
 
     def unload(self) -> None:
         self.unloaded += 1
@@ -57,6 +61,16 @@ def test_VRAM을_모르면_그대로_진행한다() -> None:
 
 def test_CUDA가_없으면_남은_VRAM을_모른다() -> None:
     assert free_vram() is None
+
+
+def test_그림과_참조_인코딩을_SDXL에_넘긴다() -> None:
+    from model_runtime.backends import Reference
+
+    backends, _, sdxl, _ = make(None)
+    ref = Reference("c", b"e", 0.6)
+    assert backends.draw({"prompt": "p"}, [ref]) == b"png"
+    assert sdxl.references == [ref]
+    assert backends.encode_reference(b"img") == b"embed:img"
 
 
 # --- 남은 VRAM 읽기: Windows(WDDM)에서는 torch 값이 다른 프로세스 사용량을 빼지 않는다 ---

@@ -20,6 +20,7 @@ def load_env_file(path: Path, environ: dict[str, str] | None = None) -> None:
         target.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 
+DEFAULT_SDXL_IP_ADAPTER = "h94/IP-Adapter:sdxl_models/ip-adapter-plus-face_sdxl_vit-h.safetensors"
 DEFAULT_SDXL_LORA = "ByteDance/SDXL-Lightning:sdxl_lightning_8step_lora.safetensors"
 
 
@@ -41,6 +42,8 @@ class Settings:
     sdxl_guidance: float = 0.0
     # 모델을 내릴 때 지우지 않고 시스템 RAM에 옮겨 둔다 (SDXL, 정렬 모델). RAM 약 7GB를 더 쓴다
     keep_in_ram: bool = True
+    # 캐릭터 참조용 IP-Adapter "<HF 레포>:<레포 안 경로>". 비우면 참조를 무시한다
+    sdxl_ip_adapter: str = DEFAULT_SDXL_IP_ADAPTER
     poll_min: float = 2.0
     poll_max: float = 10.0
     heartbeat_interval: float = 30.0
@@ -66,4 +69,5 @@ class Settings:
             sdxl_steps=int(env.get("SDXL_STEPS", "8")),
             sdxl_guidance=float(env.get("SDXL_GUIDANCE", "0")),
             keep_in_ram=env.get("MODEL_KEEP_IN_RAM", "true").lower() == "true",
+            sdxl_ip_adapter=env.get("SDXL_IP_ADAPTER", DEFAULT_SDXL_IP_ADAPTER).strip(),
         )

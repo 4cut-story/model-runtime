@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any, Protocol
 
 
@@ -11,6 +12,23 @@ class VramBusyError(Exception):
 
 class JobInputError(Exception):
     """작업 입력이 틀렸다. 다시 해도 같으므로 재시도하지 않는다."""
+
+
+REGIONS = ("full", "left", "right")
+
+
+@dataclass(frozen=True)
+class Reference:
+    """IP-Adapter 캐릭터 참조 하나 (캐릭터 DB, conversation-service REQ-018).
+
+    embed는 safetensors 바이트(키 "embeds", [1, 1, 257, 1280] fp16)다. region이 left/right면
+    그 절반에만 얼굴을 넣는다(두 명이 나오는 컷).
+    """
+
+    character: str
+    embed: bytes
+    scale: float
+    region: str = "full"
 
 
 class Backends(Protocol):
@@ -34,8 +52,12 @@ class Backends(Protocol):
         """{content: "<JSON 문자열>", evalCount}"""
         ...
 
-    def draw(self, image: dict[str, Any]) -> bytes:
-        """PNG 바이트"""
+    def draw(self, image: dict[str, Any], references: list[Reference] | None = None) -> bytes:
+        """PNG 바이트. references가 있으면 IP-Adapter로 그 캐릭터 얼굴을 유지한다."""
+        ...
+
+    def encode_reference(self, image: bytes) -> bytes | None:
+        """참조 그림 → IP-Adapter embedding(safetensors). IP-Adapter를 끄면 None."""
         ...
 
     def prepare(self, model: str) -> None:
