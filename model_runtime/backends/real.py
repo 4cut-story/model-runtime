@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import os
+import shutil
+import subprocess
 from typing import Any
 
 from . import VramBusyError
@@ -14,15 +17,64 @@ REQUIRED_VRAM = {"WHISPER": 7 * GIB, "LLM": 8 * GIB, "SDXL": 10 * GIB}
 
 
 def free_vram() -> int | None:
-    """남은 VRAM(바이트). CUDA가 없으면 None."""
+    """GPU에 실제로 남은 VRAM(바이트). CUDA가 없으면 None.
+
+    Windows(WDDM)에서는 torch.cuda.mem_get_info()가 다른 프로세스가 잡은 VRAM을 빼지 않고
+    보고한다(nvidia-smi 2.9GB 남음일 때 13.7GB로 보고). 그래서 nvidia-smi와 같은 값을 주는
+    NVML을 먼저 보고, 없으면 nvidia-smi, 그것도 없으면 torch 값을 쓴다.
+    """
     try:
         import torch
     except ImportError:
         return None
     if not torch.cuda.is_available():
         return None
+    index = _gpu_index()
+    for probe in (_nvml_free, _nvidia_smi_free):
+        free = probe(index)
+        if free is not None:
+            return free
     free, _total = torch.cuda.mem_get_info()
     return int(free)
+
+
+def _gpu_index() -> int:
+    """NVML은 CUDA_VISIBLE_DEVICES를 모르므로 보이는 첫 GPU의 실제 번호를 쓴다."""
+    first = os.environ.get("CUDA_VISIBLE_DEVICES", "").split(",")[0].strip()
+    return int(first) if first.isdigit() else 0
+
+
+def _nvml_free(index: int) -> int | None:
+    try:
+        import pynvml  # nvidia-ml-py
+    except ImportError:
+        return None
+    try:
+        pynvml.nvmlInit()
+        try:
+            handle = pynvml.nvmlDeviceGetHandleByIndex(index)
+            return int(pynvml.nvmlDeviceGetMemoryInfo(handle).free)
+        finally:
+            pynvml.nvmlShutdown()
+    except pynvml.NVMLError:
+        return None
+
+
+def _nvidia_smi_free(index: int) -> int | None:
+    exe = shutil.which("nvidia-smi")
+    if exe is None:
+        return None
+    try:
+        out = subprocess.run(  # noqa: S603 - 고정된 인자만 넘긴다
+            [exe, f"--id={index}", "--query-gpu=memory.free", "--format=csv,noheader,nounits"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=True,
+        ).stdout
+        return int(out.strip().splitlines()[0]) * 1024**2  # MiB
+    except (OSError, subprocess.SubprocessError, ValueError, IndexError):
+        return None
 
 
 class RealBackends:

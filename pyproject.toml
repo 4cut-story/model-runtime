@@ -20,6 +20,8 @@ gpu = [
     "safetensors>=0.4",
     # SDXL-Lightning LoRA를 올릴 때 diffusers가 쓴다
     "peft>=0.13",
+    # 남은 VRAM을 nvidia-smi와 같은 값으로 읽는다 (Windows WDDM에서 torch 값이 틀린다)
+    "nvidia-ml-py>=12.535",
 ]
 dev = ["ruff>=0.8", "mypy>=1.13", "pytest>=8.3", "pytest-cov>=6.0", "respx>=0.22"]
 
