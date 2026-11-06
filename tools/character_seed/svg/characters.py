@@ -20,7 +20,7 @@ COLORS = {
     "yellow": "#f4c430", "green": "#5f9e5a", "navy": "#2f3e6b", "red": "#c8413b",
     "white": "#f7f5ef", "sky blue": "#86c5ea", "olive": "#7b7d3a", "blue": "#3d6fb6",
     "pink": "#ef9db4", "purple": "#8e6bb8", "orange": "#ec8a3a", "teal": "#2f9e95",
-    "cream": "#f3e7c9", "jade": "#7fb8a0", "indigo": "#3b3f7a", "crimson": "#a3242f",
+    "cream": "#f3e7c9", "tan": "#c9a46a", "mint": "#9fd8c4", "jade": "#7fb8a0", "indigo": "#3b3f7a", "crimson": "#a3242f",
 }
 
 SKIN = {"light": "#f8dcc4", "warm": "#f1c9a5", "tan": "#ddb08a"}
@@ -160,6 +160,8 @@ def hair_back(p: Pen, style: str, col: str) -> str:
 def hair_front(p: Pen, style: str, col: str) -> str:
     s = p.st()
     h = p.c(col)
+    if style == "none":
+        return ""
     cap = (f'<path d="M 262 300 C 250 170 330 150 {CX} 150 C 438 150 518 170 506 300 '
            f'C 470 230 420 215 {CX} 215 C 348 215 298 230 262 300 Z" fill="{h}" {s}/>')
     if style in ("long", "straight", "bob", "wavy"):
@@ -338,7 +340,13 @@ def clothes(p: Pen, kind: str, col: str, skin: str) -> str:
                 f'<path d="M 310 470 L {CX} 640 L 480 520 M 458 470 L {CX} 560" fill="none" {p.st(3)}/>'
                 f'<path d="M 150 660 L 618 660 L 622 710 L 146 710 Z" fill="{p.c("black") if col != "black" else p.c("crimson")}" {s}/>'
                 f'<path d="M 170 600 Q 220 650 200 768 M 598 600 Q 548 650 568 768" fill="none" {p.st(3)} opacity="0.6"/>')
+    if kind in EXTRA_CLOTHES:
+        return EXTRA_CLOTHES[kind](p, c, skin)
     return f'<path d="{TORSO}" fill="{c}" {s}/>'
+
+
+EXTRA_CLOTHES: dict = {}  # jobs.py가 채운다
+EXTRA_ACC: dict = {}
 
 
 def accessory(p: Pen, kind: str, skin: str) -> str:
@@ -382,8 +390,8 @@ def accessory(p: Pen, kind: str, skin: str) -> str:
         return f'<path d="M {CX - 40} {CY + 72} Q {CX - 20} {CY + 60} {CX} {CY + 70} Q {CX + 20} {CY + 60} {CX + 40} {CY + 72}" fill="none" stroke="{p.c("black")}" stroke-width="6" stroke-linecap="round"/>'
     if kind == "scar":
         return f'<path d="M {CX + 60} {CY - 30} L {CX + 80} {CY + 10}" {p.st(4)}/>'
-    if kind == "binyeo":
-        return ""
+    if kind in EXTRA_ACC:
+        return EXTRA_ACC[kind](p, skin)
     return ""
 
 
@@ -497,6 +505,8 @@ def animal(d: dict) -> str:
     elif acc == "backpack":
         o.append(f'<path d="M 270 520 L 300 768 M 498 520 L 468 768" fill="none" stroke="{p.c(d["acc_color"])}" stroke-width="30"/>'
                  f'<path d="M 270 520 L 300 768 M 498 520 L 468 768" fill="none" {p.st(3)}/>')
+    for extra in d.get("extra", []):
+        o.append(accessory(p, extra, fur))
     return svg(p, "".join(o))
 
 

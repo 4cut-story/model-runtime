@@ -11,6 +11,10 @@ themes:
       - {name: 하린, look: "young woman, short brown bob, green cardigan"}
       - {name: 도윤, look: "young man, short black hair, navy sweater"}
       - {name: 준호, look: "young man, curly brown hair, red flannel shirt"}
+      - {name: 도현, job: 의사, look: "young man, short black hair, white doctor coat", description: "doctor, young man, short black hair, white doctor coat"}
+      - {name: 강민, job: 요리사, look: "young man, white chef hat, white chef jacket", description: "chef, young man, white chef hat, white chef jacket"}
+      - {name: 태산, job: 소방관, look: "young man, red fire helmet, tan firefighter coat", description: "firefighter, young man, red fire helmet, tan firefighter coat"}
+      - {name: 민서, job: 경찰관, look: "young woman, black ponytail, navy police uniform", description: "police officer, young woman, black ponytail, navy police uniform"}
   ANIMALS:
     style: "cute anthropomorphic animal characters, round shapes, pastel colors, simple background"
     negative: "human, person, realistic animal, insect, bug"
@@ -23,6 +27,10 @@ themes:
       - {name: 사슴이, look: "deer, purple dress"}
       - {name: 멍구, look: "dog, orange bandana"}
       - {name: 도토리, look: "squirrel, teal backpack"}
+      - {name: 하양, job: 의사, look: "rabbit, white doctor coat", description: "doctor, rabbit, white doctor coat"}
+      - {name: 뭉치, job: 요리사, look: "bear, white chef hat", description: "chef, bear, white chef hat"}
+      - {name: 바둑이, job: 소방관, look: "dog, red fire helmet", description: "firefighter, dog, red fire helmet"}
+      - {name: 냥순, job: 경찰관, look: "cat, navy police uniform", description: "police officer, cat, navy police uniform"}
   WATERCOLOR:
     style: "hand-painted anime style, watercolor background, soft warm light, gentle colors"
     negative: ""
@@ -31,6 +39,10 @@ themes:
       - {name: 유나, look: "young woman, black ponytail, sky blue dress"}
       - {name: 태오, look: "young man, short brown hair, white shirt"}
       - {name: 시우, look: "young man, messy black hair, olive jacket"}
+      - {name: 봄비, job: 꽃집 주인, look: "young woman, long brown hair, green apron", description: "florist, young woman, long brown hair, green apron"}
+      - {name: 나래, job: 바리스타, look: "young woman, black bob, brown apron", description: "barista, young woman, black bob, brown apron"}
+      - {name: 하늘, job: 화가, look: "young woman, wavy blonde hair, red beret", description: "painter, young woman, wavy blonde hair, red beret"}
+      - {name: 우진, job: 우체부, look: "young man, blue cap, blue postal uniform", description: "mail carrier, young man, blue cap, blue postal uniform"}
   PICTURE_BOOK:
     style: "children's picture book, crayon and colored pencil drawing, simple shapes, white paper"
     negative: ""
@@ -39,6 +51,10 @@ themes:
       - {name: 봄이, look: "little girl, short bob, yellow raincoat"}
       - {name: 단우, look: "little boy, buzz cut, blue overalls"}
       - {name: 해솔, look: "little boy, curly hair, green striped shirt"}
+      - {name: 불꽃이, job: 꼬마 소방관, look: "little boy, red fire helmet, tan coat", description: "little firefighter, little boy, red fire helmet, tan coat"}
+      - {name: 튼튼이, job: 꼬마 의사, look: "little girl, pigtails, white doctor coat", description: "little doctor, little girl, pigtails, white doctor coat"}
+      - {name: 냠냠이, job: 꼬마 요리사, look: "little boy, white chef hat, white jacket", description: "little chef, little boy, white chef hat, white jacket"}
+      - {name: 별이, job: 꼬마 우주비행사, look: "little girl, short bob, white space suit", description: "little astronaut, little girl, short bob, white space suit"}
   NEWSPAPER:
     style: "black and white newspaper comic strip, ink pen lines, cross hatching"
     negative: "color, colorful, red, blue"
@@ -47,6 +63,10 @@ themes:
       - {name: 미숙, look: "young woman, long straight hair, beret"}
       - {name: 철수, look: "young man, curly hair, round glasses"}
       - {name: 만식, look: "young man, crew cut, bow tie"}
+      - {name: 박기자, job: 기자, look: "young man, fedora hat, notepad and pencil", description: "newspaper reporter, young man, fedora hat, notepad and pencil"}
+      - {name: 강형사, job: 형사, look: "young man, fedora hat, trench coat", description: "detective, young man, fedora hat, trench coat"}
+      - {name: 덕배, job: 정비공, look: "young man, work cap, wrench", description: "mechanic, young man, work cap, wrench"}
+      - {name: 순이, job: 식당 종업원, look: "young woman, ponytail, white apron", description: "diner waitress, young woman, ponytail, white apron"}
   JOSEON:
     style: "korean traditional genre painting, joseon era village, ink lines with soft color wash, hanji paper texture"
     negative: "modern clothes, car, building, smartphone, computer"
@@ -55,6 +75,10 @@ themes:
       - {name: 단아, look: "woman in hanbok, chignon bun, purple chima"}
       - {name: 김선비, look: "man in hanbok, black gat, blue jeogori"}
       - {name: 이도령, look: "man in hanbok, topknot, white jeogori"}
+      - {name: 돌쇠, job: 포졸, look: "man in hanbok, black jeollip hat, red vest", description: "joseon police constable, man in hanbok, black jeollip hat, red vest"}
+      - {name: 만복, job: 보부상, look: "man in hanbok, straw hat, wooden backpack frame", description: "traveling peddler, man in hanbok, straw hat, wooden backpack frame"}
+      - {name: 주모, job: 주모, look: "woman in hanbok, white headscarf, brown chima", description: "tavern keeper, woman in hanbok, white headscarf, brown chima"}
+      - {name: 장금, job: 의녀, look: "woman in hanbok, black head cloth, navy chima", description: "female royal physician, woman in hanbok, black head cloth, navy chima"}
   WUXIA:
     style: "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting"
     negative: "modern clothes, car, building, smartphone, computer, gun"
@@ -63,3 +87,7 @@ themes:
       - {name: 홍련, look: "swordswoman, red robe, folding fan"}
       - {name: 무진, look: "swordsman, black robe, broadsword"}
       - {name: 청운, look: "swordsman, blue robe, bamboo flute"}
+      - {name: 왕장궤, job: 객잔 주인, look: "swordsman, brown robe, abacus", description: "innkeeper, swordsman, brown robe, abacus"}
+      - {name: 혜능, job: 소림 무승, look: "swordsman, orange robe, prayer beads, shaved head", description: "shaolin monk, swordsman, orange robe, prayer beads, shaved head"}
+      - {name: 화타, job: 신의, look: "swordsman, jade robe, medicine gourd", description: "divine physician, swordsman, jade robe, medicine gourd"}
+      - {name: 흑영, job: 자객, look: "swordsman, black robe, black mask, dagger", description: "assassin, swordsman, black robe, black mask, dagger"}
