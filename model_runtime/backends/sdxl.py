@@ -23,7 +23,7 @@ import gc
 import io
 from typing import Any
 
-from . import Reference
+from . import Reference, long_prompt
 from .ip_schedule import IpSchedule
 
 # IP-Adapter 이미지 인코더 (ViT-H). 어댑터와 같은 레포 안 경로
@@ -208,9 +208,14 @@ class SdxlBackend:
                 extra["callback_on_step_end"] = self._schedule_callback(refs, schedule)
         generator = torch.Generator(device="cpu").manual_seed(int(image.get("seed", 0)))
         negative = image.get("negativePrompt") if self.guidance > 1 else None
+        text: dict[str, Any] = {"prompt": image["prompt"], "negative_prompt": negative}
+        if self.guidance <= 1:
+            # guidance 0(Lightning)은 negative가 필요 없어 긴 프롬프트를 조각으로 인코딩해 넣는다
+            long = long_prompt.encode(self._pipe, image["prompt"])
+            if long is not None:
+                text = {"prompt_embeds": long[0], "pooled_prompt_embeds": long[1]}
         result = self._pipe(
-            prompt=image["prompt"],
-            negative_prompt=negative,
+            **text,
             width=width,
             height=height,
             num_inference_steps=self.steps,
