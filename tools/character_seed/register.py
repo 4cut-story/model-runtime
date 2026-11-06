@@ -78,6 +78,7 @@ def main() -> None:
     ap.add_argument("--out", default="out")
     ap.add_argument("--picks", default="picks.yaml")
     ap.add_argument("--env", default="local.env")
+    ap.add_argument("--images", help="draw.py 대신 <THEME>/<이름>.png 그림 폴더를 쓴다 (picks 불필요)")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -85,8 +86,10 @@ def main() -> None:
 
     env = load_env(Path(args.env))
     catalog = yaml.safe_load(Path(args.catalog).read_text(encoding="utf-8"))
-    picks = yaml.safe_load(Path(args.picks).read_text(encoding="utf-8")) or {}
-    manifest = json.loads((Path(args.out) / "manifest.json").read_text(encoding="utf-8"))
+    picks, manifest = {}, {}
+    if not args.images:
+        picks = yaml.safe_load(Path(args.picks).read_text(encoding="utf-8")) or {}
+        manifest = json.loads((Path(args.out) / "manifest.json").read_text(encoding="utf-8"))
     endpoint = re.sub(r"^https?://", "", env["MINIO_ENDPOINT"])
     s3 = Minio(endpoint, access_key=env["MINIO_ACCESS_KEY"], secret_key=env["MINIO_SECRET_KEY"],
                secure=env["MINIO_ENDPOINT"].startswith("https"), region=env.get("MINIO_REGION", "us-east-1"))
@@ -102,14 +105,21 @@ def main() -> None:
     for theme, spec in catalog["themes"].items():
         for ch in spec["characters"]:
             name = ch["name"]
-            seed = picks.get(name)
-            if seed is None:
-                print(f"건너뜀 {name}: picks에 없음")
-                continue
-            d = Path(args.out) / manifest[name]["dir"]
-            png = (d / f"seed{seed}.png").read_bytes()
-            emb_path = d / f"seed{seed}.ipadapter.safetensors"
-            emb = emb_path.read_bytes() if emb_path.exists() else None
+            if args.images:
+                img = Path(args.images) / theme / f"{name}.png"
+                if not img.exists():
+                    print(f"건너뜀 {name}: {img} 없음")
+                    continue
+                seed, png, emb = "-", img.read_bytes(), None  # embedding은 워커가 첫 그림 때 계산한다
+            else:
+                seed = picks.get(name)
+                if seed is None:
+                    print(f"건너뜀 {name}: picks에 없음")
+                    continue
+                d = Path(args.out) / manifest[name]["dir"]
+                png = (d / f"seed{seed}.png").read_bytes()
+                emb_path = d / f"seed{seed}.ipadapter.safetensors"
+                emb = emb_path.read_bytes() if emb_path.exists() else None
             look = ch["look"].strip()
             desc = (ch.get("description") or look).strip()
             scale = float(ch.get("scale", 0.6))
