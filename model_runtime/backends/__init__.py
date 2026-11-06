@@ -14,7 +14,7 @@ class JobInputError(Exception):
     """작업 입력이 틀렸다. 다시 해도 같으므로 재시도하지 않는다."""
 
 
-REGIONS = ("full", "left", "right")
+REGIONS = ("full", "left", "right", "center")
 
 
 @dataclass(frozen=True)
@@ -22,7 +22,8 @@ class Reference:
     """IP-Adapter 캐릭터 참조 하나 (캐릭터 DB, conversation-service REQ-018).
 
     embed는 safetensors 바이트(키 "embeds", [1, 1, 257, 1280] fp16)다. region이 left/right면
-    그 절반에만 얼굴을 넣는다(두 명이 나오는 컷).
+    그 절반에만 얼굴을 넣는다(두 명이 나오는 컷). center는 가운데 60%에만 넣는다(캐릭터 한 명과
+    참조 없는 다른 사람이 함께 나오는 컷: 전체에 걸면 다른 사람까지 그 얼굴이 됐다).
     """
 
     character: str

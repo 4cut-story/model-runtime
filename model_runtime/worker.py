@@ -201,7 +201,7 @@ class Worker:
                 continue
             region = str(item.get("region") or "full")
             if region not in REGIONS:
-                raise JobInputError(f"참조 위치는 full, left, right 중 하나다: {region}")
+                raise JobInputError(f"참조 위치는 full, left, right, center 중 하나다: {region}")
             scale = min(max(float(item.get("scale", 0.6)), 0.0), 1.0)
             refs.append(Reference(character, embed, scale, region))
         return refs

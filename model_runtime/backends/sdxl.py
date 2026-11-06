@@ -244,12 +244,18 @@ class SdxlBackend:
 
 
 def _region_masks(regions: list[str], width: int, height: int) -> Any:
-    """자리별 마스크 [1, 참조 수, H, W]. left는 왼쪽 절반, right는 오른쪽 절반, full은 전체."""
+    """자리별 마스크 [1, 참조 수, H, W]. left는 왼쪽 절반, right는 오른쪽 절반, center는 가운데 60%,
+    full은 전체."""
     from diffusers.image_processor import IPAdapterMaskProcessor
     from PIL import Image
 
     half = width // 2
-    boxes = {"left": (0, 0, half, height), "right": (half, 0, width, height)}
+    edge = width // 5
+    boxes = {
+        "left": (0, 0, half, height),
+        "right": (half, 0, width, height),
+        "center": (edge, 0, width - edge, height),
+    }
     pictures = []
     for region in regions:
         mask = Image.new("L", (width, height), 255 if region == "full" else 0)
