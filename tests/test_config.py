@@ -34,7 +34,8 @@ def test_SDXL은_Lightning_8step_768용_기본값을_쓰고_환경변수로_바�
     assert s.sdxl_cpu_offload is False
     assert s.sdxl_lora == "ByteDance/SDXL-Lightning:sdxl_lightning_8step_lora.safetensors"
     assert (s.sdxl_steps, s.sdxl_guidance) == (8, 0.0)
-    assert s.sdxl_ip_adapter.endswith("ip-adapter-plus-face_sdxl_vit-h.safetensors")
+    assert s.sdxl_ip_adapter.endswith("ip-adapter-plus_sdxl_vit-h.safetensors")
+    assert (s.sdxl_ip_early_scale, s.sdxl_ip_early_steps, s.sdxl_ip_late_boost) == (0.2, 4, 0.2)
     s = Settings.from_env(
         {
             **base,

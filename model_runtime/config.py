@@ -20,7 +20,7 @@ def load_env_file(path: Path, environ: dict[str, str] | None = None) -> None:
         target.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 
-DEFAULT_SDXL_IP_ADAPTER = "h94/IP-Adapter:sdxl_models/ip-adapter-plus-face_sdxl_vit-h.safetensors"
+DEFAULT_SDXL_IP_ADAPTER = "h94/IP-Adapter:sdxl_models/ip-adapter-plus_sdxl_vit-h.safetensors"
 DEFAULT_SDXL_LORA = "ByteDance/SDXL-Lightning:sdxl_lightning_8step_lora.safetensors"
 
 
@@ -44,6 +44,11 @@ class Settings:
     keep_in_ram: bool = True
     # 캐릭터 참조용 IP-Adapter "<HF 레포>:<레포 안 경로>". 비우면 참조를 무시한다
     sdxl_ip_adapter: str = DEFAULT_SDXL_IP_ADAPTER
+    # IP-Adapter step별 강도: 앞쪽 early_steps는 early_scale 이하, 뒤쪽은 캐릭터 강도 + late_boost.
+    # early_steps=0이면 캐릭터 강도 그대로 (Plus-Face로 되돌릴 때)
+    sdxl_ip_early_scale: float = 0.2
+    sdxl_ip_early_steps: int = 4
+    sdxl_ip_late_boost: float = 0.2
     poll_min: float = 2.0
     poll_max: float = 10.0
     heartbeat_interval: float = 30.0
@@ -70,4 +75,7 @@ class Settings:
             sdxl_guidance=float(env.get("SDXL_GUIDANCE", "0")),
             keep_in_ram=env.get("MODEL_KEEP_IN_RAM", "true").lower() == "true",
             sdxl_ip_adapter=env.get("SDXL_IP_ADAPTER", DEFAULT_SDXL_IP_ADAPTER).strip(),
+            sdxl_ip_early_scale=float(env.get("SDXL_IP_EARLY_SCALE", "0.2")),
+            sdxl_ip_early_steps=int(env.get("SDXL_IP_EARLY_STEPS", "4")),
+            sdxl_ip_late_boost=float(env.get("SDXL_IP_LATE_BOOST", "0.2")),
         )

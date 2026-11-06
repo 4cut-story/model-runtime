@@ -8,10 +8,13 @@ keep_in_ram이면 내릴 때 지우지 않고 시스템 RAM으로 옮겨 둔다.
 읽지 않고 GPU로 옮기기만 한다 (GPU PC 측정: 디스크에서 86~194초 → RAM에서 1.2~1.4초, RAM 약 5.5GB).
 
 캐릭터 참조(conversation-service 캐릭터 DB)가 오면 IP-Adapter를 처음 한 번 올린다
-(Plus-Face, ViT-H 인코더, 약 4초, VRAM +2GB). 참조 embedding은 미리 계산해 둔 것을
+(Plus, ViT-H 인코더, 약 4초, VRAM +2GB). 참조 embedding은 미리 계산해 둔 것을
 ip_adapter_image_embeds로 넣고, 두 명이 나오는 컷은 왼쪽·오른쪽 마스크로 자리를 나눈다.
+Plus는 얼굴뿐 아니라 머리 모양·옷까지 따르므로, 앞쪽 step은 약하게 걸어 구도는 프롬프트가 정하고
+뒤쪽 step은 강하게 걸어 정체성을 넣는다(IpSchedule). Plus-Face는 얼굴만 잡아 두 명 컷에서 옷·머리가
+컷마다 바뀌었다. embedding은 ViT-H 인코더 출력이라 Plus와 Plus-Face가 같은 것을 쓴다.
 어댑터를 올린 뒤 참조가 없는 컷은 강도 0으로 그린다(텍스트만으로 그린 것과 픽셀이 같다).
-GPU PC 벤치: 4컷 5.45초 → 약 5.6초, Plus-Face 0.5~0.7이 장면과 얼굴의 균형이 가장 좋다.
+GPU PC 벤치: 4컷 5.45초 → 약 5.6초, 예약 VRAM 약 12.5GiB.
 """
 
 from __future__ import annotations
@@ -21,6 +24,7 @@ import io
 from typing import Any
 
 from . import Reference
+from .ip_schedule import IpSchedule
 
 # IP-Adapter 이미지 인코더 (ViT-H). 어댑터와 같은 레포 안 경로
 IP_ADAPTER_ENCODER = "models/image_encoder"
@@ -38,6 +42,7 @@ class SdxlBackend:
         guidance: float = 0.0,
         keep_in_ram: bool = False,
         ip_adapter: str = "",
+        ip_schedule: IpSchedule | None = None,
     ) -> None:
         self.model_name = model_name
         self.cpu_offload = cpu_offload
@@ -47,6 +52,7 @@ class SdxlBackend:
         # CPU offload는 이미 컷마다 GPU↔CPU를 오가므로 RAM에 따로 둘 필요가 없다
         self.keep_in_ram = keep_in_ram and not cpu_offload
         self.ip_adapter = ip_adapter
+        self.ip_schedule = ip_schedule or IpSchedule()
         self._pipe: Any = None
         self._on_gpu = False
         self._ip_loaded = False
@@ -145,18 +151,34 @@ class SdxlBackend:
             tensors.append(t.to(device=device, dtype=torch.float16))
         embeds = torch.cat(tensors, dim=1)
         regions = [r.region for r in refs]
+        self._set_scales(refs, 0)
         if len(refs) == 1 and regions[0] == "full":
-            self._pipe.set_ip_adapter_scale(refs[0].scale)
             return {"ip_adapter_image_embeds": [embeds]}
         if len(refs) > 1 and "full" in regions:
             # 두 명인데 자리가 없으면 나온 순서대로 왼쪽·오른쪽
             regions = ["left", "right"][: len(refs)]
         masks = _region_masks(regions, width, height)
-        self._pipe.set_ip_adapter_scale([[r.scale for r in refs]])
         return {
             "ip_adapter_image_embeds": [embeds],
             "cross_attention_kwargs": {"ip_adapter_masks": [masks]},
         }
+
+    def _set_scales(self, refs: list[Reference], step: int) -> None:
+        """step에서 쓸 강도. 전체 참조 한 명은 숫자 하나, 마스크를 쓰면 참조별 목록."""
+        scales = self.ip_schedule.scales([r.scale for r in refs], step)
+        if len(refs) == 1 and refs[0].region == "full":
+            self._pipe.set_ip_adapter_scale(scales[0])
+        else:
+            self._pipe.set_ip_adapter_scale([scales])
+
+    def _schedule_callback(self, refs: list[Reference]) -> Any:
+        """step이 끝날 때마다 다음 step의 강도를 건다 (callback_on_step_end)."""
+
+        def callback(pipe: Any, step: int, timestep: Any, kwargs: dict[str, Any]) -> dict[str, Any]:
+            self._set_scales(refs, step + 1)
+            return kwargs
+
+        return callback
 
     def unload(self) -> None:
         import torch
@@ -179,6 +201,8 @@ class SdxlBackend:
         extra: dict[str, Any] = {}
         if (refs and self._ensure_ip_adapter()) or self._ip_loaded:
             extra = self._ip_kwargs(refs, width, height)
+            if refs and self.ip_schedule.active:
+                extra["callback_on_step_end"] = self._schedule_callback(refs)
         generator = torch.Generator(device="cpu").manual_seed(int(image.get("seed", 0)))
         negative = image.get("negativePrompt") if self.guidance > 1 else None
         result = self._pipe(
@@ -203,6 +227,11 @@ class SdxlBackend:
             "guidance": self.guidance,
             "cpuOffload": self.cpu_offload,
             "ipAdapter": self.ip_adapter or None,
+            "ipSchedule": {
+                "earlyScale": self.ip_schedule.early_scale,
+                "earlySteps": self.ip_schedule.early_steps,
+                "lateBoost": self.ip_schedule.late_boost,
+            },
         }
 
 
