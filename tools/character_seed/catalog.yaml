@@ -1,0 +1,65 @@
+# 테마(컨셉)별 캐릭터 목록. 이름은 전체에서 겹치면 안 된다 (characters.name UNIQUE, 30자 이내).
+# look은 conversation-service Concept.lookRule 형식을 그대로 따른다. 콘티 LLM이 같은 형식으로 외모를 쓰므로
+# 설명 임베딩(pgvector)으로 비슷한 캐릭터를 찾을 때 가까워진다. description을 비우면 look을 쓴다.
+# style/negative는 Concept.style()/negative()와 같다 (DAILY는 comic.style 기본값과 같은 문구).
+themes:
+  DAILY:
+    style: "simple cartoon, thick outlines, flat colors, plain background"
+    negative: ""
+    characters:
+      - {name: 지우, look: "young woman, long black hair, yellow hoodie"}
+      - {name: 하린, look: "young woman, short brown bob, green cardigan"}
+      - {name: 도윤, look: "young man, short black hair, navy sweater"}
+      - {name: 준호, look: "young man, curly brown hair, red flannel shirt"}
+  ANIMALS:
+    style: "cute anthropomorphic animal characters, round shapes, pastel colors, simple background"
+    negative: "human, person, realistic animal, insect, bug"
+    characters:
+      - {name: 토토, look: "rabbit, pink scarf"}
+      - {name: 곰곰, look: "bear, green sweater"}
+      - {name: 여울, look: "fox, yellow raincoat"}
+      - {name: 판다랑, look: "panda, red bow tie"}
+      - {name: 나비, look: "cat, blue overalls"}
+      - {name: 사슴이, look: "deer, purple dress"}
+      - {name: 멍구, look: "dog, orange bandana"}
+      - {name: 도토리, look: "squirrel, teal backpack"}
+  WATERCOLOR:
+    style: "hand-painted anime style, watercolor background, soft warm light, gentle colors"
+    negative: ""
+    characters:
+      - {name: 소라, look: "young woman, wavy auburn hair, white blouse"}
+      - {name: 유나, look: "young woman, black ponytail, sky blue dress"}
+      - {name: 태오, look: "young man, short brown hair, white shirt"}
+      - {name: 시우, look: "young man, messy black hair, olive jacket"}
+  PICTURE_BOOK:
+    style: "children's picture book, crayon and colored pencil drawing, simple shapes, white paper"
+    negative: ""
+    characters:
+      - {name: 콩이, look: "little girl, pigtails, red dress"}
+      - {name: 봄이, look: "little girl, short bob, yellow raincoat"}
+      - {name: 단우, look: "little boy, buzz cut, blue overalls"}
+      - {name: 해솔, look: "little boy, curly hair, green striped shirt"}
+  NEWSPAPER:
+    style: "black and white newspaper comic strip, ink pen lines, cross hatching"
+    negative: "color, colorful, red, blue"
+    characters:
+      - {name: 영자, look: "young woman, hair bun, pearl necklace"}
+      - {name: 미숙, look: "young woman, long straight hair, beret"}
+      - {name: 철수, look: "young man, curly hair, round glasses"}
+      - {name: 만식, look: "young man, crew cut, bow tie"}
+  JOSEON:
+    style: "korean traditional genre painting, joseon era village, ink lines with soft color wash, hanji paper texture"
+    negative: "modern clothes, car, building, smartphone, computer"
+    characters:
+      - {name: 연이, look: "woman in hanbok, braided hair, pink chima"}
+      - {name: 단아, look: "woman in hanbok, chignon bun, purple chima"}
+      - {name: 김선비, look: "man in hanbok, black gat, blue jeogori"}
+      - {name: 이도령, look: "man in hanbok, topknot, white jeogori"}
+  WUXIA:
+    style: "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting"
+    negative: "modern clothes, car, building, smartphone, computer, gun"
+    characters:
+      - {name: 설화, look: "swordswoman, white robe, long sword"}
+      - {name: 홍련, look: "swordswoman, red robe, folding fan"}
+      - {name: 무진, look: "swordsman, black robe, broadsword"}
+      - {name: 청운, look: "swordsman, blue robe, bamboo flute"}
