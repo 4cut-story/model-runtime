@@ -63,6 +63,12 @@ def test_env_파일은_없는_값만_채운다(tmp_path: Path) -> None:
     load_env_file(tmp_path / "missing", env)
 
 
+def test_체크포인트_variant는_기본_fp16이고_비우면_variant_없이_읽는다() -> None:
+    base = {"GPU_WORKER_API_URL": "https://4cut.example", "GPU_WORKER_TOKEN": "t"}
+    assert Settings.from_env(base).sdxl_variant == "fp16"
+    assert Settings.from_env({**base, "SDXL_VARIANT": ""}).sdxl_variant == ""
+
+
 def test_화자_분리_최소_화자_수는_기본_2이고_0으로_끌_수_있다() -> None:
     base = {"GPU_WORKER_API_URL": "https://4cut.example", "GPU_WORKER_TOKEN": "t"}
     assert Settings.from_env(base).diarize_min_speakers == 2

@@ -46,14 +46,46 @@ def encode(pipe: Any, prompt: str) -> tuple[Any, Any] | None:
 
     75토큰 이하면 None을 돌려줘 파이프라인 기본 인코딩을 쓴다.
     """
-    import torch
-
-    tok = pipe.tokenizer
-    ids: list[int] = tok(prompt, truncation=False, add_special_tokens=False).input_ids
+    ids = _ids(pipe, prompt)
     if len(ids) <= CHUNK:
         return None
-    comma = tok.convert_tokens_to_ids(",</w>")
-    parts = split_ids(ids, comma)
+    return _encode_parts(pipe, split_ids(ids, _comma(pipe)))
+
+
+def encode_pair(pipe: Any, prompt: str, negative: str) -> tuple[Any, Any, Any, Any] | None:
+    """guidance > 1용: 긴 프롬프트와 negative를 같은 조각 수로 인코딩한다.
+
+    (prompt_embeds, negative_prompt_embeds, pooled, negative_pooled). 파이프라인은 두 임베딩의
+    길이가 같아야 해서 짧은 쪽은 빈 조각으로 채운다. 둘 다 75토큰 이하면 None.
+    """
+    pos = _ids(pipe, prompt)
+    neg = _ids(pipe, negative)
+    if len(pos) <= CHUNK and len(neg) <= CHUNK:
+        return None
+    comma = _comma(pipe)
+    pos_parts = split_ids(pos, comma)
+    neg_parts = split_ids(neg, comma)
+    count = max(len(pos_parts), len(neg_parts))
+    pos_parts += [[] for _ in range(count - len(pos_parts))]
+    neg_parts += [[] for _ in range(count - len(neg_parts))]
+    embeds, pooled = _encode_parts(pipe, pos_parts)
+    neg_embeds, neg_pooled = _encode_parts(pipe, neg_parts)
+    return embeds, neg_embeds, pooled, neg_pooled
+
+
+def _ids(pipe: Any, text: str) -> list[int]:
+    ids: list[int] = pipe.tokenizer(text, truncation=False, add_special_tokens=False).input_ids
+    return ids
+
+
+def _comma(pipe: Any) -> int:
+    comma: int = pipe.tokenizer.convert_tokens_to_ids(",</w>")
+    return comma
+
+
+def _encode_parts(pipe: Any, parts: list[list[int]]) -> tuple[Any, Any]:
+    import torch
+
     device = pipe._execution_device
     hidden = []
     pooled = None
