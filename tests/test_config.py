@@ -61,3 +61,16 @@ def test_env_파일은_없는_값만_채운다(tmp_path: Path) -> None:
     load_env_file(env_file, env)
     assert env == {"A": "1", "B": "two", "C": "keep"}
     load_env_file(tmp_path / "missing", env)
+
+
+def test_화자_분리_최소_화자_수는_기본_2이고_0으로_끌_수_있다() -> None:
+    base = {"GPU_WORKER_API_URL": "https://4cut.example", "GPU_WORKER_TOKEN": "t"}
+    assert Settings.from_env(base).diarize_min_speakers == 2
+    assert Settings.from_env({**base, "DIARIZE_MIN_SPEAKERS": "0"}).diarize_min_speakers == 0
+
+
+def test_화자_분리에_최소_화자_수를_넘긴다() -> None:
+    from model_runtime.backends.whisper import WhisperBackend
+
+    assert WhisperBackend("m", None, min_speakers=2)._speaker_hint() == {"min_speakers": 2}
+    assert WhisperBackend("m", None)._speaker_hint() == {}
