@@ -133,7 +133,9 @@ class SdxlBackend:
         data: bytes = save({"embeds": tensor}, metadata={"adapter": self.ip_adapter})
         return data
 
-    def _ip_kwargs(self, refs: list[Reference], width: int, height: int) -> dict[str, Any]:
+    def _ip_kwargs(
+        self, refs: list[Reference], width: int, height: int, schedule: IpSchedule
+    ) -> dict[str, Any]:
         """참조 embedding·강도·마스크. 참조가 없으면 0 embedding과 강도 0."""
         import torch
         from safetensors.torch import load
@@ -151,7 +153,7 @@ class SdxlBackend:
             tensors.append(t.to(device=device, dtype=torch.float16))
         embeds = torch.cat(tensors, dim=1)
         regions = [r.region for r in refs]
-        self._set_scales(refs, 0)
+        self._set_scales(refs, 0, schedule)
         if len(refs) == 1 and regions[0] == "full":
             return {"ip_adapter_image_embeds": [embeds]}
         if len(refs) > 1 and "full" in regions:
@@ -163,19 +165,19 @@ class SdxlBackend:
             "cross_attention_kwargs": {"ip_adapter_masks": [masks]},
         }
 
-    def _set_scales(self, refs: list[Reference], step: int) -> None:
+    def _set_scales(self, refs: list[Reference], step: int, schedule: IpSchedule) -> None:
         """step에서 쓸 강도. 전체 참조 한 명은 숫자 하나, 마스크를 쓰면 참조별 목록."""
-        scales = self.ip_schedule.scales([r.scale for r in refs], step)
+        scales = schedule.scales([r.scale for r in refs], step)
         if len(refs) == 1 and refs[0].region == "full":
             self._pipe.set_ip_adapter_scale(scales[0])
         else:
             self._pipe.set_ip_adapter_scale([scales])
 
-    def _schedule_callback(self, refs: list[Reference]) -> Any:
+    def _schedule_callback(self, refs: list[Reference], schedule: IpSchedule) -> Any:
         """step이 끝날 때마다 다음 step의 강도를 건다 (callback_on_step_end)."""
 
         def callback(pipe: Any, step: int, timestep: Any, kwargs: dict[str, Any]) -> dict[str, Any]:
-            self._set_scales(refs, step + 1)
+            self._set_scales(refs, step + 1, schedule)
             return kwargs
 
         return callback
@@ -199,10 +201,11 @@ class SdxlBackend:
         height = int(image.get("height", 768))
         refs = list(references or [])
         extra: dict[str, Any] = {}
+        schedule = self.ip_schedule.override(image.get("ipSchedule"))
         if (refs and self._ensure_ip_adapter()) or self._ip_loaded:
-            extra = self._ip_kwargs(refs, width, height)
-            if refs and self.ip_schedule.active:
-                extra["callback_on_step_end"] = self._schedule_callback(refs)
+            extra = self._ip_kwargs(refs, width, height, schedule)
+            if refs and schedule.active:
+                extra["callback_on_step_end"] = self._schedule_callback(refs, schedule)
         generator = torch.Generator(device="cpu").manual_seed(int(image.get("seed", 0)))
         negative = image.get("negativePrompt") if self.guidance > 1 else None
         result = self._pipe(

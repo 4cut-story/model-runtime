@@ -10,7 +10,8 @@ GPU PC IP-Adapter 벤치(2026-11-05): Plus 1~4 step 0.2 → 5~8 step 0.8이
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -27,6 +28,31 @@ class IpSchedule:
             return [_clip(min(self.early_scale, s)) for s in scales]
         boost = self.late_boost if self.early_steps > 0 else 0.0
         return [_clip(s + boost) if s > 0 else 0.0 for s in scales]
+
+    def override(self, data: Any) -> IpSchedule:
+        """그림 작업의 ipSchedule(earlyScale, earlySteps, lateBoost)로 바꾼 스케줄.
+
+        conversation-service가 설정으로 보내면 GPU PC를 다시 띄우지 않고 강도를 고칠 수 있다.
+        없거나 잘못된 값은 이 스케줄(환경 변수) 값을 쓴다.
+        """
+        if not isinstance(data, dict):
+            return self
+
+        def number(key: str) -> float | None:
+            value = data.get(key)
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                return None
+            return float(value)
+
+        early_scale = number("earlyScale")
+        early_steps = number("earlySteps")
+        late_boost = number("lateBoost")
+        return replace(
+            self,
+            early_scale=self.early_scale if early_scale is None else early_scale,
+            early_steps=self.early_steps if early_steps is None else int(early_steps),
+            late_boost=self.late_boost if late_boost is None else late_boost,
+        )
 
     @property
     def active(self) -> bool:

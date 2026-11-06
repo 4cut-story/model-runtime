@@ -25,3 +25,20 @@ def test_REQ018_early_steps가_0이면_스케줄_없이_캐릭터_강도를_그�
     assert not s.active
     assert s.scales([0.6], 0) == [0.6]
     assert s.scales([0.6], 7) == [0.6]
+
+
+def test_REQ018_그림_작업의_ipSchedule로_강도_스케줄을_바꾼다() -> None:
+    base = IpSchedule(early_scale=0.2, early_steps=4, late_boost=0.2)
+    s = base.override({"earlyScale": 0.3, "earlySteps": 2, "lateBoost": 0.1})
+    assert s == IpSchedule(early_scale=0.3, early_steps=2, late_boost=0.1)
+    assert s.scales([0.6], 1) == [0.3]
+    assert [round(v, 6) for v in s.scales([0.6], 2)] == [0.7]
+    # 일부만 오면 나머지는 환경 변수 값
+    assert base.override({"earlySteps": 3}) == IpSchedule(0.2, 3, 0.2)
+
+
+def test_REQ018_ipSchedule이_없거나_잘못되면_환경_변수_스케줄을_쓴다() -> None:
+    base = IpSchedule()
+    assert base.override(None) is base
+    assert base.override("x") is base
+    assert base.override({"earlySteps": "2", "earlyScale": True}) == base
