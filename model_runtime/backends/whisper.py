@@ -31,8 +31,10 @@ class WhisperBackend:
         hf_token: str | None,
         device: str = "cuda",
         keep_in_ram: bool = False,
+        min_speakers: int = 0,
     ) -> None:
         self.model_name = model_name
+        self.min_speakers = min_speakers
         self.hf_token = hf_token
         self.device = device
         self.keep_in_ram = keep_in_ram
@@ -48,6 +50,10 @@ class WhisperBackend:
 
         if self._tf32 is not None:
             torch.backends.cuda.matmul.allow_tf32, torch.backends.cudnn.allow_tf32 = self._tf32
+
+    def _speaker_hint(self) -> dict[str, int]:
+        """pyannote에 줄 최소 화자 수. 0 이하면 정하지 않는다."""
+        return {"min_speakers": self.min_speakers} if self.min_speakers > 0 else {}
 
     def load(self) -> None:
         import torch
@@ -106,7 +112,7 @@ class WhisperBackend:
         result: dict[str, Any] = {"segments": merged}
         if self._diarize is not None:
             try:
-                speakers = self._diarize(audio)
+                speakers = self._diarize(audio, **self._speaker_hint())
             finally:
                 self._restore_tf32()
             result = whisperx.assign_word_speakers(speakers, result)
