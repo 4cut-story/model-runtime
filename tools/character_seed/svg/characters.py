@@ -481,12 +481,15 @@ def animal(d: dict) -> str:
         for x, y in ((CX - 80, CY - 60), (CX + 70, CY - 70), (CX - 40, CY - 95), (CX + 30, CY - 100)):
             o.append(f'<circle cx="{x}" cy="{y}" r="9" fill="#fff4e4"/>')
     # 눈·코·입
-    for side in (-1, 1):
-        x = CX + side * 46
-        o.append(f'<ellipse cx="{x}" cy="{CY + 14}" rx="13" ry="16" fill="#241c19"/><circle cx="{x + 4}" cy="{CY + 8}" r="5" fill="#fff"/>')
-    o.append(f'<ellipse cx="{CX}" cy="{CY + 52}" rx="16" ry="11" fill="#3a2a26"/>')
-    o.append(f'<path d="M {CX} {CY + 62} L {CX} {CY + 74} M {CX - 22} {CY + 80} Q {CX - 10} {CY + 92} {CX} {CY + 74} Q {CX + 10} {CY + 92} {CX + 22} {CY + 80}" fill="none" {p.st(4)}/>')
-    o.append(f'<ellipse cx="{CX - 80}" cy="{CY + 56}" rx="20" ry="11" fill="#f39a9a" opacity="0.55"/><ellipse cx="{CX + 80}" cy="{CY + 56}" rx="20" ry="11" fill="#f39a9a" opacity="0.55"/>')
+    if d.get("face_svg") is not None:
+        o.append(d["face_svg"])
+    else:
+        for side in (-1, 1):
+            x = CX + side * 46
+            o.append(f'<ellipse cx="{x}" cy="{CY + 14}" rx="13" ry="16" fill="#241c19"/><circle cx="{x + 4}" cy="{CY + 8}" r="5" fill="#fff"/>')
+        o.append(f'<ellipse cx="{CX}" cy="{CY + 52}" rx="16" ry="11" fill="#3a2a26"/>')
+        o.append(f'<path d="M {CX} {CY + 62} L {CX} {CY + 74} M {CX - 22} {CY + 80} Q {CX - 10} {CY + 92} {CX} {CY + 74} Q {CX + 10} {CY + 92} {CX + 22} {CY + 80}" fill="none" {p.st(4)}/>')
+        o.append(f'<ellipse cx="{CX - 80}" cy="{CY + 56}" rx="20" ry="11" fill="#f39a9a" opacity="0.55"/><ellipse cx="{CX + 80}" cy="{CY + 56}" rx="20" ry="11" fill="#f39a9a" opacity="0.55"/>')
     if a == "cat":
         for side in (-1, 1):
             for dy in (-6, 8):
