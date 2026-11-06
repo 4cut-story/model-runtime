@@ -125,3 +125,14 @@ def test_REQ018_모르는_위치는_BAD_INPUT() -> None:
         respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
         w.run_once()
     assert api.fails == [("i", "BAD_INPUT", False)]
+
+
+def test_REQ018_가운데_자리_참조를_받는다() -> None:
+    backends = FakeBackends()
+    w, _ = make(backends)
+    ref = {"character": "c", "scale": 0.6, "region": "center", "embedUrl": "http://minio/get/c"}
+    with respx.mock:
+        respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        respx.get("http://minio/get/c").mock(return_value=httpx.Response(200, content=b"emb-c"))
+        w.draw_all([image(1, [ref])])
+    assert backends.drawn[0][1] == [Reference("c", b"emb-c", 0.6, "center")]
