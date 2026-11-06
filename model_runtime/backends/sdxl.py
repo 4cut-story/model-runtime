@@ -43,6 +43,7 @@ class SdxlBackend:
         keep_in_ram: bool = False,
         ip_adapter: str = "",
         ip_schedule: IpSchedule | None = None,
+        variant: str = "fp16",
     ) -> None:
         self.model_name = model_name
         self.cpu_offload = cpu_offload
@@ -53,6 +54,8 @@ class SdxlBackend:
         self.keep_in_ram = keep_in_ram and not cpu_offload
         self.ip_adapter = ip_adapter
         self.ip_schedule = ip_schedule or IpSchedule()
+        # 체크포인트 레포에 fp16 variant 파일이 없으면(애니 계열 등) 비운다
+        self.variant = variant or None
         self._pipe: Any = None
         self._on_gpu = False
         self._ip_loaded = False
@@ -67,7 +70,7 @@ class SdxlBackend:
         from diffusers import EulerDiscreteScheduler, StableDiffusionXLPipeline
 
         pipe = StableDiffusionXLPipeline.from_pretrained(
-            self.model_name, torch_dtype=torch.float16, variant="fp16", use_safetensors=True
+            self.model_name, torch_dtype=torch.float16, variant=self.variant, use_safetensors=True
         )
         if self.lora:
             from huggingface_hub import hf_hub_download
@@ -214,6 +217,16 @@ class SdxlBackend:
             long = long_prompt.encode(self._pipe, image["prompt"])
             if long is not None:
                 text = {"prompt_embeds": long[0], "pooled_prompt_embeds": long[1]}
+        else:
+            # guidance > 1(LoRA 없는 모델)은 negative도 같은 조각 수로 인코딩한다
+            pair = long_prompt.encode_pair(self._pipe, image["prompt"], negative or "")
+            if pair is not None:
+                text = {
+                    "prompt_embeds": pair[0],
+                    "negative_prompt_embeds": pair[1],
+                    "pooled_prompt_embeds": pair[2],
+                    "negative_pooled_prompt_embeds": pair[3],
+                }
         result = self._pipe(
             **text,
             width=width,

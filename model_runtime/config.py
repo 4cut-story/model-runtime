@@ -38,6 +38,8 @@ class Settings:
     sdxl_cpu_offload: bool = False
     # 적은 step용 LoRA "<HF 레포>:<파일>". 비우면 SDXL base만 쓴다 (steps 30, guidance 6 권장)
     sdxl_lora: str = DEFAULT_SDXL_LORA
+    # from_pretrained variant. fp16 파일이 없는 체크포인트(Animagine XL 4 등)는 비운다
+    sdxl_variant: str = "fp16"
     sdxl_steps: int = 8
     sdxl_guidance: float = 0.0
     # 모델을 내릴 때 지우지 않고 시스템 RAM에 옮겨 둔다 (SDXL, 정렬 모델). RAM 약 7GB를 더 쓴다
@@ -71,6 +73,7 @@ class Settings:
             hf_token=env.get("HF_TOKEN") or None,
             sdxl_cpu_offload=env.get("SDXL_CPU_OFFLOAD", "false").lower() == "true",
             sdxl_lora=env.get("SDXL_LORA", DEFAULT_SDXL_LORA).strip(),
+            sdxl_variant=env.get("SDXL_VARIANT", "fp16").strip(),
             sdxl_steps=int(env.get("SDXL_STEPS", "8")),
             sdxl_guidance=float(env.get("SDXL_GUIDANCE", "0")),
             keep_in_ram=env.get("MODEL_KEEP_IN_RAM", "true").lower() == "true",

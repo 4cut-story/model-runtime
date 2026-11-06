@@ -37,6 +37,7 @@ def build_backends(settings: Settings) -> Backends:
             settings.sdxl_model,
             settings.sdxl_cpu_offload,
             lora=settings.sdxl_lora,
+            variant=settings.sdxl_variant,
             steps=settings.sdxl_steps,
             guidance=settings.sdxl_guidance,
             keep_in_ram=settings.keep_in_ram,
