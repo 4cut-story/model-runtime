@@ -47,6 +47,7 @@ def build_backends(settings: Settings) -> Backends:
             guidance=settings.sdxl_guidance,
             keep_in_ram=settings.keep_in_ram,
             ip_adapter=settings.sdxl_ip_adapter,
+            image_check=settings.image_check,
             ip_schedule=IpSchedule(
                 settings.sdxl_ip_early_scale,
                 settings.sdxl_ip_early_steps,

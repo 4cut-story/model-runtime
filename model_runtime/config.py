@@ -54,6 +54,8 @@ class Settings:
     sdxl_ip_early_scale: float = 0.2
     sdxl_ip_early_steps: int = 4
     sdxl_ip_late_boost: float = 0.2
+    # 그린 뒤 CLIP으로 인물 성별·나이·동물을 확인하고 틀리면 다시 그린다 (VRAM 약 +0.9GB)
+    image_check: bool = True
     poll_min: float = 2.0
     poll_max: float = 10.0
     heartbeat_interval: float = 30.0
@@ -85,4 +87,5 @@ class Settings:
             sdxl_ip_early_scale=float(env.get("SDXL_IP_EARLY_SCALE", "0.2")),
             sdxl_ip_early_steps=int(env.get("SDXL_IP_EARLY_STEPS", "4")),
             sdxl_ip_late_boost=float(env.get("SDXL_IP_LATE_BOOST", "0.2")),
+            image_check=env.get("IMAGE_CHECK", "true").lower() == "true",
         )

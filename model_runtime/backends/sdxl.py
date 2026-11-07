@@ -19,6 +19,11 @@ GPU PC 벤치: 4컷 5.45초 → 약 5.6초, 예약 VRAM 약 12.5GiB.
 두 명 이상 나오는 컷에 자리별 인물 프롬프트(images[].regions)가 오면 cross-attention에서 자리마다
 그 인물 프롬프트 결과를 섞는다(regional.py). guidance 0(Lightning)에서만 쓰고, 실패하면 자리
 프롬프트 없이 다시 그린다.
+
+컷에 인물 확인(images[].checks)이 오면 그린 뒤 CLIP(ViT-L/14, fp16 약 0.9GB)으로 자리마다
+성별·나이·동물을 확인하고, 틀리면 시드를 바꿔 최대 두 번 더 그려 가장 잘 맞는 그림을
+쓴다(check.py). 확인이 실패하면
+처음 그림을 그대로 쓴다.
 """
 
 from __future__ import annotations
@@ -29,7 +34,7 @@ import io
 import logging
 from typing import Any
 
-from . import Reference, long_prompt, regional
+from . import Reference, check, long_prompt, regional
 from .ip_schedule import IpSchedule
 
 log = logging.getLogger(__name__)
@@ -38,6 +43,8 @@ log = logging.getLogger(__name__)
 IP_ADAPTER_ENCODER = "models/image_encoder"
 # Plus 계열 embedding 모양: [이미지 수, 참조 수, 토큰, 차원]
 EMBED_SHAPE = (1, 1, 257, 1280)
+# 그린 뒤 인물 확인에 쓰는 CLIP
+CHECK_MODEL = "openai/clip-vit-large-patch14"
 
 
 class SdxlBackend:
@@ -52,6 +59,7 @@ class SdxlBackend:
         ip_adapter: str = "",
         ip_schedule: IpSchedule | None = None,
         variant: str = "fp16",
+        image_check: bool = False,
     ) -> None:
         self.model_name = model_name
         self.cpu_offload = cpu_offload
@@ -67,6 +75,8 @@ class SdxlBackend:
         self._pipe: Any = None
         self._on_gpu = False
         self._ip_loaded = False
+        self.image_check = image_check
+        self._clip: Any = None
 
     def load(self) -> None:
         if self._pipe is not None:
@@ -200,11 +210,57 @@ class SdxlBackend:
             self._pipe.to("cpu")
         else:
             self._pipe = None
+        self._clip = None
         self._on_gpu = False
         gc.collect()
         torch.cuda.empty_cache()
 
     def draw(self, image: dict[str, Any], references: list[Reference] | None = None) -> bytes:
+        checks = check.parse(image.get("checks")) if self.image_check else []
+        first = self._draw_once(image, references)
+        if not checks:
+            return first
+        qs = check.questions(checks)
+        try:
+            best = (first, self._judge(first, qs))
+            for k in range(1, check.RETRIES + 1):
+                if best[1][0] == 0:
+                    break
+                again = dict(image, seed=int(image.get("seed", 0)) + k * check.SEED_STEP)
+                data = self._draw_once(again, references)
+                result = self._judge(data, qs)
+                log.info("인물 확인 다시 그림 %d: 틀림 %d → %d", k, best[1][0], result[0])
+                if check.better(result, best[1]):
+                    best = (data, result)
+            return best[0]
+        except Exception:
+            log.exception("인물 확인을 하지 못해 처음 그림을 쓴다")
+            return first
+
+    def _judge(self, png: bytes, qs: list[check.Question]) -> tuple[int, float]:
+        """그림의 자리마다 CLIP으로 물어 (틀린 수, 맞는 말 확률 평균)을 낸다."""
+        import torch
+        from PIL import Image
+
+        if self._clip is None:
+            from transformers import CLIPModel, CLIPProcessor
+
+            model = CLIPModel.from_pretrained(CHECK_MODEL, torch_dtype=torch.float16).to("cuda")
+            self._clip = (model.eval(), CLIPProcessor.from_pretrained(CHECK_MODEL))
+        model, processor = self._clip
+        picture = Image.open(io.BytesIO(png)).convert("RGB")
+        probs = []
+        for q in qs:
+            crop = picture.crop(check.box(q.region, picture.width, picture.height))
+            inputs = processor(text=list(q.labels), images=crop, return_tensors="pt", padding=True)
+            inputs = {k: v.to("cuda") for k, v in inputs.items()}
+            inputs["pixel_values"] = inputs["pixel_values"].half()
+            with torch.no_grad():
+                logits = model(**inputs).logits_per_image[0]
+            probs.append(logits.float().softmax(-1).tolist())
+        return check.score(probs, qs)
+
+    def _draw_once(self, image: dict[str, Any], references: list[Reference] | None) -> bytes:
         regions = regional.parse(image.get("regions")) if self.guidance <= 1 else []
         if regions:
             try:
@@ -306,6 +362,7 @@ class SdxlBackend:
             "guidance": self.guidance,
             "cpuOffload": self.cpu_offload,
             "ipAdapter": self.ip_adapter or None,
+            "imageCheck": CHECK_MODEL if self.image_check else None,
             "ipSchedule": {
                 "earlyScale": self.ip_schedule.early_scale,
                 "earlySteps": self.ip_schedule.early_steps,
