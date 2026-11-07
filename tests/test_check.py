@@ -30,17 +30,21 @@ def test_FR006_확인_항목을_읽고_모르는_자리와_빈_항목은_뺀다(
 
 def test_FR006_사람은_나이대와_성별을_동물은_종을_묻는다() -> None:
     qs = questions([Check("left", "F", "CHILD"), Check("right", "M", "OLD")])
-    assert qs[0] == Question(
+    assert qs[0] == Question("left", ("a cartoon person", "an empty background with nobody"), 0)
+    assert qs[1] == Question(
         "left", ("a cartoon child", "a cartoon adult", "a cartoon elderly person"), 0
     )
-    assert qs[1] == Question("left", ("a cartoon girl", "a cartoon boy"), 0)
-    assert qs[2].answer == 2
-    assert qs[3] == Question("right", ("a cartoon woman", "a cartoon man"), 1)
+    assert qs[2] == Question("left", ("a cartoon girl", "a cartoon boy"), 0)
+    assert qs[4].answer == 2
+    assert qs[5] == Question("right", ("a cartoon woman", "a cartoon man"), 1)
     animals = questions([Check("left", animal="bear"), Check("right", animal="rabbit")])
-    assert animals[0].labels[:2] == ("a cartoon bear", "a cartoon rabbit")
-    assert animals[0].labels[-1] == "a cartoon human person"
-    assert animals[1].labels[:2] == ("a cartoon rabbit", "a cartoon bear")
-    assert len(set(animals[1].labels)) == len(animals[1].labels)
+    assert animals[0].labels == ("a cartoon bear", "an empty background with nobody")
+    assert animals[1].labels[:2] == ("a cartoon bear", "a cartoon rabbit")
+    assert animals[1].labels[-1] == "a cartoon human person"
+    assert animals[3].labels[:2] == ("a cartoon rabbit", "a cartoon bear")
+    assert len(set(animals[3].labels)) == len(animals[3].labels)
+    solo = questions([Check("center", "F", "OLD")])
+    assert [q.labels[0] for q in solo] == ["a cartoon child", "a cartoon woman"]
 
 
 def test_FR006_자리별로_잘라_본다() -> None:
