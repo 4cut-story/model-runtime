@@ -117,7 +117,9 @@ class SdxlBackend:
             repo, _, filename = self.lora.partition(":")
             pipe.load_lora_weights(hf_hub_download(repo, filename))
             pipe.fuse_lora()
-            # Lightning은 trailing timestep으로 학습됐다
+        if self.lora or self.steps <= 10:
+            # Lightning(LoRA든 Lightning을 합친 체크포인트든)은 trailing timestep으로 학습됐다.
+            # 체크포인트 기본(leading)으로 10 step 아래를 돌리면 흐리고 덜 그려진다
             pipe.scheduler = EulerDiscreteScheduler.from_config(
                 pipe.scheduler.config, timestep_spacing="trailing"
             )
