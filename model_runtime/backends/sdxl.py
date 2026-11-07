@@ -188,14 +188,14 @@ class SdxlBackend:
         if not refs:
             self._pipe.set_ip_adapter_scale(0.0)
             zeros = torch.zeros(EMBED_SHAPE, dtype=torch.float16, device=device)
-            return {"ip_adapter_image_embeds": [zeros]}
+            return {"ip_adapter_image_embeds": [self._with_negative(zeros)]}
         tensors = []
         for ref in refs:
             t = load(ref.embed)["embeds"]
             if tuple(t.shape) != EMBED_SHAPE:
                 raise ValueError(f"{ref.character} embedding 모양이 {tuple(t.shape)}이다")
             tensors.append(t.to(device=device, dtype=torch.float16))
-        embeds = torch.cat(tensors, dim=1)
+        embeds = self._with_negative(torch.cat(tensors, dim=1))
         regions = [r.region for r in refs]
         self._set_scales(refs, 0, schedule)
         if len(refs) == 1 and regions[0] == "full":
@@ -208,6 +208,18 @@ class SdxlBackend:
             "ip_adapter_image_embeds": [embeds],
             "cross_attention_kwargs": {"ip_adapter_masks": [masks]},
         }
+
+    def _with_negative(self, embeds: Any) -> Any:
+        """guidance > 1(CFG)이면 앞에 0 embedding을 붙여 [negative; positive]로 넘긴다.
+
+        diffusers가 CFG에서 embedding을 chunk(2)로 나누므로 한 벌만 넘기면 ValueError가 난다
+        (회차 21, DreamShaper guidance 2).
+        """
+        if self.guidance <= 1:
+            return embeds
+        import torch
+
+        return torch.cat([torch.zeros_like(embeds), embeds], dim=0)
 
     def _set_scales(self, refs: list[Reference], step: int, schedule: IpSchedule) -> None:
         """step에서 쓸 강도. 전체 참조 한 명은 숫자 하나, 마스크를 쓰면 참조별 목록."""
