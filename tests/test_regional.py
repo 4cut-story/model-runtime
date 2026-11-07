@@ -1,6 +1,6 @@
 """인물별 자리 프롬프트 (FR-006: 두 명 컷에서 인물이 섞이지 않게)."""
 
-from model_runtime.backends.regional import RegionPrompt, columns, grid, parse
+from model_runtime.backends.regional import RegionPrompt, active, columns, grid, parse
 
 
 def test_FR006_자리_프롬프트는_두_개_이상일_때만_쓴다() -> None:
@@ -32,3 +32,10 @@ def test_FR006_자리별_가로_열() -> None:
     assert columns("left", 96) == (0, 48)
     assert columns("right", 96) == (48, 96)
     assert columns("center", 24) == (5, 19)
+
+
+def test_FR006_구도가_잡히기_전_단계에는_섞지_않는다() -> None:
+    assert not active(0)
+    assert not active(1)
+    assert active(2)
+    assert active(7)
