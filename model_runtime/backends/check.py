@@ -86,10 +86,15 @@ def questions(checks: list[Check]) -> list[Question]:
     """인물마다 물을 것.
 
     동물은 종(컷에 나오는 다른 동물과 사람 가운데)을, 사람은 나이대와 성별을 따로 묻는다.
+    두 명 이상 나오는 컷은 왼쪽·오른쪽 자리에 누가 있는지도 묻는다. 회차 16에서 성별·나이만 물었더니
+    한 사람만 그린 그림이 더 잘 맞는다고 골라져 두 사람 컷에서 한 사람이 빠졌다.
     """
     animals = [c.animal for c in checks if c.animal]
     out = []
     for c in checks:
+        if len(checks) >= 2 and c.region in ("left", "right"):
+            who = f"a cartoon {c.animal}" if c.animal else "a cartoon person"
+            out.append(Question(c.region, (who, "an empty background with nobody"), 0))
         if c.animal:
             others = [a for a in ANIMALS if a != c.animal and a not in animals]
             choices = [c.animal, *[a for a in animals if a != c.animal], *others[:4]]
