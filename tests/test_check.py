@@ -30,19 +30,21 @@ def test_FR006_확인_항목을_읽고_모르는_자리와_빈_항목은_뺀다(
 
 def test_FR006_사람은_나이대와_성별을_동물은_종을_묻는다() -> None:
     qs = questions([Check("left", "F", "CHILD"), Check("right", "M", "OLD")])
-    assert qs[0] == Question("left", ("a cartoon person", "an empty background with nobody"), 0)
+    assert qs[0] == Question(
+        "full", ("two cartoon characters", "one cartoon character alone"), 0, 3
+    )
     assert qs[1] == Question(
         "left", ("a cartoon child", "a cartoon adult", "a cartoon elderly person"), 0
     )
     assert qs[2] == Question("left", ("a cartoon girl", "a cartoon boy"), 0)
-    assert qs[4].answer == 2
-    assert qs[5] == Question("right", ("a cartoon woman", "a cartoon man"), 1)
+    assert qs[3].answer == 2
+    assert qs[4] == Question("right", ("a cartoon woman", "a cartoon man"), 1)
     animals = questions([Check("left", animal="bear"), Check("right", animal="rabbit")])
-    assert animals[0].labels == ("a cartoon bear", "an empty background with nobody")
+    assert animals[0].region == "full"
     assert animals[1].labels[:2] == ("a cartoon bear", "a cartoon rabbit")
     assert animals[1].labels[-1] == "a cartoon human person"
-    assert animals[3].labels[:2] == ("a cartoon rabbit", "a cartoon bear")
-    assert len(set(animals[3].labels)) == len(animals[3].labels)
+    assert animals[2].labels[:2] == ("a cartoon rabbit", "a cartoon bear")
+    assert len(set(animals[2].labels)) == len(animals[2].labels)
     solo = questions([Check("center", "F", "OLD")])
     assert [q.labels[0] for q in solo] == ["a cartoon child", "a cartoon woman"]
 
@@ -58,6 +60,8 @@ def test_FR006_틀린_수가_적고_확률이_높은_그림을_고른다() -> No
     assert score([[0.9, 0.1], [0.2, 0.3, 0.5]], qs) == (0, 0.7)
     assert score([[0.4, 0.6], [0.5, 0.1, 0.4]], qs)[0] == 2
     assert score([], []) == (0, 1.0)
+    many = [Question("full", ("two", "one"), 0, 3), Question("left", ("a", "b"), 0)]
+    assert score([[0.2, 0.8], [0.9, 0.1]], many)[0] == 3
     assert better((0, 0.5), (1, 0.9))
     assert better((1, 0.8), (1, 0.7))
     assert not better((1, 0.7), (1, 0.7))

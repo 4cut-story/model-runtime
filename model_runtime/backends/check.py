@@ -21,6 +21,9 @@ RETRIES = 2
 SEED_STEP = 1_000_003
 # 기대한 말의 확률이 이보다 낮으면 틀린 것으로 본다
 THRESHOLD = 0.5
+# 인물 수 질문이 틀리면 이만큼 틀린 것으로 센다. 사람이 빠진 그림은 성별·나이가 맞아도 쓸 수 없다
+COUNT_WEIGHT = 3
+NUMBERS = {2: "two", 3: "three", 4: "four"}
 
 ANIMALS = (
     "bear",
@@ -60,6 +63,7 @@ class Question:
     region: str
     labels: tuple[str, ...]
     answer: int
+    weight: int = 1
 
 
 def parse(raw: Any) -> list[Check]:
@@ -86,15 +90,18 @@ def questions(checks: list[Check]) -> list[Question]:
     """인물마다 물을 것.
 
     동물은 종(컷에 나오는 다른 동물과 사람 가운데)을, 사람은 나이대와 성별을 따로 묻는다.
-    두 명 이상 나오는 컷은 왼쪽·오른쪽 자리에 누가 있는지도 묻는다. 회차 16에서 성별·나이만 물었더니
-    한 사람만 그린 그림이 더 잘 맞는다고 골라져 두 사람 컷에서 한 사람이 빠졌다.
+    두 명 이상 나오는 컷은 그림 전체에 인물이 몇인지도 묻는다. 회차 16에서 성별·나이만 물었더니
+    한 사람만 그린 그림이 골라져 두 사람 컷에서 한 사람이 빠졌다. 회차 17에서 왼쪽·오른쪽 반을
+    잘라 "사람이 있는가"를 물었지만, 가운데 선 한 사람이 두 반에 다 걸려 빠진 그림을 못 가렸다.
+    회차 14~16의 두 사람 컷 39개로 재 보니 그림 전체에 "two / one" 을 묻는 쪽이 훨씬 잘 가렸다
+    (빠진 그림 20개 가운데 18개를 가림, 반 자르기는 13개).
     """
     animals = [c.animal for c in checks if c.animal]
     out = []
+    if len(checks) in NUMBERS:
+        many = f"{NUMBERS[len(checks)]} cartoon characters"
+        out.append(Question("full", (many, "one cartoon character alone"), 0, COUNT_WEIGHT))
     for c in checks:
-        if len(checks) >= 2 and c.region in ("left", "right"):
-            who = f"a cartoon {c.animal}" if c.animal else "a cartoon person"
-            out.append(Question(c.region, (who, "an empty background with nobody"), 0))
         if c.animal:
             others = [a for a in ANIMALS if a != c.animal and a not in animals]
             choices = [c.animal, *[a for a in animals if a != c.animal], *others[:4]]
@@ -124,7 +131,7 @@ def box(region: str, width: int, height: int) -> tuple[int, int, int, int]:
 
 
 def score(probs: list[list[float]], qs: list[Question]) -> tuple[int, float]:
-    """질문별 확률 → (틀린 수, 맞는 말 확률 평균).
+    """질문별 확률 → (틀린 수(무게를 곱해), 맞는 말 확률 평균).
 
     다시 그린 그림 가운데 틀린 수가 적고 평균이 높은 것을 고른다.
     """
@@ -134,7 +141,7 @@ def score(probs: list[list[float]], qs: list[Question]) -> tuple[int, float]:
         right = p[q.answer]
         total += right
         if right < THRESHOLD or right < max(p):
-            wrong += 1
+            wrong += q.weight
     return wrong, total / len(qs) if qs else 1.0
 
 
