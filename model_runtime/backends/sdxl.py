@@ -17,8 +17,8 @@ Plus는 얼굴뿐 아니라 머리 모양·옷까지 따르므로, 앞쪽 step�
 GPU PC 벤치: 4컷 5.45초 → 약 5.6초, 예약 VRAM 약 12.5GiB.
 
 두 명 이상 나오는 컷에 자리별 인물 프롬프트(images[].regions)가 오면 cross-attention에서 자리마다
-그 인물 프롬프트 결과를 섞는다(regional.py). guidance 0(Lightning)에서만 쓰고, 실패하면 자리
-프롬프트 없이 다시 그린다.
+그 인물 프롬프트 결과를 섞는다(regional.py). guidance > 1(CFG)이면 배치 앞 절반이 negative라
+뒤 절반(프롬프트 쪽)에만 섞는다. 실패하면 자리 프롬프트 없이 다시 그린다.
 
 컷에 인물 확인(images[].checks)이 오면 그린 뒤 CLIP(ViT-L/14, fp16 약 0.9GB)으로 자리마다
 성별·나이·동물을 확인하고, 틀리면 시드를 바꿔 최대 두 번 더 그려 가장 잘 맞는 그림을
@@ -308,7 +308,7 @@ class SdxlBackend:
     def _draw_plain(
         self, image: dict[str, Any], references: list[Reference] | None, posed: bool
     ) -> bytes:
-        regions = regional.parse(image.get("regions")) if self.guidance <= 1 else []
+        regions = regional.parse(image.get("regions"))
         if regions:
             try:
                 return self._draw(image, references, regions, posed)
@@ -425,7 +425,7 @@ class SdxlBackend:
             prepared.append((r.region, embeds))
         saved = dict(self._pipe.unet.attn_processors)
         swapped = {
-            name: _regional_processor(proc, prepared, width, height, step)
+            name: _regional_processor(proc, prepared, width, height, step, self.guidance > 1)
             if name.endswith("attn2.processor")
             else proc
             for name, proc in saved.items()
@@ -485,9 +485,16 @@ def _count_steps(step: list[int], inner: Any) -> Any:
 
 
 def _regional_processor(
-    inner: Any, prepared: list[tuple[str, Any]], width: int, height: int, step: list[int]
+    inner: Any,
+    prepared: list[tuple[str, Any]],
+    width: int,
+    height: int,
+    step: list[int],
+    cfg: bool = False,
 ) -> Any:
     """자리 안에서 인물 프롬프트 결과를 섞는 처리기.
+
+    cfg이면 배치 앞 절반(negative)은 그대로 두고 뒤 절반(프롬프트)에만 섞는다.
 
     inner와 같은 종류라 IP-Adapter 강도 설정이 그대로 닿고, inner의 상태(가중치 등)를 함께 쓴다.
     """
@@ -522,6 +529,9 @@ def _regional_processor(
             mask = hidden_states.new_zeros(h, w)
             mask[:, start:end] = regional.WEIGHT
             mask = mask.reshape(1, seq, 1)
+            if cfg:
+                mask = mask.expand(batch, -1, -1).clone()
+                mask[: batch // 2] = 0
             out = out * (1 - mask) + part * mask
         return out
 
