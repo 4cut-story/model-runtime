@@ -15,16 +15,24 @@ Plus는 얼굴뿐 아니라 머리 모양·옷까지 따르므로, 앞쪽 step�
 컷마다 바뀌었다. embedding은 ViT-H 인코더 출력이라 Plus와 Plus-Face가 같은 것을 쓴다.
 어댑터를 올린 뒤 참조가 없는 컷은 강도 0으로 그린다(텍스트만으로 그린 것과 픽셀이 같다).
 GPU PC 벤치: 4컷 5.45초 → 약 5.6초, 예약 VRAM 약 12.5GiB.
+
+두 명 이상 나오는 컷에 자리별 인물 프롬프트(images[].regions)가 오면 cross-attention에서 자리마다
+그 인물 프롬프트 결과를 섞는다(regional.py). guidance 0(Lightning)에서만 쓰고, 실패하면 자리
+프롬프트 없이 다시 그린다.
 """
 
 from __future__ import annotations
 
+import functools
 import gc
 import io
+import logging
 from typing import Any
 
-from . import Reference, long_prompt
+from . import Reference, long_prompt, regional
 from .ip_schedule import IpSchedule
+
+log = logging.getLogger(__name__)
 
 # IP-Adapter 이미지 인코더 (ViT-H). 어댑터와 같은 레포 안 경로
 IP_ADAPTER_ENCODER = "models/image_encoder"
@@ -197,6 +205,21 @@ class SdxlBackend:
         torch.cuda.empty_cache()
 
     def draw(self, image: dict[str, Any], references: list[Reference] | None = None) -> bytes:
+        regions = regional.parse(image.get("regions")) if self.guidance <= 1 else []
+        if regions:
+            try:
+                return self._draw(image, references, regions)
+            except Exception:
+                # 자리 프롬프트는 그림을 낫게 하려는 것이라, 어긋나면 예전 방식으로 그린다
+                log.exception("자리 프롬프트로 그리지 못해 전체 프롬프트로만 다시 그린다")
+        return self._draw(image, references, [])
+
+    def _draw(
+        self,
+        image: dict[str, Any],
+        references: list[Reference] | None,
+        regions: list[regional.RegionPrompt],
+    ) -> bytes:
         import torch
 
         self.load()
@@ -227,18 +250,50 @@ class SdxlBackend:
                     "pooled_prompt_embeds": pair[2],
                     "negative_pooled_prompt_embeds": pair[3],
                 }
-        result = self._pipe(
-            **text,
-            width=width,
-            height=height,
-            num_inference_steps=self.steps,
-            guidance_scale=self.guidance,
-            generator=generator,
-            **extra,
-        ).images[0]
+        saved = self._install_regions(regions, width, height) if regions else None
+        try:
+            result = self._pipe(
+                **text,
+                width=width,
+                height=height,
+                num_inference_steps=self.steps,
+                guidance_scale=self.guidance,
+                generator=generator,
+                **extra,
+            ).images[0]
+        finally:
+            if saved is not None:
+                self._pipe.unet.set_attn_processor(saved)
         out = io.BytesIO()
         result.save(out, format="PNG")
         return out.getvalue()
+
+    def _install_regions(
+        self, regions: list[regional.RegionPrompt], width: int, height: int
+    ) -> dict[str, Any]:
+        """cross-attention 처리기를 자리 프롬프트를 섞는 것으로 바꾸고, 원래 처리기를 돌려준다."""
+        import torch
+
+        device = self._pipe._execution_device
+        prepared = []
+        for r in regions:
+            with torch.no_grad():
+                embeds = self._pipe.encode_prompt(
+                    prompt=r.prompt,
+                    device=device,
+                    num_images_per_prompt=1,
+                    do_classifier_free_guidance=False,
+                )[0]
+            prepared.append((r.region, embeds))
+        saved = dict(self._pipe.unet.attn_processors)
+        swapped = {
+            name: _regional_processor(proc, prepared, width, height)
+            if name.endswith("attn2.processor")
+            else proc
+            for name, proc in saved.items()
+        }
+        self._pipe.unet.set_attn_processor(swapped)
+        return saved
 
     def model_info(self) -> dict[str, Any]:
         return {
@@ -277,3 +332,50 @@ def _region_masks(regions: list[str], width: int, height: int) -> Any:
         pictures.append(mask)
     masks = IPAdapterMaskProcessor().preprocess(pictures, height=height, width=width)
     return masks.reshape(1, masks.shape[0], masks.shape[2], masks.shape[3])
+
+
+def _regional_processor(
+    inner: Any, prepared: list[tuple[str, Any]], width: int, height: int
+) -> Any:
+    """자리 안에서 인물 프롬프트 결과를 섞는 처리기.
+
+    inner와 같은 종류라 IP-Adapter 강도 설정이 그대로 닿고, inner의 상태(가중치 등)를 함께 쓴다.
+    """
+    base_cls = type(inner)
+    base_call = base_cls.__call__
+
+    @functools.wraps(base_call)
+    def call(
+        self: Any,
+        attn: Any,
+        hidden_states: Any,
+        encoder_hidden_states: Any = None,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Any:
+        out = base_call(self, attn, hidden_states, encoder_hidden_states, *args, **kwargs)
+        if encoder_hidden_states is None or hidden_states.ndim != 3:
+            return out
+        batch, seq, _ = hidden_states.shape
+        size = regional.grid(seq, width, height)
+        if size is None:
+            return out
+        h, w = size
+        ip = None
+        if isinstance(encoder_hidden_states, tuple):
+            ip = encoder_hidden_states[1]
+        for region, embeds in prepared:
+            text = embeds.to(hidden_states.dtype).expand(batch, -1, -1)
+            ehs = (text, ip) if ip is not None else text
+            part = base_call(self, attn, hidden_states, ehs, *args, **kwargs)
+            start, end = regional.columns(region, w)
+            mask = hidden_states.new_zeros(h, w)
+            mask[:, start:end] = regional.WEIGHT
+            mask = mask.reshape(1, seq, 1)
+            out = out * (1 - mask) + part * mask
+        return out
+
+    cls = type("Regional" + base_cls.__name__, (base_cls,), {"__call__": call})
+    proc: Any = object.__new__(cls)
+    proc.__dict__.update(inner.__dict__)
+    return proc
