@@ -34,7 +34,7 @@ import io
 import logging
 from typing import Any
 
-from . import Reference, check, long_prompt, regional
+from . import Reference, check, long_prompt, pose, regional
 from .ip_schedule import IpSchedule
 
 log = logging.getLogger(__name__)
@@ -45,6 +45,18 @@ IP_ADAPTER_ENCODER = "models/image_encoder"
 EMBED_SHAPE = (1, 1, 257, 1280)
 # 그린 뒤 인물 확인에 쓰는 CLIP
 CHECK_MODEL = "openai/clip-vit-large-patch14"
+# 뼈대 파이프라인이 SDXL 파이프라인에서 넘겨받는 부품
+ADAPTER_PARTS = (
+    "vae",
+    "text_encoder",
+    "text_encoder_2",
+    "tokenizer",
+    "tokenizer_2",
+    "unet",
+    "scheduler",
+    "feature_extractor",
+    "image_encoder",
+)
 
 
 class SdxlBackend:
@@ -60,6 +72,9 @@ class SdxlBackend:
         ip_schedule: IpSchedule | None = None,
         variant: str = "fp16",
         image_check: bool = False,
+        pose_adapter: str = "",
+        pose_scale: float = 0.8,
+        pose_factor: float = 0.5,
     ) -> None:
         self.model_name = model_name
         self.cpu_offload = cpu_offload
@@ -77,6 +92,12 @@ class SdxlBackend:
         self._ip_loaded = False
         self.image_check = image_check
         self._clip: Any = None
+        # 컷마다 인물 수·자리·키를 뼈대 그림으로 넣는 T2I-Adapter (HF 레포). 비우면 쓰지 않는다
+        self.pose_adapter = pose_adapter
+        self.pose_scale = pose_scale
+        # 앞쪽 몇 할의 step에만 뼈대를 건다. 구도만 잡고 나머지는 프롬프트에 맡긴다
+        self.pose_factor = pose_factor
+        self._adapter_pipe: Any = None
 
     def load(self) -> None:
         if self._pipe is not None:
@@ -211,6 +232,7 @@ class SdxlBackend:
         else:
             self._pipe = None
         self._clip = None
+        self._adapter_pipe = None
         self._on_gpu = False
         gc.collect()
         torch.cuda.empty_cache()
@@ -261,20 +283,32 @@ class SdxlBackend:
         return check.score(probs, qs)
 
     def _draw_once(self, image: dict[str, Any], references: list[Reference] | None) -> bytes:
+        if self.pose_adapter:
+            try:
+                return self._draw_plain(image, references, posed=True)
+            except Exception:
+                # 뼈대는 그림을 낫게 하려는 것이라, 어긋나면 뼈대 없이 그린다
+                log.exception("뼈대 그림으로 그리지 못해 뼈대 없이 다시 그린다")
+        return self._draw_plain(image, references, posed=False)
+
+    def _draw_plain(
+        self, image: dict[str, Any], references: list[Reference] | None, posed: bool
+    ) -> bytes:
         regions = regional.parse(image.get("regions")) if self.guidance <= 1 else []
         if regions:
             try:
-                return self._draw(image, references, regions)
+                return self._draw(image, references, regions, posed)
             except Exception:
                 # 자리 프롬프트는 그림을 낫게 하려는 것이라, 어긋나면 예전 방식으로 그린다
                 log.exception("자리 프롬프트로 그리지 못해 전체 프롬프트로만 다시 그린다")
-        return self._draw(image, references, [])
+        return self._draw(image, references, [], posed)
 
     def _draw(
         self,
         image: dict[str, Any],
         references: list[Reference] | None,
         regions: list[regional.RegionPrompt],
+        posed: bool = False,
     ) -> bytes:
         import torch
 
@@ -291,6 +325,20 @@ class SdxlBackend:
         step = [0]
         if regions:
             extra["callback_on_step_end"] = _count_steps(step, extra.get("callback_on_step_end"))
+        pipe = self._pipe
+        skeleton = pose.render(check.parse(image.get("checks")), width, height) if posed else None
+        if skeleton is not None:
+            pipe = self._with_adapter()
+            extra.update(
+                image=skeleton,
+                adapter_conditioning_scale=self.pose_scale,
+                adapter_conditioning_factor=self.pose_factor,
+            )
+            # adapter 파이프라인은 callback_on_step_end가 없어
+            # 예전 callback(step, t, latents)로 부른다
+            inner = extra.pop("callback_on_step_end", None)
+            if inner is not None:
+                extra["callback"] = lambda i, t, latents: inner(self._pipe, i, t, {})
         generator = torch.Generator(device="cpu").manual_seed(int(image.get("seed", 0)))
         negative = image.get("negativePrompt") if self.guidance > 1 else None
         text: dict[str, Any] = {"prompt": image["prompt"], "negative_prompt": negative}
@@ -311,7 +359,7 @@ class SdxlBackend:
                 }
         saved = self._install_regions(regions, width, height, step) if regions else None
         try:
-            result = self._pipe(
+            result = pipe(
                 **text,
                 width=width,
                 height=height,
@@ -326,6 +374,23 @@ class SdxlBackend:
         out = io.BytesIO()
         result.save(out, format="PNG")
         return out.getvalue()
+
+    def _with_adapter(self) -> Any:
+        """뼈대 그림을 받는 파이프라인. SDXL 부품(UNet 처리기·IP-Adapter 포함)을 함께 쓴다."""
+        if self._adapter_pipe is None:
+            import torch
+            from diffusers import StableDiffusionXLAdapterPipeline, T2IAdapter
+
+            adapter = T2IAdapter.from_pretrained(self.pose_adapter, torch_dtype=torch.float16)
+            parts = {
+                k: v
+                for k, v in self._pipe.components.items()
+                if k in ADAPTER_PARTS and v is not None
+            }
+            self._adapter_pipe = StableDiffusionXLAdapterPipeline(
+                **parts, adapter=adapter.to("cuda")
+            )
+        return self._adapter_pipe
 
     def _install_regions(
         self, regions: list[regional.RegionPrompt], width: int, height: int, step: list[int]
@@ -358,6 +423,7 @@ class SdxlBackend:
         return {
             "sdxl": self.model_name,
             "lora": self.lora or None,
+            "poseAdapter": self.pose_adapter or None,
             "steps": self.steps,
             "guidance": self.guidance,
             "cpuOffload": self.cpu_offload,

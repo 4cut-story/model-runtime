@@ -80,3 +80,13 @@ def test_화자_분리에_최소_화자_수를_넘긴다() -> None:
 
     assert WhisperBackend("m", None, min_speakers=2)._speaker_hint() == {"min_speakers": 2}
     assert WhisperBackend("m", None)._speaker_hint() == {}
+
+
+def test_FR006_인물_확인은_끄고_뼈대_그림을_기본으로_쓴다() -> None:
+    base = {"GPU_WORKER_API_URL": "https://4cut.example", "GPU_WORKER_TOKEN": "t"}
+    s = Settings.from_env(base)
+    assert s.image_check is False
+    assert s.pose_adapter == "TencentARC/t2i-adapter-openpose-sdxl-1.0"
+    assert (s.pose_scale, s.pose_factor) == (0.8, 0.5)
+    s = Settings.from_env({**base, "POSE_ADAPTER": "", "IMAGE_CHECK": "true", "POSE_SCALE": "1"})
+    assert (s.pose_adapter, s.image_check, s.pose_scale) == ("", True, 1.0)
