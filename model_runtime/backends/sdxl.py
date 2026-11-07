@@ -232,6 +232,9 @@ class SdxlBackend:
             extra = self._ip_kwargs(refs, width, height, schedule)
             if refs and schedule.active:
                 extra["callback_on_step_end"] = self._schedule_callback(refs, schedule)
+        step = [0]
+        if regions:
+            extra["callback_on_step_end"] = _count_steps(step, extra.get("callback_on_step_end"))
         generator = torch.Generator(device="cpu").manual_seed(int(image.get("seed", 0)))
         negative = image.get("negativePrompt") if self.guidance > 1 else None
         text: dict[str, Any] = {"prompt": image["prompt"], "negative_prompt": negative}
@@ -250,7 +253,7 @@ class SdxlBackend:
                     "pooled_prompt_embeds": pair[2],
                     "negative_pooled_prompt_embeds": pair[3],
                 }
-        saved = self._install_regions(regions, width, height) if regions else None
+        saved = self._install_regions(regions, width, height, step) if regions else None
         try:
             result = self._pipe(
                 **text,
@@ -269,7 +272,7 @@ class SdxlBackend:
         return out.getvalue()
 
     def _install_regions(
-        self, regions: list[regional.RegionPrompt], width: int, height: int
+        self, regions: list[regional.RegionPrompt], width: int, height: int, step: list[int]
     ) -> dict[str, Any]:
         """cross-attention 처리기를 자리 프롬프트를 섞는 것으로 바꾸고, 원래 처리기를 돌려준다."""
         import torch
@@ -287,7 +290,7 @@ class SdxlBackend:
             prepared.append((r.region, embeds))
         saved = dict(self._pipe.unet.attn_processors)
         swapped = {
-            name: _regional_processor(proc, prepared, width, height)
+            name: _regional_processor(proc, prepared, width, height, step)
             if name.endswith("attn2.processor")
             else proc
             for name, proc in saved.items()
@@ -334,8 +337,18 @@ def _region_masks(regions: list[str], width: int, height: int) -> Any:
     return masks.reshape(1, masks.shape[0], masks.shape[2], masks.shape[3])
 
 
+def _count_steps(step: list[int], inner: Any) -> Any:
+    """step이 끝날 때마다 다음 step 번호를 step[0]에 적고, 원래 callback이 있으면 부른다."""
+
+    def callback(pipe: Any, i: int, timestep: Any, kwargs: dict[str, Any]) -> dict[str, Any]:
+        step[0] = i + 1
+        return inner(pipe, i, timestep, kwargs) if inner is not None else kwargs
+
+    return callback
+
+
 def _regional_processor(
-    inner: Any, prepared: list[tuple[str, Any]], width: int, height: int
+    inner: Any, prepared: list[tuple[str, Any]], width: int, height: int, step: list[int]
 ) -> Any:
     """자리 안에서 인물 프롬프트 결과를 섞는 처리기.
 
@@ -354,7 +367,7 @@ def _regional_processor(
         **kwargs: Any,
     ) -> Any:
         out = base_call(self, attn, hidden_states, encoder_hidden_states, *args, **kwargs)
-        if encoder_hidden_states is None or hidden_states.ndim != 3:
+        if encoder_hidden_states is None or hidden_states.ndim != 3 or not regional.active(step[0]):
             return out
         batch, seq, _ = hidden_states.shape
         size = regional.grid(seq, width, height)
