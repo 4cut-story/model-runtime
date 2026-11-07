@@ -1,4 +1,4 @@
-"""guidance > 1(CFG)일 때 IP-Adapter embedding을 [negative; positive] 두 벌로 넘기는지 (회차 21 BAD_INPUT)."""
+"""guidance > 1(CFG)이면 IP-Adapter embedding을 [negative; positive] 두 벌로 넘긴다 (회차 21)."""
 
 import pytest
 

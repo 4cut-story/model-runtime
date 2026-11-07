@@ -210,9 +210,10 @@ class SdxlBackend:
         }
 
     def _with_negative(self, embeds: Any) -> Any:
-        """guidance > 1(CFG)이면 diffusers가 embedding을 [negative; positive]로 나눠 쓰므로 앞에 0 embedding을 붙인다.
+        """guidance > 1(CFG)이면 앞에 0 embedding을 붙여 [negative; positive]로 넘긴다.
 
-        한 벌만 넘기면 prepare_ip_adapter_image_embeds의 chunk(2)가 ValueError를 낸다(회차 21, DreamShaper guidance 2).
+        diffusers가 CFG에서 embedding을 chunk(2)로 나누므로 한 벌만 넘기면 ValueError가 난다
+        (회차 21, DreamShaper guidance 2).
         """
         if self.guidance <= 1:
             return embeds
