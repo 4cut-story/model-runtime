@@ -22,8 +22,10 @@ gpu = [
     "peft>=0.13",
     # 남은 VRAM을 nvidia-smi와 같은 값으로 읽는다 (Windows WDDM에서 torch 값이 틀린다)
     "nvidia-ml-py>=12.535",
+    # 뼈대 그림(pose.py)을 그린다
+    "pillow>=10",
 ]
-dev = ["ruff>=0.8", "mypy>=1.13", "pytest>=8.3", "pytest-cov>=6.0", "respx>=0.22"]
+dev = ["ruff>=0.8", "mypy>=1.13", "pytest>=8.3", "pytest-cov>=6.0", "respx>=0.22", "pillow>=10"]
 
 [project.scripts]
 model-runtime = "model_runtime.__main__:main"

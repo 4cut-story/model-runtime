@@ -22,6 +22,7 @@ def load_env_file(path: Path, environ: dict[str, str] | None = None) -> None:
 
 DEFAULT_SDXL_IP_ADAPTER = "h94/IP-Adapter:sdxl_models/ip-adapter-plus_sdxl_vit-h.safetensors"
 DEFAULT_SDXL_LORA = "ByteDance/SDXL-Lightning:sdxl_lightning_8step_lora.safetensors"
+DEFAULT_POSE_ADAPTER = "TencentARC/t2i-adapter-openpose-sdxl-1.0"
 
 
 @dataclass(frozen=True)
@@ -54,8 +55,13 @@ class Settings:
     sdxl_ip_early_scale: float = 0.2
     sdxl_ip_early_steps: int = 4
     sdxl_ip_late_boost: float = 0.2
-    # 그린 뒤 CLIP으로 인물 성별·나이·동물을 확인하고 틀리면 다시 그린다 (VRAM 약 +0.9GB)
-    image_check: bool = True
+    # 그린 뒤 CLIP으로 인물 성별·나이·동물을 확인하고 틀리면 다시 그린다 (VRAM 약 +0.9GB).
+    # 회차 16~18에서 점수를 올리지 못해 기본은 끈다
+    image_check: bool = False
+    # 컷마다 인물 수·자리·키를 뼈대 그림으로 넣는 T2I-Adapter (VRAM 약 +0.2GB). 비우면 끈다
+    pose_adapter: str = DEFAULT_POSE_ADAPTER
+    pose_scale: float = 0.8
+    pose_factor: float = 0.5
     poll_min: float = 2.0
     poll_max: float = 10.0
     heartbeat_interval: float = 30.0
@@ -87,5 +93,8 @@ class Settings:
             sdxl_ip_early_scale=float(env.get("SDXL_IP_EARLY_SCALE", "0.2")),
             sdxl_ip_early_steps=int(env.get("SDXL_IP_EARLY_STEPS", "4")),
             sdxl_ip_late_boost=float(env.get("SDXL_IP_LATE_BOOST", "0.2")),
-            image_check=env.get("IMAGE_CHECK", "true").lower() == "true",
+            image_check=env.get("IMAGE_CHECK", "false").lower() == "true",
+            pose_adapter=env.get("POSE_ADAPTER", DEFAULT_POSE_ADAPTER).strip(),
+            pose_scale=float(env.get("POSE_SCALE", "0.8")),
+            pose_factor=float(env.get("POSE_FACTOR", "0.5")),
         )
