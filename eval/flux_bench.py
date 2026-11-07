@@ -2,10 +2,11 @@
 
 SDXL(DreamShaper XL Lightning)이 회차 23~27에서 83점 안팎에 머물러, 글 이해가 나은 FLUX.1-schnell
 (Apache 2.0)이 16GB에 들어가는지, 한 컷에 몇 초인지, 회차 27에서 틀린 컷을 맞게 그리는지 본다.
-transformer와 T5 인코더를 bitsandbytes 4비트(NF4)로 읽고 model CPU offload로 돌린다.
-처음 실행은 bf16 원본을 받아 양자화한 뒤 --out 아래 quantized/에 저장하고, 다음부터는 그것을 읽는다.
+bitsandbytes가 있으면 transformer와 T5 인코더를 4비트(NF4)로 읽고, 처음 실행에서 --out 아래
+quantized/에 저장해 다음부터는 그것을 읽는다. 없으면 설치 없이 diffusers의 layerwise casting으로
+transformer를 fp8로 담아 두고(계산은 bf16), T5는 bf16 그대로 쓴다. 둘 다 model CPU offload로
+RAM에 두고 차례인 부품만 GPU에 올린다.
 
-    pip install bitsandbytes
     python eval/flux_bench.py --cache D:\\hf-cache --out D:\\4cut\\flux-bench
 
 결과: --out에 컷 PNG와 bench.json(로드 시간, 컷별 시간, 최대 VRAM).
@@ -66,20 +67,38 @@ def main() -> None:
     os.environ["HF_HOME"] = args.cache
 
     import torch
-    from diffusers import BitsAndBytesConfig, FluxPipeline, FluxTransformer2DModel
-    from transformers import BitsAndBytesConfig as TfBnb
+    from diffusers import FluxPipeline, FluxTransformer2DModel
     from transformers import T5EncoderModel
 
     out = Path(args.out)
     saved = out / "quantized"
     out.mkdir(parents=True, exist_ok=True)
+    try:
+        import bitsandbytes  # noqa: F401
+
+        mode = "nf4"
+    except ImportError:
+        mode = "fp8"
     t0 = time.perf_counter()
-    if (saved / "transformer").exists():
+    if mode == "fp8":
+        transformer = FluxTransformer2DModel.from_pretrained(
+            REPO, subfolder="transformer", torch_dtype=torch.bfloat16
+        )
+        transformer.enable_layerwise_casting(
+            storage_dtype=torch.float8_e4m3fn, compute_dtype=torch.bfloat16
+        )
+        t5 = T5EncoderModel.from_pretrained(
+            REPO, subfolder="text_encoder_2", torch_dtype=torch.bfloat16
+        )
+    elif (saved / "transformer").exists():
         transformer = FluxTransformer2DModel.from_pretrained(
             saved / "transformer", torch_dtype=torch.bfloat16
         )
         t5 = T5EncoderModel.from_pretrained(saved / "text_encoder_2", torch_dtype=torch.bfloat16)
     else:
+        from diffusers import BitsAndBytesConfig
+        from transformers import BitsAndBytesConfig as TfBnb
+
         nf4 = dict(
             load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.bfloat16
         )
@@ -121,6 +140,7 @@ def main() -> None:
         image.save(out / f"{name}.png")
         print(name, times[name], "s", flush=True)
     result = {
+        "mode": mode,
         "loadSeconds": round(load_s, 1),
         "panelSeconds": times,
         "peakVramGiB": round(torch.cuda.max_memory_allocated() / 2**30, 2),
