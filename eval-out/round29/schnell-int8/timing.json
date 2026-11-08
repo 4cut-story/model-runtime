@@ -1,0 +1,10 @@
+{
+ "model": "black-forest-labs/FLUX.1-schnell",
+ "quant": "int8",
+ "steps": 4,
+ "guidance": 0,
+ "aborted": "컷당 약 20분(4컷 그린 뒤 중단). bitsandbytes int8 transformer(약 11GB)+offload로 VRAM 16GB가 가득 차 WDDM 공유 메모리로 넘침. GPU 사용률 100%, VRAM 16020MiB.",
+ "panelSecondsApprox": {"love-07-panel-2": 1234, "love-07-panel-3": 1231, "love-07-panel-4": 1224},
+ "renderedPanels": 4,
+ "failed": {}
+}
