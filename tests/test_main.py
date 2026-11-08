@@ -71,3 +71,29 @@ def test_FLUX_QUANT가_틀리면_시작하지_않는다() -> None:
     )
     with pytest.raises(ValueError, match="FLUX_QUANT"):
         entry.build_image_backend(s)
+
+
+def test_FLUX_nunchaku와_적은_step_LoRA를_설정으로_고른다() -> None:
+    """FR-006: 미리 줄인 SVDQuant 4bit 파일과 가속 LoRA를 환경 변수로 넘긴다."""
+    s = Settings.from_env(
+        {
+            "GPU_WORKER_API_URL": "https://x",
+            "GPU_WORKER_TOKEN": "t",
+            "IMAGE_MODEL": "flux",
+            "FLUX_MODEL": "black-forest-labs/FLUX.1-dev",
+            "FLUX_QUANT": "nunchaku",
+            "FLUX_FILE": "nunchaku-tech/nunchaku-flux.1-dev/svdq-fp4_r32-flux.1-dev.safetensors",
+            "FLUX_LORA": "ByteDance/Hyper-SD",
+            "FLUX_LORA_WEIGHT": "Hyper-FLUX.1-dev-8steps-lora.safetensors",
+            "FLUX_LORA_SCALE": "0.125",
+        }
+    )
+    image = entry.build_image_backend(s).active
+    assert image.quant == "nunchaku"
+    assert (image.lora, image.lora_weight, image.lora_scale) == (
+        "ByteDance/Hyper-SD",
+        "Hyper-FLUX.1-dev-8steps-lora.safetensors",
+        0.125,
+    )
+    assert image.model_info()["lora"] == "ByteDance/Hyper-SD"
+    assert Settings.from_env({"GPU_WORKER_API_URL": "x", "GPU_WORKER_TOKEN": "t"}).flux_lora == ""
