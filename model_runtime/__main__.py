@@ -108,6 +108,12 @@ def build_sdxl(settings: Settings) -> Any:
     )
 
 
+def _gpu_name() -> str | None:
+    from .backends.real import gpu_name
+
+    return gpu_name()
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     load_env_file(Path.cwd() / ".env")
@@ -124,6 +130,7 @@ def main(argv: list[str] | None = None) -> int:
         heartbeat_interval=settings.heartbeat_interval,
         poll_min=settings.poll_min,
         poll_max=settings.poll_max,
+        device=_gpu_name if settings.backend == "real" else (lambda: None),
     )
 
     def shutdown(signum: int, frame: FrameType | None) -> None:
