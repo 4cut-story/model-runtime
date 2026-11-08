@@ -90,3 +90,10 @@ def test_FR006_인물_확인은_끄고_뼈대_그림을_기본으로_쓴다() ->
     assert (s.pose_scale, s.pose_factor) == (0.8, 0.5)
     s = Settings.from_env({**base, "POSE_ADAPTER": "", "IMAGE_CHECK": "true", "POSE_SCALE": "1"})
     assert (s.pose_adapter, s.image_check, s.pose_scale) == ("", True, 1.0)
+
+
+def test_그림_모델은_기본_SDXL이고_FLUX를_고를_수_있다() -> None:
+    base = {"GPU_WORKER_API_URL": "https://x", "GPU_WORKER_TOKEN": "t"}
+    s = Settings.from_env(base)
+    assert (s.image_model, s.flux_steps, s.flux_quantized_dir) == ("sdxl", 4, "")
+    assert Settings.from_env({**base, "IMAGE_MODEL": "flux"}).image_model == "flux"

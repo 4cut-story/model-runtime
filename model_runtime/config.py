@@ -23,6 +23,7 @@ def load_env_file(path: Path, environ: dict[str, str] | None = None) -> None:
 DEFAULT_SDXL_IP_ADAPTER = "h94/IP-Adapter:sdxl_models/ip-adapter-plus_sdxl_vit-h.safetensors"
 DEFAULT_SDXL_LORA = "ByteDance/SDXL-Lightning:sdxl_lightning_8step_lora.safetensors"
 DEFAULT_POSE_ADAPTER = "TencentARC/t2i-adapter-openpose-sdxl-1.0"
+DEFAULT_FLUX_MODEL = "black-forest-labs/FLUX.1-schnell"
 
 
 @dataclass(frozen=True)
@@ -62,6 +63,13 @@ class Settings:
     pose_adapter: str = DEFAULT_POSE_ADAPTER
     pose_scale: float = 0.8
     pose_factor: float = 0.5
+    # 그림 모델: "sdxl" 또는 "flux"(FLUX.1-schnell, 회차 28부터 시험).
+    # flux면 SDXL_* 설정은 쓰지 않는다
+    image_model: str = "sdxl"
+    flux_model: str = DEFAULT_FLUX_MODEL
+    # NF4로 줄인 transformer·T5를 저장해 둘 폴더. 비우면 시작할 때마다 다시 줄인다
+    flux_quantized_dir: str = ""
+    flux_steps: int = 4
     poll_min: float = 2.0
     poll_max: float = 10.0
     heartbeat_interval: float = 30.0
@@ -97,4 +105,8 @@ class Settings:
             pose_adapter=env.get("POSE_ADAPTER", DEFAULT_POSE_ADAPTER).strip(),
             pose_scale=float(env.get("POSE_SCALE", "0.8")),
             pose_factor=float(env.get("POSE_FACTOR", "0.5")),
+            image_model=env.get("IMAGE_MODEL", "sdxl").strip().lower(),
+            flux_model=env.get("FLUX_MODEL", DEFAULT_FLUX_MODEL).strip(),
+            flux_quantized_dir=env.get("FLUX_QUANTIZED_DIR", "").strip(),
+            flux_steps=int(env.get("FLUX_STEPS", "4")),
         )
