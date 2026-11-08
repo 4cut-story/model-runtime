@@ -42,7 +42,8 @@ def test_IMAGE_MODEL이_flux면_FLUX_schnell_백엔드로_그린다() -> None:
             "FLUX_QUANTIZED_DIR": "C:/flux-nf4",
             "FLUX_STEPS": "6",
             "FLUX_GUIDANCE": "3.5",
-            "FLUX_QUANT": "FP8",
+            "FLUX_QUANT": "GGUF",
+            "FLUX_FILE": "C:/flux/flux1-schnell-Q8_0.gguf",
         }
     )
     wrapped = entry.build_image_backend(s)
@@ -52,7 +53,8 @@ def test_IMAGE_MODEL이_flux면_FLUX_schnell_백엔드로_그린다() -> None:
     assert image.quantized_dir == "C:/flux-nf4"
     assert image.steps == 6
     assert image.guidance == 3.5
-    assert image.quant == "fp8"
+    assert image.quant == "gguf"
+    assert image.single_file == "C:/flux/flux1-schnell-Q8_0.gguf"
     assert image.encode_reference(b"png") is None
     assert image.model_info()["flux"] == "black-forest-labs/FLUX.1-schnell"
 

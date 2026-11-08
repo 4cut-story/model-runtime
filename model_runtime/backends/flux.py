@@ -8,7 +8,7 @@ schnell은 4 step, guidance 0으로 그리므로 negative prompt를 쓰지 않�
 고르면 FLUX_STEPS(28 권장)와 FLUX_GUIDANCE(3.5 권장)를 함께 바꾼다.
 양자화본 폴더는 모델마다 따로 둔다.
 
-transformer(약 12B)와 T5는 16GB에 다 올라가지 않아 NF4(bitsandbytes가 있을 때) 또는 fp8 저장으로
+transformer(약 12B)와 T5는 16GB에 다 올라가지 않아 FLUX_QUANT(nf4·int8·gguf Q8_0·fp8)로
 줄이고 enable_model_cpu_offload()로 쓰는 부분만 GPU에 올린다. 나머지는 시스템 RAM에 둔다.
 NF4는 처음 한 번 양자화해 quantized_dir에 저장하고 다음부터 그것을 읽는다.
 
@@ -29,7 +29,26 @@ from . import Reference
 log = logging.getLogger(__name__)
 
 DEFAULT_FLUX_MODEL = "black-forest-labs/FLUX.1-schnell"
-QUANTS = ("auto", "nf4", "fp8")
+# nf4·int8: bitsandbytes로 읽으면서 줄인다. gguf·fp8: 미리 8bit로 만든 한 파일(FLUX_FILE)을 읽는다
+QUANTS = ("auto", "nf4", "int8", "gguf", "fp8")
+
+
+def _has_bnb() -> bool:
+    try:
+        import bitsandbytes  # noqa: F401
+    except ImportError:
+        return False
+    return True
+
+
+def _bnb_args(torch: Any, mode: str) -> dict[str, Any]:
+    if mode == "int8":
+        return {"load_in_8bit": True}
+    return {
+        "load_in_4bit": True,
+        "bnb_4bit_quant_type": "nf4",
+        "bnb_4bit_compute_dtype": torch.bfloat16,
+    }
 
 
 class FluxBackend:
@@ -42,6 +61,7 @@ class FluxBackend:
         max_sequence_length: int = 512,
         guidance: float = 0.0,
         quant: str = "auto",
+        single_file: str = "",
     ) -> None:
         self.model_name = model_name
         self.quantized_dir = quantized_dir
@@ -50,11 +70,11 @@ class FluxBackend:
         self.max_sequence_length = max_sequence_length
         # schnell은 0. dev는 guidance를 모델 입력으로 받는다(CFG처럼 두 번 돌지 않는다). 3.5 권장
         self.guidance = guidance
-        # auto: bitsandbytes가 있으면 nf4, 없으면 fp8. fp8은 8bit 저장·bf16 계산이다
-        # (bitsandbytes int8은 CPU offload로 옮길 수 없어 쓰지 않는다)
+        # auto: bitsandbytes가 있으면 nf4, 없으면 fp8. 양자화본 폴더는 모델·모드마다 따로 둔다
         if quant not in QUANTS:
             raise ValueError(f"FLUX_QUANT는 {', '.join(QUANTS)} 중 하나여야 한다: {quant}")
         self.quant = quant
+        self.single_file = single_file
         self.mode = ""
         self._pipe: Any = None
 
@@ -74,61 +94,77 @@ class FluxBackend:
         log.info("FLUX 준비 완료 (%s)", self.mode)
 
     def _load_heavy(self, torch: Any) -> tuple[Any, Any]:
-        from diffusers import FluxTransformer2DModel
-        from transformers import T5EncoderModel
-
         mode = self.quant
         if mode == "auto":
-            try:
-                import bitsandbytes  # noqa: F401
+            mode = "nf4" if _has_bnb() else "fp8"
+        self.mode = mode
+        saved = Path(self.quantized_dir) if self.quantized_dir else None
+        return self._transformer(torch, mode, saved), self._t5(torch, saved)
 
-                mode = "nf4"
-            except ImportError:
-                mode = "fp8"
-        if mode == "fp8":
-            self.mode = "fp8"
-            transformer = FluxTransformer2DModel.from_pretrained(
-                self.model_name, subfolder="transformer", torch_dtype=torch.bfloat16
+    def _transformer(self, torch: Any, mode: str, saved: Path | None) -> Any:
+        from diffusers import FluxTransformer2DModel
+
+        if mode in ("gguf", "fp8"):
+            # 8bit 한 파일(GGUF Q8_0 또는 fp8 e4m3fn safetensors)을 8bit 그대로 읽는다.
+            # bf16으로 읽으면 RAM에 24GB가 올라가 31GB PC에서 넘친다
+            if not self.single_file:
+                raise ValueError(f"FLUX_QUANT={mode}에는 FLUX_FILE(한 파일 경로)이 필요하다")
+            common = dict(config=self.model_name, subfolder="transformer")
+            if mode == "gguf":
+                from diffusers import GGUFQuantizationConfig
+
+                return FluxTransformer2DModel.from_single_file(
+                    self.single_file,
+                    quantization_config=GGUFQuantizationConfig(compute_dtype=torch.bfloat16),
+                    torch_dtype=torch.bfloat16,
+                    **common,
+                )
+            transformer = FluxTransformer2DModel.from_single_file(
+                self.single_file, torch_dtype=torch.float8_e4m3fn, **common
             )
             transformer.enable_layerwise_casting(
                 storage_dtype=torch.float8_e4m3fn, compute_dtype=torch.bfloat16
             )
-            t5 = T5EncoderModel.from_pretrained(
-                self.model_name, subfolder="text_encoder_2", torch_dtype=torch.bfloat16
-            )
-            return transformer, t5
-        self.mode = "nf4"
-        saved = Path(self.quantized_dir) if self.quantized_dir else None
+            return transformer
         if saved is not None and (saved / "transformer").exists():
-            transformer = FluxTransformer2DModel.from_pretrained(
+            return FluxTransformer2DModel.from_pretrained(
                 saved / "transformer", torch_dtype=torch.bfloat16
             )
-            t5 = T5EncoderModel.from_pretrained(
-                saved / "text_encoder_2", torch_dtype=torch.bfloat16
-            )
-            return transformer, t5
         from diffusers import BitsAndBytesConfig
-        from transformers import BitsAndBytesConfig as TfBnb
 
-        nf4 = dict(
-            load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.bfloat16
-        )
         transformer = FluxTransformer2DModel.from_pretrained(
             self.model_name,
             subfolder="transformer",
-            quantization_config=BitsAndBytesConfig(**nf4),
-            torch_dtype=torch.bfloat16,
-        )
-        t5 = T5EncoderModel.from_pretrained(
-            self.model_name,
-            subfolder="text_encoder_2",
-            quantization_config=TfBnb(**nf4),
+            quantization_config=BitsAndBytesConfig(**_bnb_args(torch, mode)),
             torch_dtype=torch.bfloat16,
         )
         if saved is not None:
             transformer.save_pretrained(saved / "transformer")
+        return transformer
+
+    def _t5(self, torch: Any, saved: Path | None) -> Any:
+        """T5(bf16 약 9.5GB)는 어느 모드든 bitsandbytes가 있으면 NF4로 줄여 RAM을 아낀다."""
+        from transformers import T5EncoderModel
+
+        if saved is not None and (saved / "text_encoder_2").exists():
+            return T5EncoderModel.from_pretrained(
+                saved / "text_encoder_2", torch_dtype=torch.bfloat16
+            )
+        if not _has_bnb():
+            return T5EncoderModel.from_pretrained(
+                self.model_name, subfolder="text_encoder_2", torch_dtype=torch.bfloat16
+            )
+        from transformers import BitsAndBytesConfig
+
+        t5 = T5EncoderModel.from_pretrained(
+            self.model_name,
+            subfolder="text_encoder_2",
+            quantization_config=BitsAndBytesConfig(**_bnb_args(torch, "nf4")),
+            torch_dtype=torch.bfloat16,
+        )
+        if saved is not None:
             t5.save_pretrained(saved / "text_encoder_2")
-        return transformer, t5
+        return t5
 
     def encode_reference(self, image: bytes) -> bytes | None:
         return None

@@ -71,8 +71,10 @@ class Settings:
     flux_quantized_dir: str = ""
     flux_steps: int = 4
     flux_guidance: float = 0.0
-    # auto(bitsandbytes가 있으면 nf4) | nf4 | fp8. 4bit·8bit 화질 비교용
+    # auto(bitsandbytes가 있으면 nf4) | nf4 | int8 | gguf | fp8. 4bit·8bit 화질 비교용
     flux_quant: str = "auto"
+    # gguf·fp8용 8bit transformer 한 파일 경로 (예: flux1-schnell-Q8_0.gguf)
+    flux_file: str = ""
     # FLUX를 올리는 동안 두는 표시 파일. 워커가 시작할 때 남아 있으면 SDXL로 그린다
     flux_marker: str = ".flux-loading"
     poll_min: float = 2.0
@@ -116,5 +118,6 @@ class Settings:
             flux_steps=int(env.get("FLUX_STEPS", "4")),
             flux_guidance=float(env.get("FLUX_GUIDANCE", "0")),
             flux_quant=env.get("FLUX_QUANT", "auto").strip().lower(),
+            flux_file=env.get("FLUX_FILE", "").strip(),
             flux_marker=env.get("FLUX_MARKER", ".flux-loading").strip(),
         )
