@@ -1,0 +1,24 @@
+{
+ "label": "dev nunchaku FP4 (28 step)",
+ "status": "탈락",
+ "license": "FLUX.1 [dev] 비상업 라이선스 (공개 서비스에 쓸 수 없음)",
+ "scores": [
+  90.8,
+  90.8
+ ],
+ "average": 90.8,
+ "criticalComics": 6,
+ "perComic": {
+  "solo-01": 90.6,
+  "funny-03": 89.5,
+  "twist-08": 92.8,
+  "funny-12": 93.8,
+  "funny-15": 91.7,
+  "love-07": 88.7,
+  "family-09": 90.0,
+  "mystery-02": 84.9,
+  "love-06": 86.9,
+  "mystery-08": 97.0
+ },
+ "note": "기록용으로 채점했다. schnell과 점수가 같은 수준인데 컷당 10.2초이고 비상업 라이선스다."
+}
