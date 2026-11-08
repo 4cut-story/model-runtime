@@ -24,6 +24,7 @@ from __future__ import annotations
 import gc
 import io
 import logging
+import re
 from pathlib import Path
 from typing import Any
 
@@ -55,6 +56,35 @@ def _bnb_args(torch: Any, mode: str) -> dict[str, Any]:
         "bnb_4bit_quant_type": "nf4",
         "bnb_4bit_compute_dtype": torch.bfloat16,
     }
+
+
+def _upcast_uncast(torch: Any, model: Any) -> None:
+    """layerwise casting이 건너뛴 모듈(norm, pos_embed 등)을 bf16으로 올린다.
+
+    fp8 한 파일을 fp8 그대로 읽으면 건너뛴 모듈은 fp8로 남아
+    "mat1 and mat2 must have the same dtype"
+    오류가 났다(회차 29 schnell-fp8 47컷 모두 실패). 건너뛰는 규칙은 diffusers와 같게 맞춘다.
+    """
+    from diffusers.hooks._common import _GO_LC_SUPPORTED_PYTORCH_LAYERS
+    from diffusers.hooks.layerwise_casting import DEFAULT_SKIP_MODULES_PATTERN
+
+    patterns = list(DEFAULT_SKIP_MODULES_PATTERN)
+    patterns += list(getattr(model, "_keep_in_fp32_modules", None) or [])
+    patterns += list(getattr(model, "_skip_layerwise_casting_patterns", None) or [])
+
+    def walk(module: Any, prefix: str) -> None:
+        if prefix and any(re.search(p, prefix) for p in patterns):
+            module.to(torch.bfloat16)
+            return
+        if isinstance(module, _GO_LC_SUPPORTED_PYTORCH_LAYERS):
+            return
+        for param in module.parameters(recurse=False):
+            if param.dtype == torch.float8_e4m3fn:
+                param.data = param.data.to(torch.bfloat16)
+        for name, child in module.named_children():
+            walk(child, f"{prefix}.{name}" if prefix else name)
+
+    walk(model, "")
 
 
 class FluxBackend:
@@ -159,6 +189,7 @@ class FluxBackend:
             transformer.enable_layerwise_casting(
                 storage_dtype=torch.float8_e4m3fn, compute_dtype=torch.bfloat16
             )
+            _upcast_uncast(torch, transformer)
             return transformer
         if saved is not None and (saved / "transformer").exists():
             return FluxTransformer2DModel.from_pretrained(
