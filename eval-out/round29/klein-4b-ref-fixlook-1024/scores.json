@@ -1,0 +1,25 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 프롬프트 개선 + DB 외모 글 (4 step, 1024px)",
+ "status": "비교용",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  93.6,
+  94.4
+ ],
+ "average": 94.0,
+ "criticalComics": 6,
+ "perComic": {
+  "solo-01": 89.0,
+  "funny-03": 96.6,
+  "twist-08": 89.0,
+  "funny-12": 89.0,
+  "funny-15": 94.2,
+  "love-07": 95.0,
+  "family-09": 91.7,
+  "mystery-02": 89.0,
+  "love-06": 89.0,
+  "mystery-08": 89.0
+ },
+ "note": "4 step 768px 판(95.2점)과 같은 프롬프트로 크기만 1024px로 키웠어요. 점수는 94.0점으로 내려갔고, 심각 오류가 6편으로 늘었어요. 대부분 손이나 팔이 하나 더 생기는 오류(solo-01·twist-08·funny-12·mystery-08)이고, love-06 1컷은 머리가 둘, mystery-02 1컷은 발이 셋이에요. 참조 그림을 그대로 옮긴 듯한 정면 구도(뻣뻣함)도 20건 중 6건 나왔어요. 컷당 8.7초, VRAM 최대 3.7GB로 768px보다 느려서 쓰지 않아요."
+}
