@@ -136,3 +136,23 @@ def test_REQ018_가운데_자리_참조를_받는다() -> None:
         respx.get("http://minio/get/c").mock(return_value=httpx.Response(200, content=b"emb-c"))
         w.draw_all([image(1, [ref])])
     assert backends.drawn[0][1] == [Reference("c", b"emb-c", 0.6, "center")]
+
+
+def test_REQ018_참조_그림을_그대로_받는_모델은_저장한_embedding을_쓰지도_올리지도_않는다() -> None:
+    """REQ-018: FLUX.2 klein은 SDXL embedding(embedUrl)을 건너뛰고 늘 참조 그림을 받는다."""
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+    ref = {**fresh(), "embedUrl": "http://minio/get/a.safetensors"}
+    with respx.mock:
+        respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        stored = respx.get("http://minio/get/a.safetensors").mock(
+            return_value=httpx.Response(200, content=b"sdxl-embed")
+        )
+        respx.get("http://minio/get/a.png").mock(return_value=httpx.Response(200, content=b"png-a"))
+        result = w.draw_all([image(1, [ref]), image(2, [ref])])
+        puts = [c.request.url.path for c in respx.calls if c.request.method == "PUT"]
+    assert result == {"uploaded": ["panel-1", "panel-2"]}
+    assert stored.call_count == 0
+    assert not any(p.endswith(".safetensors") for p in puts)
+    assert backends.encoded == 1

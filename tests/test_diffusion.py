@@ -1,6 +1,9 @@
+from pathlib import Path
+
 import pytest
 
 from model_runtime import __main__ as entry
+from model_runtime.backends import Reference, reference_kind
 from model_runtime.backends.diffusion import DiffusionBackend
 from model_runtime.backends.image_fallback import FallbackImage
 from model_runtime.config import Settings
@@ -69,3 +72,47 @@ def test_틀린_그림_모델_설정이면_시작하지_않는다(
     """FR-006: 모델 이름·양자화 방식이 틀리면 워커가 시작하지 않는다."""
     with pytest.raises(ValueError, match=match):
         DiffusionBackend(kind, quant=quant, single_file=file)
+
+
+@pytest.mark.parametrize(
+    ("kind", "model", "steps", "guidance"),
+    [
+        ("klein", "black-forest-labs/FLUX.2-klein-4B", 4, 1.0),
+        ("zimage", "Tongyi-MAI/Z-Image-Turbo", 9, 0.0),
+        ("chroma", "lodestones/Chroma1-HD", 28, 4.0),
+    ],
+)
+def test_회차30_새_그림_모델은_기본값으로_그린다(
+    kind: str, model: str, steps: int, guidance: float
+) -> None:
+    """FR-006: IMAGE_MODEL=klein·zimage·chroma도 SDXL 안전장치와 함께 쓴다."""
+    wrapped = entry.build_image_backend(Settings.from_env({**BASE, "IMAGE_MODEL": kind}))
+    assert isinstance(wrapped, FallbackImage)
+    image = wrapped.active
+    assert (image.model_name, image.steps, image.guidance) == (model, steps, guidance)
+    args = image.call_args({"prompt": "p", "negativePrompt": "n"})
+    assert args["guidance_scale"] == guidance
+    assert "true_cfg_scale" not in args
+    # klein은 negative prompt를 받지 않고, zimage는 CFG 0이라 쓰지 않는다
+    assert ("negative_prompt" in args) == (kind == "chroma")
+
+
+def test_REQ018_klein은_참조_그림을_그대로_받고_캐릭터마다_한_장만_넘긴다() -> None:
+    """REQ-018: FLUX.2 klein은 IP-Adapter embedding 대신 참조 그림을 입력으로 받는다."""
+    klein = DiffusionBackend("klein")
+    assert klein.reference_kind() == "image"
+    assert klein.encode_reference(b"png-a") == b"png-a"
+    refs = [Reference(c, f"png-{c}".encode(), 0.6) for c in "aabcdef"]
+    assert klein.reference_images(refs) == [b"png-a", b"png-b", b"png-c", b"png-d"]
+    assert klein.model_info()["references"] == "image"
+    zimage = DiffusionBackend("zimage")
+    assert zimage.reference_kind() == "none"
+    assert zimage.encode_reference(b"png") is None
+    assert zimage.reference_images(refs) == []
+
+
+def test_REQ018_참조_방식은_감싼_그림_백엔드를_따른다() -> None:
+    """REQ-018: SDXL·FLUX처럼 reference_kind가 없는 백엔드는 embedding 방식으로 본다."""
+    klein = FallbackImage(DiffusionBackend("klein"), lambda: object(), Path("/nonexistent"))
+    assert klein.reference_kind() == "image"
+    assert reference_kind(object()) == "embed"

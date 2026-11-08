@@ -13,6 +13,7 @@ import httpx
 
 from .api import WorkerApi
 from .backends import Backends
+from .backends.diffusion import KINDS
 from .backends.fake import FakeBackends
 from .config import Settings, load_env_file
 from .worker import Worker
@@ -62,7 +63,7 @@ def build_image_backend(settings: Settings) -> Any:
         )
         # FLUX가 실패하거나 올리다 워커가 죽으면 사람 손 없이 SDXL로 되돌린다
         return FallbackImage(flux, lambda: build_sdxl(settings), Path(settings.flux_marker))
-    if settings.image_model in ("sd35", "qwen"):
+    if settings.image_model in KINDS:
         from .backends.diffusion import DiffusionBackend
         from .backends.image_fallback import FallbackImage
 
@@ -78,7 +79,7 @@ def build_image_backend(settings: Settings) -> Any:
         return FallbackImage(other, lambda: build_sdxl(settings), Path(settings.flux_marker))
     if settings.image_model != "sdxl":
         raise ValueError(
-            f"IMAGE_MODEL은 sdxl, flux, sd35, qwen 중 하나여야 한다: {settings.image_model}"
+            f"IMAGE_MODEL은 sdxl, flux, {', '.join(KINDS)} 중 하나여야 한다: {settings.image_model}"
         )
     return build_sdxl(settings)
 

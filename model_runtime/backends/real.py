@@ -7,7 +7,7 @@ import shutil
 import subprocess
 from typing import Any
 
-from . import Reference, VramBusyError
+from . import Reference, VramBusyError, reference_kind
 from .ollama import OllamaClient
 
 GIB = 1024**3
@@ -125,6 +125,9 @@ class RealBackends:
     def encode_reference(self, image: bytes) -> bytes | None:
         data: bytes | None = self.sdxl.encode_reference(image)
         return data
+
+    def reference_kind(self) -> str:
+        return reference_kind(self.sdxl)
 
     def prepare(self, model: str) -> None:
         free = self._vram()

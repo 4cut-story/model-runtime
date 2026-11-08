@@ -32,6 +32,12 @@ class Reference:
     region: str = "full"
 
 
+def reference_kind(image_backend: object) -> str:
+    """그림 백엔드의 참조 방식. reference_kind()가 없는 백엔드(SDXL·FLUX)는 "embed"로 본다."""
+    method = getattr(image_backend, "reference_kind", None)
+    return str(method()) if callable(method) else "embed"
+
+
 class Backends(Protocol):
     def transcribe(
         self,
@@ -58,7 +64,14 @@ class Backends(Protocol):
         ...
 
     def encode_reference(self, image: bytes) -> bytes | None:
-        """참조 그림 → IP-Adapter embedding(safetensors). IP-Adapter를 끄면 None."""
+        """참조 그림 → IP-Adapter embedding(safetensors). IP-Adapter를 끄면 None.
+
+        reference_kind()가 "image"인 모델(FLUX.2 klein)은 그림 바이트를 그대로 돌려준다."""
+        ...
+
+    def reference_kind(self) -> str:
+        """ "embed": IP-Adapter embedding을 쓴다(저장해 두고 다시 쓴다). "image": 참조 그림을 그대로
+        입력으로 받는다(저장한 embedding을 받지도 올리지도 않는다). "none": 참조를 쓰지 않는다."""
         ...
 
     def prepare(self, model: str) -> None:

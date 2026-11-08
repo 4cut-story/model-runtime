@@ -35,6 +35,8 @@ class FakeBackends:
         self.unloaded: list[str] = []
         self.drawn: list[tuple[str, list[Reference]]] = []
         self.encoded = 0
+        # 테스트에서 "image"로 바꿔 klein처럼 참조 그림을 그대로 받는 경우를 본다
+        self.reference_mode = "embed"
 
     def transcribe_part(
         self, audio_urls: list[str], language: str | None, from_sec: float
@@ -116,6 +118,9 @@ class FakeBackends:
         """참조 그림 내용에 따라 정해지는 가짜 embedding."""
         self.encoded += 1
         return b"fake-embed:" + hashlib.sha256(image).hexdigest().encode()
+
+    def reference_kind(self) -> str:
+        return self.reference_mode
 
     def prepare(self, model: str) -> None:
         self.loaded.append(model)
