@@ -46,15 +46,22 @@ def build_image_backend(settings: Settings) -> Any:
     """IMAGE_MODEL에 맞는 그림 백엔드. 작업의 모델 묶음 이름은 계약대로 SDXL을 그대로 쓴다."""
     if settings.image_model == "flux":
         from .backends.flux import FluxBackend
+        from .backends.image_fallback import FallbackImage
 
-        return FluxBackend(
+        flux = FluxBackend(
             settings.flux_model,
             settings.flux_quantized_dir,
             steps=settings.flux_steps,
             keep_in_ram=settings.keep_in_ram,
         )
+        # FLUX가 실패하거나 올리다 워커가 죽으면 사람 손 없이 SDXL로 되돌린다
+        return FallbackImage(flux, lambda: build_sdxl(settings), Path(settings.flux_marker))
     if settings.image_model != "sdxl":
         raise ValueError(f"IMAGE_MODEL은 sdxl 또는 flux여야 한다: {settings.image_model}")
+    return build_sdxl(settings)
+
+
+def build_sdxl(settings: Settings) -> Any:
     from .backends.ip_schedule import IpSchedule
     from .backends.sdxl import SdxlBackend
 
