@@ -55,6 +55,7 @@ module = [
     "model_runtime.backends.whisper",
     "model_runtime.backends.sdxl",
     "model_runtime.backends.flux",
+    "model_runtime.backends.diffusion",
 ]
 disallow_untyped_calls = false
 warn_return_any = false

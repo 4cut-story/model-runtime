@@ -80,6 +80,13 @@ class Settings:
     # flux_lora가 저장소일 때 그 안의 파일 이름
     flux_lora_weight: str = ""
     flux_lora_scale: float = 1.0
+    # IMAGE_MODEL=sd35·qwen용. 비우거나 0·음수면 모델마다 기본값(backends/diffusion.py KINDS)
+    diffusion_model: str = ""
+    diffusion_steps: int = 0
+    diffusion_guidance: float = -1.0
+    # nf4 | nunchaku(qwen만, DIFFUSION_FILE 필요) | none
+    diffusion_quant: str = "nf4"
+    diffusion_file: str = ""
     # FLUX를 올리는 동안 두는 표시 파일. 워커가 시작할 때 남아 있으면 SDXL로 그린다
     flux_marker: str = ".flux-loading"
     poll_min: float = 2.0
@@ -127,5 +134,10 @@ class Settings:
             flux_lora=env.get("FLUX_LORA", "").strip(),
             flux_lora_weight=env.get("FLUX_LORA_WEIGHT", "").strip(),
             flux_lora_scale=float(env.get("FLUX_LORA_SCALE", "1")),
+            diffusion_model=env.get("DIFFUSION_MODEL", "").strip(),
+            diffusion_steps=int(env.get("DIFFUSION_STEPS", "0")),
+            diffusion_guidance=float(env.get("DIFFUSION_GUIDANCE", "-1")),
+            diffusion_quant=env.get("DIFFUSION_QUANT", "nf4").strip().lower(),
+            diffusion_file=env.get("DIFFUSION_FILE", "").strip(),
             flux_marker=env.get("FLUX_MARKER", ".flux-loading").strip(),
         )

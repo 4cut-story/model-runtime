@@ -62,8 +62,24 @@ def build_image_backend(settings: Settings) -> Any:
         )
         # FLUX가 실패하거나 올리다 워커가 죽으면 사람 손 없이 SDXL로 되돌린다
         return FallbackImage(flux, lambda: build_sdxl(settings), Path(settings.flux_marker))
+    if settings.image_model in ("sd35", "qwen"):
+        from .backends.diffusion import DiffusionBackend
+        from .backends.image_fallback import FallbackImage
+
+        other = DiffusionBackend(
+            settings.image_model,
+            settings.diffusion_model,
+            steps=settings.diffusion_steps,
+            guidance=settings.diffusion_guidance,
+            quant=settings.diffusion_quant,
+            single_file=settings.diffusion_file,
+            keep_in_ram=settings.keep_in_ram,
+        )
+        return FallbackImage(other, lambda: build_sdxl(settings), Path(settings.flux_marker))
     if settings.image_model != "sdxl":
-        raise ValueError(f"IMAGE_MODEL은 sdxl 또는 flux여야 한다: {settings.image_model}")
+        raise ValueError(
+            f"IMAGE_MODEL은 sdxl, flux, sd35, qwen 중 하나여야 한다: {settings.image_model}"
+        )
     return build_sdxl(settings)
 
 
