@@ -66,7 +66,8 @@ class DiffusionBackend:
             self._pipe = self._sd35(torch)
         else:
             self._pipe = self._qwen(torch)
-        self._pipe.enable_vae_tiling()
+        # SD3·Qwen 파이프라인에는 enable_vae_tiling()이 없어 VAE에 바로 켠다.
+        self._pipe.vae.enable_tiling()
         self._pipe.enable_model_cpu_offload()
         log.info("%s 준비 완료 (%s)", self.kind, self.quant)
 
