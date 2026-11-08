@@ -1,0 +1,205 @@
+{
+ "reference": true,
+ "model": "nunchaku-ai/nunchaku-qwen-image-edit-2509",
+ "base": "Qwen/Qwen-Image-Edit-2509",
+ "file": "svdq-fp4_r128-qwen-image-edit-2509.safetensors",
+ "steps": 40,
+ "trueCfgScale": 4.0,
+ "offload": "transformer block offload + sequential cpu offload (nunchaku example for <18GB)",
+ "compat": "pos_embed txt_seq_lens -> max_txt_seq_len shim (nunchaku 1.2.1 + diffusers 0.39)",
+ "loadSeconds": 43.5,
+ "panelSeconds": {
+  "love-07-panel-1": 634.6,
+  "love-07-panel-2": 350.9,
+  "love-07-panel-3": 316.89,
+  "love-07-panel-4": 339.93,
+  "love-07-panel-5": 646.52,
+  "solo-01-panel-1": 335.73,
+  "solo-01-panel-2": 316.75,
+  "solo-01-panel-3": 306.16,
+  "solo-01-panel-4": 327.53,
+  "solo-01-panel-5": 305.31,
+  "love-06-panel-1": 611.68,
+  "love-06-panel-2": 344.15,
+  "love-06-panel-3": 323.25,
+  "love-06-panel-4": 329.9,
+  "love-06-panel-5": 999.68,
+  "family-09-panel-1": 310.45,
+  "family-09-panel-2": 309.11,
+  "family-09-panel-5": 316.68,
+  "funny-03-panel-1": 583.91,
+  "funny-03-panel-2": 311.69,
+  "funny-03-panel-3": 308.88,
+  "funny-03-panel-4": 321.1,
+  "funny-03-panel-5": 327.51,
+  "mystery-02-panel-1": 605.06,
+  "mystery-02-panel-2": 318.58,
+  "mystery-02-panel-3": 303.17,
+  "mystery-02-panel-4": 299.12,
+  "mystery-02-panel-5": 324.66,
+  "twist-08-panel-1": 605.8,
+  "twist-08-panel-2": 317.69,
+  "twist-08-panel-3": 333.0,
+  "twist-08-panel-4": 593.76,
+  "funny-15-panel-1": 616.57,
+  "funny-15-panel-2": 319.92,
+  "funny-15-panel-3": 309.07,
+  "funny-15-panel-4": 352.45,
+  "mystery-08-panel-3": 334.17,
+  "mystery-08-panel-5": 340.92,
+  "funny-12-panel-1": 620.52,
+  "funny-12-panel-2": 328.19,
+  "funny-12-panel-3": 340.67,
+  "funny-12-panel-4": 316.15
+ },
+ "referencesUsed": {
+  "love-07-panel-1": [
+   "새봄",
+   "이랑"
+  ],
+  "love-07-panel-2": [
+   "새봄"
+  ],
+  "love-07-panel-3": [
+   "이랑"
+  ],
+  "love-07-panel-4": [
+   "이랑"
+  ],
+  "love-07-panel-5": [
+   "이랑",
+   "새봄"
+  ],
+  "solo-01-panel-1": [
+   "나래"
+  ],
+  "solo-01-panel-2": [
+   "나래"
+  ],
+  "solo-01-panel-3": [
+   "보람"
+  ],
+  "solo-01-panel-4": [
+   "보람"
+  ],
+  "solo-01-panel-5": [
+   "보람"
+  ],
+  "love-06-panel-1": [
+   "가온",
+   "나래"
+  ],
+  "love-06-panel-2": [
+   "나래"
+  ],
+  "love-06-panel-3": [
+   "가온"
+  ],
+  "love-06-panel-4": [
+   "보람"
+  ],
+  "love-06-panel-5": [
+   "보람",
+   "가온",
+   "나래"
+  ],
+  "family-09-panel-1": [
+   "다온"
+  ],
+  "family-09-panel-2": [
+   "다온"
+  ],
+  "family-09-panel-5": [
+   "다온"
+  ],
+  "funny-03-panel-1": [
+   "하늘",
+   "해담"
+  ],
+  "funny-03-panel-2": [
+   "하늘"
+  ],
+  "funny-03-panel-3": [
+   "해담"
+  ],
+  "funny-03-panel-4": [
+   "지우"
+  ],
+  "funny-03-panel-5": [
+   "하늘"
+  ],
+  "mystery-02-panel-1": [
+   "은솔",
+   "주원"
+  ],
+  "mystery-02-panel-2": [
+   "은솔"
+  ],
+  "mystery-02-panel-3": [
+   "주원"
+  ],
+  "mystery-02-panel-4": [
+   "은솔"
+  ],
+  "mystery-02-panel-5": [
+   "주원"
+  ],
+  "twist-08-panel-1": [
+   "윤슬",
+   "단비"
+  ],
+  "twist-08-panel-2": [
+   "윤슬"
+  ],
+  "twist-08-panel-3": [
+   "도담"
+  ],
+  "twist-08-panel-4": [
+   "도담",
+   "단비"
+  ],
+  "funny-15-panel-1": [
+   "유진",
+   "해솔"
+  ],
+  "funny-15-panel-2": [
+   "해솔"
+  ],
+  "funny-15-panel-3": [
+   "해솔"
+  ],
+  "funny-15-panel-4": [
+   "유진"
+  ],
+  "mystery-08-panel-3": [
+   "지우"
+  ],
+  "mystery-08-panel-5": [
+   "지우"
+  ],
+  "funny-12-panel-1": [
+   "하늘",
+   "지우"
+  ],
+  "funny-12-panel-2": [
+   "하늘"
+  ],
+  "funny-12-panel-3": [
+   "하늘"
+  ],
+  "funny-12-panel-4": [
+   "지우"
+  ]
+ },
+ "skipped": {
+  "family-09-panel-3": "no lookId: edit model needs an input image",
+  "family-09-panel-4": "no lookId: edit model needs an input image",
+  "mystery-08-panel-1": "no lookId: edit model needs an input image",
+  "mystery-08-panel-2": "no lookId: edit model needs an input image",
+  "mystery-08-panel-4": "no lookId: edit model needs an input image"
+ },
+ "failed": {},
+ "peakRamGiB": 25.26,
+ "peakVramGiB": 3.05,
+ "secondsPerPanel": 401.38
+}
