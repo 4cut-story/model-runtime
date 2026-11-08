@@ -8,8 +8,11 @@ schnell은 4 step, guidance 0으로 그리므로 negative prompt를 쓰지 않�
 고르면 FLUX_STEPS(28 권장)와 FLUX_GUIDANCE(3.5 권장)를 함께 바꾼다.
 양자화본 폴더는 모델마다 따로 둔다.
 
-transformer(약 12B)와 T5는 16GB에 다 올라가지 않아 FLUX_QUANT(nf4·int8·gguf Q8_0·fp8)로
+transformer(약 12B)와 T5는 16GB에 다 올라가지 않아 FLUX_QUANT(nf4·int8·gguf·fp8·nunchaku)로
 줄이고 enable_model_cpu_offload()로 쓰는 부분만 GPU에 올린다. 나머지는 시스템 RAM에 둔다.
+gguf는 Q4~Q8 어느 파일이든 읽는다. nunchaku는 SVDQuant 4bit 파일을 nunchaku 패키지로 돌린다.
+FLUX_LORA로 적은 step용 LoRA를 붙일 수 있다(회차 29: dev 28 step은 그림 점수 90.7로 schnell 86.8보다
+높았지만 컷당 42초로 약 6배 느려 보류했다).
 NF4는 처음 한 번 양자화해 quantized_dir에 저장하고 다음부터 그것을 읽는다.
 
 IP-Adapter·자리 프롬프트·뼈대·CLIP 확인은 SDXL 전용이라 쓰지 않는다. 캐릭터 참조는 무시하고
@@ -29,8 +32,11 @@ from . import Reference
 log = logging.getLogger(__name__)
 
 DEFAULT_FLUX_MODEL = "black-forest-labs/FLUX.1-schnell"
-# nf4·int8: bitsandbytes로 읽으면서 줄인다. gguf·fp8: 미리 8bit로 만든 한 파일(FLUX_FILE)을 읽는다
-QUANTS = ("auto", "nf4", "int8", "gguf", "fp8")
+# nf4·int8: bitsandbytes로 읽으면서 줄인다. gguf·fp8: 미리 줄인 한 파일(FLUX_FILE)을 읽는다.
+# nunchaku: SVDQuant 4bit 한 파일(50번대 GPU는 fp4, 그 전은 int4)을 nunchaku 커널로 돌린다
+QUANTS = ("auto", "nf4", "int8", "gguf", "fp8", "nunchaku")
+# 미리 줄인 한 파일을 읽는 방식
+SINGLE_FILE_QUANTS = ("gguf", "fp8", "nunchaku")
 
 
 def _has_bnb() -> bool:
@@ -62,6 +68,9 @@ class FluxBackend:
         guidance: float = 0.0,
         quant: str = "auto",
         single_file: str = "",
+        lora: str = "",
+        lora_weight: str = "",
+        lora_scale: float = 1.0,
     ) -> None:
         self.model_name = model_name
         self.quantized_dir = quantized_dir
@@ -75,6 +84,10 @@ class FluxBackend:
             raise ValueError(f"FLUX_QUANT는 {', '.join(QUANTS)} 중 하나여야 한다: {quant}")
         self.quant = quant
         self.single_file = single_file
+        # 적은 step으로 그리게 하는 LoRA (예: Hyper-SD dev 8 step, scale 0.125)
+        self.lora = lora
+        self.lora_weight = lora_weight
+        self.lora_scale = lora_scale
         self.mode = ""
         self._pipe: Any = None
 
@@ -88,10 +101,27 @@ class FluxBackend:
         pipe = FluxPipeline.from_pretrained(
             self.model_name, transformer=transformer, text_encoder_2=t5, torch_dtype=torch.bfloat16
         )
+        if self.lora:
+            self._load_lora(pipe, transformer)
         pipe.enable_vae_tiling()
         pipe.enable_model_cpu_offload()
         self._pipe = pipe
         log.info("FLUX 준비 완료 (%s)", self.mode)
+
+    def _load_lora(self, pipe: Any, transformer: Any) -> None:
+        if self.mode == "nunchaku":
+            # nunchaku transformer는 diffusers LoRA 대신 자기 함수로 LoRA를 합친다
+            path = self.lora
+            if self.lora_weight:
+                from huggingface_hub import hf_hub_download
+
+                path = hf_hub_download(self.lora, self.lora_weight)
+            transformer.update_lora_params(path)
+            transformer.set_lora_strength(self.lora_scale)
+            return
+        kwargs = {"weight_name": self.lora_weight} if self.lora_weight else {}
+        pipe.load_lora_weights(self.lora, adapter_name="speed", **kwargs)
+        pipe.set_adapters(["speed"], adapter_weights=[self.lora_scale])
 
     def _load_heavy(self, torch: Any) -> tuple[Any, Any]:
         mode = self.quant
@@ -104,11 +134,15 @@ class FluxBackend:
     def _transformer(self, torch: Any, mode: str, saved: Path | None) -> Any:
         from diffusers import FluxTransformer2DModel
 
+        if mode in SINGLE_FILE_QUANTS and not self.single_file:
+            raise ValueError(f"FLUX_QUANT={mode}에는 FLUX_FILE(한 파일 경로)이 필요하다")
+        if mode == "nunchaku":
+            from nunchaku import NunchakuFluxTransformer2dModel
+
+            return NunchakuFluxTransformer2dModel.from_pretrained(self.single_file)
         if mode in ("gguf", "fp8"):
             # 8bit 한 파일(GGUF Q8_0 또는 fp8 e4m3fn safetensors)을 8bit 그대로 읽는다.
             # bf16으로 읽으면 RAM에 24GB가 올라가 31GB PC에서 넘친다
-            if not self.single_file:
-                raise ValueError(f"FLUX_QUANT={mode}에는 FLUX_FILE(한 파일 경로)이 필요하다")
             common = dict(config=self.model_name, subfolder="transformer")
             if mode == "gguf":
                 from diffusers import GGUFQuantizationConfig
@@ -205,6 +239,7 @@ class FluxBackend:
             "quantization": self.mode or None,
             "steps": self.steps,
             "guidance": self.guidance,
+            "lora": self.lora or None,
             "cpuOffload": True,
             "ipAdapter": None,
         }

@@ -71,10 +71,15 @@ class Settings:
     flux_quantized_dir: str = ""
     flux_steps: int = 4
     flux_guidance: float = 0.0
-    # auto(bitsandbytes가 있으면 nf4) | nf4 | int8 | gguf | fp8. 4bit·8bit 화질 비교용
+    # auto(bitsandbytes가 있으면 nf4) | nf4 | int8 | gguf | fp8 | nunchaku. 양자화 방식 비교용
     flux_quant: str = "auto"
-    # gguf·fp8용 8bit transformer 한 파일 경로 (예: flux1-schnell-Q8_0.gguf)
+    # gguf·fp8·nunchaku용 transformer 한 파일 경로 (예: flux1-schnell-Q8_0.gguf)
     flux_file: str = ""
+    # 적은 step으로 그리게 하는 LoRA(예: dev 8 step 가속 LoRA). 폴더·파일 경로 또는 HF 저장소
+    flux_lora: str = ""
+    # flux_lora가 저장소일 때 그 안의 파일 이름
+    flux_lora_weight: str = ""
+    flux_lora_scale: float = 1.0
     # FLUX를 올리는 동안 두는 표시 파일. 워커가 시작할 때 남아 있으면 SDXL로 그린다
     flux_marker: str = ".flux-loading"
     poll_min: float = 2.0
@@ -119,5 +124,8 @@ class Settings:
             flux_guidance=float(env.get("FLUX_GUIDANCE", "0")),
             flux_quant=env.get("FLUX_QUANT", "auto").strip().lower(),
             flux_file=env.get("FLUX_FILE", "").strip(),
+            flux_lora=env.get("FLUX_LORA", "").strip(),
+            flux_lora_weight=env.get("FLUX_LORA_WEIGHT", "").strip(),
+            flux_lora_scale=float(env.get("FLUX_LORA_SCALE", "1")),
             flux_marker=env.get("FLUX_MARKER", ".flux-loading").strip(),
         )

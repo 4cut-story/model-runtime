@@ -55,6 +55,9 @@ def build_image_backend(settings: Settings) -> Any:
             guidance=settings.flux_guidance,
             quant=settings.flux_quant,
             single_file=settings.flux_file,
+            lora=settings.flux_lora,
+            lora_weight=settings.flux_lora_weight,
+            lora_scale=settings.flux_lora_scale,
             keep_in_ram=settings.keep_in_ram,
         )
         # FLUX가 실패하거나 올리다 워커가 죽으면 사람 손 없이 SDXL로 되돌린다
