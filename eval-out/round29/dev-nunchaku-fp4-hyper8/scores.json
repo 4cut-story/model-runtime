@@ -1,0 +1,24 @@
+{
+ "label": "dev nunchaku FP4 + Hyper-SD 8 step",
+ "status": "보류",
+ "license": "FLUX.1-dev 비상업",
+ "scores": [
+  93.2,
+  92.9
+ ],
+ "average": 93.1,
+ "criticalComics": 2,
+ "perComic": {
+  "solo-01": 93.8,
+  "funny-03": 90.0,
+  "twist-08": 95.7,
+  "funny-12": 94.9,
+  "funny-15": 92.8,
+  "love-07": 94.9,
+  "family-09": 94.5,
+  "mystery-02": 90.0,
+  "love-06": 89.2,
+  "mystery-08": 92.9
+ },
+ "note": "측정한 방식 중 점수가 가장 높고(93.1) 컷당 4.5초로 빠르지만 비상업 라이선스라 상업 운영에는 쓸 수 없다."
+}
