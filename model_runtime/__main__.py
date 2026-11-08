@@ -7,6 +7,7 @@ import signal
 import sys
 from pathlib import Path
 from types import FrameType
+from typing import Any
 
 import httpx
 
@@ -22,10 +23,8 @@ def build_backends(settings: Settings) -> Backends:
         return FakeBackends()
     if settings.backend != "real":
         raise ValueError(f"WORKER_BACKEND는 fake 또는 real이어야 한다: {settings.backend}")
-    from .backends.ip_schedule import IpSchedule
     from .backends.ollama import OllamaClient
     from .backends.real import RealBackends
-    from .backends.sdxl import SdxlBackend
     from .backends.whisper import WhisperBackend
 
     ollama = OllamaClient.create(settings.ollama_url)
@@ -38,26 +37,45 @@ def build_backends(settings: Settings) -> Backends:
             keep_in_ram=settings.keep_in_ram,
             min_speakers=settings.diarize_min_speakers,
         ),
-        SdxlBackend(
-            settings.sdxl_model,
-            settings.sdxl_cpu_offload,
-            lora=settings.sdxl_lora,
-            variant=settings.sdxl_variant,
-            steps=settings.sdxl_steps,
-            guidance=settings.sdxl_guidance,
-            keep_in_ram=settings.keep_in_ram,
-            ip_adapter=settings.sdxl_ip_adapter,
-            image_check=settings.image_check,
-            pose_adapter=settings.pose_adapter,
-            pose_scale=settings.pose_scale,
-            pose_factor=settings.pose_factor,
-            ip_schedule=IpSchedule(
-                settings.sdxl_ip_early_scale,
-                settings.sdxl_ip_early_steps,
-                settings.sdxl_ip_late_boost,
-            ),
-        ),
+        build_image_backend(settings),
         ollama,
+    )
+
+
+def build_image_backend(settings: Settings) -> Any:
+    """IMAGE_MODEL에 맞는 그림 백엔드. 작업의 모델 묶음 이름은 계약대로 SDXL을 그대로 쓴다."""
+    if settings.image_model == "flux":
+        from .backends.flux import FluxBackend
+
+        return FluxBackend(
+            settings.flux_model,
+            settings.flux_quantized_dir,
+            steps=settings.flux_steps,
+            keep_in_ram=settings.keep_in_ram,
+        )
+    if settings.image_model != "sdxl":
+        raise ValueError(f"IMAGE_MODEL은 sdxl 또는 flux여야 한다: {settings.image_model}")
+    from .backends.ip_schedule import IpSchedule
+    from .backends.sdxl import SdxlBackend
+
+    return SdxlBackend(
+        settings.sdxl_model,
+        settings.sdxl_cpu_offload,
+        lora=settings.sdxl_lora,
+        variant=settings.sdxl_variant,
+        steps=settings.sdxl_steps,
+        guidance=settings.sdxl_guidance,
+        keep_in_ram=settings.keep_in_ram,
+        ip_adapter=settings.sdxl_ip_adapter,
+        image_check=settings.image_check,
+        pose_adapter=settings.pose_adapter,
+        pose_scale=settings.pose_scale,
+        pose_factor=settings.pose_factor,
+        ip_schedule=IpSchedule(
+            settings.sdxl_ip_early_scale,
+            settings.sdxl_ip_early_steps,
+            settings.sdxl_ip_late_boost,
+        ),
     )
 
 

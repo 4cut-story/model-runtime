@@ -51,7 +51,11 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 # GPU 전용 모듈은 torch·diffusers·whisperx 타입이 없다
-module = ["model_runtime.backends.whisper", "model_runtime.backends.sdxl"]
+module = [
+    "model_runtime.backends.whisper",
+    "model_runtime.backends.sdxl",
+    "model_runtime.backends.flux",
+]
 disallow_untyped_calls = false
 warn_return_any = false
 
@@ -60,4 +64,8 @@ testpaths = ["tests"]
 
 [tool.coverage.run]
 # GPU와 모델 가중치가 있어야 도는 모듈은 CI에서 잴 수 없다. GPU PC에서 eval/로 검증한다
-omit = ["model_runtime/backends/whisper.py", "model_runtime/backends/sdxl.py"]
+omit = [
+    "model_runtime/backends/whisper.py",
+    "model_runtime/backends/sdxl.py",
+    "model_runtime/backends/flux.py",
+]
