@@ -1,0 +1,8 @@
+{
+ "settings": {
+  "IMAGE_MODEL": "sd35",
+  "MODEL_KEEP_IN_RAM": "false"
+ },
+ "loadError": "AttributeError: 'StableDiffusion3Pipeline' object has no attribute 'enable_vae_tiling'",
+ "peakRamGiB": 12.54
+}
