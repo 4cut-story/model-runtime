@@ -215,3 +215,49 @@ def test_전체_전사는_미리_전사한_앞부분을_받아_잇는다() -> No
     result = api.results[0][1]
     assert result["language"] == "en"
     assert result["segments"][0]["text"] == "hi"
+
+
+def test_결과의_모델_정보에_GPU_로드_시간_컷별_시간과_시드를_붙인다() -> None:
+    images = [
+        {"name": "panel-1", "prompt": "p", "uploadUrl": "http://minio/put/1", "seed": 7},
+        {"name": "panel-2", "prompt": "p", "uploadUrl": "http://minio/put/2", "width": 768},
+    ]
+    infos: list[tuple[dict[str, Any], int]] = []
+
+    class Recording(FakeApi):
+        def result(self, job: Job, result: dict[str, Any], info: dict[str, Any], ms: int) -> None:
+            infos.append((info, ms))
+
+    ticks = iter(float(i) for i in range(100))
+    api = Recording([Job("i", "IMAGE", "lt", {"images": images})])
+    w = Worker(
+        api,  # type: ignore[arg-type]
+        FakeBackends(),
+        httpx.Client(),
+        sleep=lambda s: None,
+        device=lambda: "NVIDIA GeForce RTX 5060 Ti",
+        clock=lambda: next(ticks),
+    )
+    with respx.mock:
+        respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        w.run(max_polls=1)
+    info, ms = infos[0]
+    assert info["backend"] == "fake"
+    assert info["gpu"] == "NVIDIA GeForce RTX 5060 Ti"
+    assert info["runtime"]
+    assert info["loadMs"] == 1000
+    assert info["panels"] == [
+        {"name": "panel-1", "ms": 1000, "seed": 7},
+        {"name": "panel-2", "ms": 1000, "width": 768},
+    ]
+    assert ms > 0
+
+
+def test_GPU_이름을_못_읽어도_결과는_보낸다() -> None:
+    def broken() -> str | None:
+        raise RuntimeError("nvml")
+
+    api = FakeApi([Job("l", "LLM", "lt", {"jsonSchema": {"required": ["title"]}})])
+    w = Worker(api, FakeBackends(), httpx.Client(), sleep=lambda s: None, device=broken)  # type: ignore[arg-type]
+    w.run(max_polls=1)
+    assert [r[0] for r in api.results] == ["l"]

@@ -10,6 +10,7 @@ from typing import Any
 
 import httpx
 
+from . import __version__
 from .api import Job, LeaseLostError, WorkerApi
 from .backends import REGIONS, Backends, JobInputError, Reference, VramBusyError
 from .backends.ollama import OllamaUnavailableError
@@ -56,6 +57,8 @@ class Worker:
         poll_min: float = 2.0,
         poll_max: float = 10.0,
         sleep: Callable[[float], None] = time.sleep,
+        device: Callable[[], str | None] = lambda: None,
+        clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self.api = api
         self.backends = backends
@@ -64,7 +67,11 @@ class Worker:
         self.poll_min = poll_min
         self.poll_max = poll_max
         self.sleep = sleep
+        self.device = device
+        self.clock = clock
         self.loaded: str | None = None
+        # 작업 하나의 제작 정보(모델 로드 시간, 컷별 시간). 결과 보고의 modelInfo에 붙인다.
+        self._stats: dict[str, Any] = {}
         self._running = True
 
     def stop(self) -> None:
@@ -94,7 +101,8 @@ class Worker:
         log.info("작업 시작: job=%s type=%s", job.job_id, job.type)
         heartbeat = Heartbeat(self.api, job, self.heartbeat_interval)
         heartbeat.start()
-        started = time.monotonic()
+        started = self.clock()
+        self._stats = {}
         try:
             result, model = self.execute(job)
         except VramBusyError as e:
@@ -113,10 +121,10 @@ class Worker:
         if heartbeat.lost.is_set():
             heartbeat.stop()
             return True
-        duration = int((time.monotonic() - started) * 1000)
+        duration = int((self.clock() - started) * 1000)
         # 보고를 다시 보내는 동안에도 임대가 끝나지 않게 heartbeat는 보고 뒤에 멈춘다.
         try:
-            self.api.result(job, result, self.backends.model_info(model), duration)
+            self.api.result(job, result, self.model_info(model), duration)
             log.info("작업 완료: job=%s %dms", job.job_id, duration)
         except LeaseLostError:
             log.warning("결과를 냈지만 임대가 넘어갔다: job=%s", job.job_id)
@@ -156,23 +164,42 @@ class Worker:
             prefix = response.json()
         return self.backends.transcribe(urls, language, prefix)
 
+    def model_info(self, model: str) -> dict[str, Any]:
+        """백엔드의 모델·조건에 GPU, 모델 로드 시간, 컷별 시간을 더한다 (만화 제작 정보)."""
+        info = dict(self.backends.model_info(model))
+        info["runtime"] = __version__
+        try:
+            gpu = self.device()
+        except Exception:  # 제작 정보 때문에 결과 보고를 막지 않는다
+            gpu = None
+        if gpu:
+            info["gpu"] = gpu
+        info.update(self._stats)
+        return info
+
     def switch_to(self, model: str) -> None:
         """다른 모델 묶음이 올라가 있으면 먼저 내린다 (16GB VRAM에 하나만)."""
         if self.loaded == model:
             return
+        started = self.clock()
         if self.loaded is not None:
             self.backends.unload(self.loaded)
             self.loaded = None
         self.backends.prepare(model)
         self.loaded = model
+        self._stats["loadMs"] = int((self.clock() - started) * 1000)
 
     def draw_all(self, images: list[dict[str, Any]]) -> dict[str, Any]:
         uploaded = []
         embeds: dict[str, bytes | None] = {}
         computed: list[str] = []
+        panels: list[dict[str, Any]] = []
+        self._stats["panels"] = panels
         for image in images:
             refs = self.references(image.get("references") or [], embeds, computed)
+            started = self.clock()
             png = self.backends.draw(image, refs)
+            panels.append(_panel_stats(image, refs, int((self.clock() - started) * 1000)))
             response = self.uploader.put(
                 image["uploadUrl"], content=png, headers={"Content-Type": "image/png"}
             )
@@ -249,3 +276,14 @@ class Worker:
             self.api.fail(job, code, message, retryable)
         except LeaseLostError:
             log.warning("실패를 보고했지만 임대가 넘어갔다: job=%s", job.job_id)
+
+
+def _panel_stats(image: dict[str, Any], refs: list[Reference], ms: int) -> dict[str, Any]:
+    """컷 하나를 그린 조건과 시간. 참조 계산·업로드 시간은 빼고 그리기만 잰다."""
+    stats: dict[str, Any] = {"name": image.get("name"), "ms": ms}
+    for key in ("seed", "width", "height"):
+        if image.get(key) is not None:
+            stats[key] = image[key]
+    if refs:
+        stats["references"] = len(refs)
+    return stats

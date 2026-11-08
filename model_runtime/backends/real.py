@@ -38,6 +38,17 @@ def free_vram() -> int | None:
     return int(free)
 
 
+def gpu_name() -> str | None:
+    """보이는 첫 GPU 이름 (만화 제작 정보). CUDA가 없으면 None."""
+    try:
+        import torch
+    except ImportError:
+        return None
+    if not torch.cuda.is_available():
+        return None
+    return str(torch.cuda.get_device_name(0))
+
+
 def _gpu_index() -> int:
     """NVML은 CUDA_VISIBLE_DEVICES를 모르므로 보이는 첫 GPU의 실제 번호를 쓴다."""
     first = os.environ.get("CUDA_VISIBLE_DEVICES", "").split(",")[0].strip()
