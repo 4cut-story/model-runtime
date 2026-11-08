@@ -1,0 +1,24 @@
+{
+ "label": "schnell NF4 (지금 운영)",
+ "status": "기준",
+ "license": "Apache 2.0 (상업 가능)",
+ "scores": [
+  90.2,
+  91.4
+ ],
+ "average": 90.8,
+ "criticalComics": 5,
+ "perComic": {
+  "solo-01": 95.2,
+  "funny-03": 87.2,
+  "twist-08": 94.4,
+  "funny-12": 94.9,
+  "funny-15": 85.0,
+  "love-07": 87.1,
+  "family-09": 90.8,
+  "mystery-02": 89.0,
+  "love-06": 88.7,
+  "mystery-08": 93.9
+ },
+ "note": "지금 운영 중인 방식. 다른 방식은 모두 이것과 비교한다."
+}

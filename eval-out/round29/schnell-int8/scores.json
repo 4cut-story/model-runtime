@@ -1,0 +1,6 @@
+{
+ "label": "schnell int8",
+ "status": "탈락",
+ "license": "Apache 2.0 (상업 가능)",
+ "note": "bitsandbytes int8과 CPU offload를 함께 쓰면 VRAM 16GB가 넘쳐 컷당 약 20분이 걸려 4컷만 그리고 멈췄다. 채점하지 않았다."
+}

@@ -1,0 +1,24 @@
+{
+ "label": "schnell GGUF Q8_0",
+ "status": "탈락",
+ "license": "Apache 2.0 (상업 가능)",
+ "scores": [
+  90.5,
+  90.6
+ ],
+ "average": 90.5,
+ "criticalComics": 4,
+ "perComic": {
+  "solo-01": 95.4,
+  "funny-03": 87.8,
+  "twist-08": 95.3,
+  "funny-12": 95.8,
+  "funny-15": 84.2,
+  "love-07": 88.4,
+  "family-09": 92.8,
+  "mystery-02": 83.8,
+  "love-06": 87.2,
+  "mystery-08": 93.5
+ },
+ "note": "NF4와 점수가 같고 VRAM을 약 2배 쓰며 조금 느리다."
+}

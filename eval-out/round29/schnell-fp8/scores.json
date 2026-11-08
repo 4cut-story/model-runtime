@@ -1,0 +1,6 @@
+{
+ "label": "schnell fp8",
+ "status": "측정 중",
+ "license": "Apache 2.0 (상업 가능)",
+ "note": "첫 시도는 dtype 오류로 한 컷도 못 그렸다. 고친 코드(model-runtime#34)로 다시 그린다."
+}
