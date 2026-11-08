@@ -1,4 +1,6 @@
-"""SD 3.5 Large·Qwen-Image 그림 (GPU PC 전용, IMAGE_MODEL=sd35 또는 qwen). 회차 29 모델 비교용.
+"""SD 3.5·Qwen-Image·FLUX.2 klein·Z-Image·Chroma 그림 (GPU PC 전용). 회차 29~30 모델 비교용.
+
+IMAGE_MODEL=sd35 | qwen | klein | zimage | chroma.
 
 FLUX처럼 큰 transformer와 글 인코더(SD 3.5는 T5, Qwen-Image는 Qwen2.5-VL 7B)를 4bit로 줄이고
 enable_model_cpu_offload()로 쓰는 부분만 GPU에 올린다.
@@ -7,9 +9,12 @@ enable_model_cpu_offload()로 쓰는 부분만 GPU에 올린다.
   Lightning 8 step을 합친 파일이면 DIFFUSION_STEPS=8, DIFFUSION_GUIDANCE=1로 그린다.
 - DIFFUSION_QUANT=none: bf16 그대로 읽는다.
 
-SD 3.5는 guidance_scale(CFG)로, Qwen-Image는 true_cfg_scale로 negative prompt를 쓴다.
-1 이하면 negative prompt를 쓰지 않는다.
-캐릭터 참조(IP-Adapter)는 쓰지 않는다.
+SD 3.5·Z-Image·Chroma는 guidance_scale(CFG)로, Qwen-Image는 true_cfg_scale로 negative prompt를 쓴다.
+1 이하면 negative prompt를 쓰지 않는다. FLUX.2 klein은 negative prompt를 받지 않는다.
+
+캐릭터 참조: FLUX.2 klein은 참조 그림을 그대로 입력(image=[...])으로 받는다. IP-Adapter embedding이
+아니므로 encode_reference는 그림 바이트를 그대로 돌려주고, reference_kind()는 "image"다.
+나머지 모델은 참조를 쓰지 않는다(encode_reference가 None).
 """
 
 from __future__ import annotations
@@ -26,7 +31,17 @@ log = logging.getLogger(__name__)
 KINDS: dict[str, dict[str, Any]] = {
     "sd35": {"model": "stabilityai/stable-diffusion-3.5-large", "steps": 28, "guidance": 3.5},
     "qwen": {"model": "Qwen/Qwen-Image", "steps": 50, "guidance": 4.0},
+    # Apache 2.0. 4 step 증류 모델, 참조 그림 여러 장을 입력으로 받는다
+    "klein": {"model": "black-forest-labs/FLUX.2-klein-4B", "steps": 4, "guidance": 1.0},
+    # Apache 2.0. 8 step 증류(num_inference_steps=9가 transformer 8번), CFG 없이 그린다
+    "zimage": {"model": "Tongyi-MAI/Z-Image-Turbo", "steps": 9, "guidance": 0.0},
+    # Apache 2.0. FLUX.1 schnell을 바탕으로 다시 학습한 모델
+    "chroma": {"model": "lodestones/Chroma1-HD", "steps": 28, "guidance": 4.0},
 }
+# 참조 그림을 입력으로 받는 모델
+IMAGE_REFERENCE_KINDS = ("klein",)
+# 참조 그림은 이만큼까지만 넘긴다(컷 하나에 나오는 캐릭터 수)
+MAX_REFERENCES = 4
 QUANTS = ("nf4", "nunchaku", "none")
 
 
@@ -64,8 +79,10 @@ class DiffusionBackend:
 
         if self.kind == "sd35":
             self._pipe = self._sd35(torch)
-        else:
+        elif self.kind == "qwen":
             self._pipe = self._qwen(torch)
+        else:
+            self._pipe = self._generic(torch)
         # SD3·Qwen 파이프라인에는 enable_vae_tiling()이 없어 VAE에 바로 켠다.
         self._pipe.vae.enable_tiling()
         self._pipe.enable_model_cpu_offload()
@@ -131,6 +148,27 @@ class DiffusionBackend:
             torch_dtype=torch.bfloat16,
         )
 
+    def _generic(self, torch: Any) -> Any:  # pragma: no cover - GPU 전용
+        """klein·zimage·chroma: 파이프라인을 통째로 읽고 nf4면 transformer와 글 인코더를 줄인다."""
+        from diffusers import DiffusionPipeline
+
+        quantization = None
+        if self.quant == "nf4":
+            from diffusers.quantizers import PipelineQuantizationConfig
+
+            quantization = PipelineQuantizationConfig(
+                quant_backend="bitsandbytes_4bit",
+                quant_kwargs={
+                    "load_in_4bit": True,
+                    "bnb_4bit_quant_type": "nf4",
+                    "bnb_4bit_compute_dtype": torch.bfloat16,
+                },
+                components_to_quantize=["transformer", "text_encoder"],
+            )
+        return DiffusionPipeline.from_pretrained(
+            self.model_name, quantization_config=quantization, torch_dtype=torch.bfloat16
+        )
+
     def _nf4_always(self, torch: Any) -> Any:  # pragma: no cover - GPU 전용
         from transformers import BitsAndBytesConfig
 
@@ -150,14 +188,30 @@ class DiffusionBackend:
         if self.kind == "sd35":
             args["guidance_scale"] = self.guidance
             args["max_sequence_length"] = 512
-        else:
+        elif self.kind == "qwen":
             args["true_cfg_scale"] = self.guidance
-        if negative and self.guidance > 1:
+        else:
+            args["guidance_scale"] = self.guidance
+        if negative and self.guidance > 1 and self.kind != "klein":
             args["negative_prompt"] = negative
         return args
 
+    def reference_kind(self) -> str:
+        """ "image"면 참조 그림을 그대로 받는다. "none"이면 참조를 쓰지 않는다."""
+        return "image" if self.kind in IMAGE_REFERENCE_KINDS else "none"
+
     def encode_reference(self, image: bytes) -> bytes | None:
-        return None
+        """klein은 그림 바이트를 그대로 쓴다. 나머지는 참조를 쓰지 않는다."""
+        return image if self.reference_kind() == "image" else None
+
+    def reference_images(self, references: list[Reference] | None) -> list[bytes]:
+        """파이프라인에 넘길 참조 그림. 같은 캐릭터는 한 번만, 최대 MAX_REFERENCES장."""
+        if self.reference_kind() != "image":
+            return []
+        seen: dict[str, bytes] = {}
+        for ref in references or []:
+            seen.setdefault(ref.character, ref.embed)
+        return list(seen.values())[:MAX_REFERENCES]
 
     def unload(self) -> None:  # pragma: no cover - GPU 전용
         import torch
@@ -177,7 +231,13 @@ class DiffusionBackend:
 
         self.load()
         generator = torch.Generator(device="cpu").manual_seed(int(image.get("seed", 0)))
-        picture = self._pipe(generator=generator, **self.call_args(image)).images[0]
+        args = self.call_args(image)
+        refs = self.reference_images(references)
+        if refs:
+            from PIL import Image
+
+            args["image"] = [Image.open(io.BytesIO(r)).convert("RGB") for r in refs]
+        picture = self._pipe(generator=generator, **args).images[0]
         buf = io.BytesIO()
         picture.save(buf, format="PNG")
         return buf.getvalue()
@@ -190,4 +250,5 @@ class DiffusionBackend:
             "guidance": self.guidance,
             "cpuOffload": True,
             "ipAdapter": None,
+            "references": self.reference_kind(),
         }

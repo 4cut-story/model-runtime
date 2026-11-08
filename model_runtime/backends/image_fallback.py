@@ -19,7 +19,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from . import JobInputError, Reference, VramBusyError
+from . import JobInputError, Reference, VramBusyError, reference_kind
 
 log = logging.getLogger(__name__)
 
@@ -91,6 +91,9 @@ class FallbackImage:
     def encode_reference(self, image: bytes) -> bytes | None:
         data: bytes | None = self.active.encode_reference(image)
         return data
+
+    def reference_kind(self) -> str:
+        return reference_kind(self.active)
 
     def unload(self) -> None:
         self.active.unload()

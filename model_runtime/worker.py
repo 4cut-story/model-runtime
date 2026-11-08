@@ -217,6 +217,8 @@ class Worker:
 
         embedUrl이 있으면 저장해 둔 embedding을 받는다. 없으면 참조 그림(imageUrl)으로 계산해
         embedUploadUrl에 올린다. 받거나 계산하지 못한 참조는 빼고 텍스트만으로 그린다.
+        참조 그림을 그대로 받는 모델(reference_kind "image", FLUX.2 klein)은 저장한 embedding을
+        쓰지도 올리지도 않고 늘 imageUrl을 받는다. 저장한 embedding은 SDXL IP-Adapter 것이다.
         """
         refs = []
         for item in items:
@@ -235,8 +237,9 @@ class Worker:
 
     def _embed(self, item: dict[str, Any], computed: list[str]) -> bytes | None:
         character = item["character"]
+        raw_image = self.backends.reference_kind() == "image"
         try:
-            if item.get("embedUrl"):
+            if item.get("embedUrl") and not raw_image:
                 response = self.uploader.get(item["embedUrl"])
                 response.raise_for_status()
                 return response.content
@@ -250,7 +253,7 @@ class Worker:
         embed = self.backends.encode_reference(response.content)
         if embed is None:
             return None
-        if item.get("embedUploadUrl"):
+        if item.get("embedUploadUrl") and not raw_image:
             try:
                 put = self.uploader.put(
                     item["embedUploadUrl"],
