@@ -1,0 +1,24 @@
+{
+ "label": "schnell GGUF Q5_K_S",
+ "status": "탈락",
+ "license": "Apache 2.0 (상업 가능)",
+ "scores": [
+  90.3,
+  91.1
+ ],
+ "average": 90.7,
+ "criticalComics": 4,
+ "perComic": {
+  "solo-01": 96.2,
+  "funny-03": 90.4,
+  "twist-08": 94.2,
+  "funny-12": 96.1,
+  "funny-15": 87.0,
+  "love-07": 89.0,
+  "family-09": 88.8,
+  "mystery-02": 82.8,
+  "love-06": 86.7,
+  "mystery-08": 93.1
+ },
+ "note": "점수는 FP4와 같은 수준(90.7)인데 컷당 12.3초로 FP4보다 느리다."
+}

@@ -1,0 +1,24 @@
+{
+ "label": "schnell GGUF Q6_K",
+ "status": "탈락",
+ "license": "Apache 2.0 (상업 가능)",
+ "scores": [
+  91.0,
+  91.2
+ ],
+ "average": 91.1,
+ "criticalComics": 5,
+ "perComic": {
+  "solo-01": 91.3,
+  "funny-03": 89.2,
+  "twist-08": 95.7,
+  "funny-12": 95.3,
+  "funny-15": 85.5,
+  "love-07": 89.0,
+  "family-09": 92.0,
+  "mystery-02": 86.0,
+  "love-06": 84.6,
+  "mystery-08": 94.7
+ },
+ "note": "점수는 FP4와 같은 수준(91.1)인데 컷당 12.5초, VRAM 9.7GiB로 FP4보다 무겁다."
+}
