@@ -1,0 +1,24 @@
+{
+ "label": "schnell nunchaku FP4",
+ "status": "채택",
+ "license": "Apache 2.0 (상업 가능)",
+ "scores": [
+  91.5,
+  90.9
+ ],
+ "average": 91.2,
+ "criticalComics": 4,
+ "perComic": {
+  "solo-01": 94.9,
+  "funny-03": 87.3,
+  "twist-08": 89.0,
+  "funny-12": 95.3,
+  "funny-15": 85.3,
+  "love-07": 89.0,
+  "family-09": 89.2,
+  "mystery-02": 93.2,
+  "love-06": 88.4,
+  "mystery-08": 92.9
+ },
+ "note": "NF4와 점수가 같고(91.2 vs 90.8) 컷당 2.9초로 약 3배 빠르며 VRAM 6.1GiB. 운영 모델로 바꾼다."
+}
