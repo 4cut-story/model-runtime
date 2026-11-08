@@ -1,0 +1,11 @@
+{
+ "settings": {
+  "IMAGE_MODEL": "sd35",
+  "DIFFUSION_MODEL": "stabilityai/stable-diffusion-3.5-large-turbo",
+  "DIFFUSION_STEPS": "4",
+  "DIFFUSION_GUIDANCE": "0",
+  "MODEL_KEEP_IN_RAM": "false"
+ },
+ "loadError": "OSError: stabilityai/stable-diffusion-3.5-large-turbo is not a local folder and is not a valid model identifier listed on 'https://huggingface.co/models'\nIf this is a private repository, make sure to pass a token having permission to this repo with `token` or log in with `hf auth login`.",
+ "peakRamGiB": 0.72
+}
