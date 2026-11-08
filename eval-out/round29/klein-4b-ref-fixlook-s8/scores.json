@@ -1,0 +1,25 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 프롬프트 개선 + DB 외모 글 (8 step)",
+ "status": "비교용",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  94.9,
+  94.6
+ ],
+ "average": 94.8,
+ "criticalComics": 3,
+ "perComic": {
+  "solo-01": 95.4,
+  "funny-03": 97.5,
+  "twist-08": 97.8,
+  "funny-12": 96.3,
+  "funny-15": 89.0,
+  "love-07": 91.8,
+  "family-09": 94.0,
+  "mystery-02": 90.8,
+  "love-06": 96.4,
+  "mystery-08": 93.3
+ },
+ "note": "4 step 판(95.2점)과 같은 프롬프트로 step만 8로 늘렸어요. 점수는 94.8점으로 오르지 않았고, DB 그림과 닮음은 good 36·partial 6, 컷 사이 옷·소품 유지는 43명 중 23명으로 오히려 조금 낮아요. 심각 오류는 3편(funny-15 2컷 토끼가 둘, love-07 5컷 두 사람 손이 하나로 합쳐짐, mystery-02 4컷 다리가 강아지 몸과 섞임 — 뒤 둘은 채점자 한 명만 짚음). 컷당 10.3초로 4 step보다 느려서 쓰지 않아요."
+}
