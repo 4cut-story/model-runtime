@@ -1,0 +1,25 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 (4 step)",
+ "status": "후보",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  92.4,
+  92.9
+ ],
+ "average": 92.7,
+ "criticalComics": 2,
+ "perComic": {
+  "solo-01": 89.0,
+  "funny-03": 90.2,
+  "twist-08": 92.4,
+  "funny-12": 99.2,
+  "funny-15": 90.1,
+  "love-07": 95.4,
+  "family-09": 90.9,
+  "mystery-02": 91.3,
+  "love-06": 89.0,
+  "mystery-08": 93.9
+ },
+ "note": "컷마다 DB 캐릭터 그림(최대 2명)을 넣고 그렸어요. 심각 오류는 2편(solo-01 5컷 격자, love-06 4컷 같은 사람 둘). 같은 사람인지(C2)는 0/10편에서 걸렸고, DB 그림과 닮음은 good 17·partial 23·poor 2, 참조를 베낀 듯 굳은 자세는 0편. 컷당 6.3초, VRAM 최대 3.7GB."
+}
