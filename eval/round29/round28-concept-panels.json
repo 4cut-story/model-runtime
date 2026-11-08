@@ -1,0 +1,298 @@
+[ {
+  "name" : "love-07-panel-1",
+  "comic" : "love-07",
+  "concept" : "WATERCOLOR",
+  "prompt" : "hand-painted anime style, watercolor background, soft warm light, gentle colors, rainy street, gray rainy sky, a young man and a young woman, side by side, both fully visible, (young man, black short hair, navy coat) on the left, (young woman, brown ponytail, yellow raincoat) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, wide shot, school gate, the young man opens a small umbrella for the young woman at school gate, rainy street, the young man gentle smile, opening umbrella, the young woman surprised, hands empty, rainy street, school gate, puddles, gray rainy sky",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed" : 668610223,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "love-07-panel-2",
+  "comic" : "love-07",
+  "concept" : "WATERCOLOR",
+  "prompt" : "hand-painted anime style, watercolor background, soft warm light, gentle colors, rainy street, gray rainy sky, young man, black short hair, navy coat, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, wet sidewalk, young man holds a small umbrella tilted to one side, his own shoulder soaked in rain, rainy street, calm smile, shoulder soaked, rainy street, wet sidewalk, puddles, gray rainy sky",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed" : 668610223,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "love-07-panel-3",
+  "comic" : "love-07",
+  "concept" : "WATERCOLOR",
+  "prompt" : "hand-painted anime style, watercolor background, soft warm light, gentle colors, rainy street, gray rainy sky, young woman, brown ponytail, yellow raincoat, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, close up shot, raindrops on umbrella edge, young woman looks up from under the small umbrella, rainy street, pouting, cheeks pink, rainy street, raindrops on umbrella edge, gray rainy sky",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed" : 668610223,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "love-07-panel-4",
+  "comic" : "love-07",
+  "concept" : "WATERCOLOR",
+  "prompt" : "hand-painted anime style, watercolor background, soft warm light, gentle colors, rain streaks, young woman, brown ponytail, yellow raincoat, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, wet bench, young woman points at a soaked coat sleeve at a bus stop, rainy street, concerned, pointing at shoulder, bus stop shelter, rain streaks, wet bench, glowing streetlight",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed" : 668610223,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "love-07-panel-5",
+  "comic" : "love-07",
+  "concept" : "WATERCOLOR",
+  "prompt" : "hand-painted anime style, watercolor background, soft warm light, gentle colors, rainy street, a young man and a young woman, side by side, both fully visible, (young man, black short hair, navy coat) on the left, (young woman, brown ponytail, yellow raincoat) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, wide shot, school gate, the young woman opens a huge golf umbrella over the young man, rainy street, the young woman bright grin, holding big umbrella, the young man laughing, looking up, rainy street, school gate, puddles, soft light through clouds",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed" : 668610223,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "love-06-panel-1",
+  "comic" : "love-06",
+  "concept" : "JOSEON",
+  "prompt" : "korean traditional genre painting, joseon era village, ink lines with soft color wash, hanji paper texture, two people in hanbok, side by side, both fully visible, (young man in hanbok, black gat, blue jeogori) on the left, (old man in hanbok, white topknot, brown jeogori) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, wide shot, paper doors, the young man in hanbok bows deeply holding a red ginseng gift box, the old man in hanbok sits upright, hanok room, the young man in hanbok nervous, deep bow, the old man in hanbok stern, arms folded, hanok room, paper doors, folding screen, low table",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, modern clothes, car, building, smartphone, computer, chinese characters, calligraphy, red seal stamp, japanese, kimono",
+  "seed" : 694748373,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "love-06-panel-2",
+  "comic" : "love-06",
+  "concept" : "JOSEON",
+  "prompt" : "korean traditional genre painting, joseon era village, ink lines with soft color wash, hanji paper texture, old man in hanbok, white topknot, brown jeogori, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, wooden baduk board, old man in hanbok sets a baduk board on the floor, hanok room, serious, setting board, hanok room, wooden baduk board, bowls of black and white stones",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, modern clothes, car, building, smartphone, computer, chinese characters, calligraphy, red seal stamp, japanese, kimono",
+  "seed" : 694748373,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "love-06-panel-3",
+  "comic" : "love-06",
+  "concept" : "JOSEON",
+  "prompt" : "korean traditional genre painting, joseon era village, ink lines with soft color wash, hanji paper texture, flickering candle, young man in hanbok, black gat, blue jeogori, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, close up shot, wooden baduk board with stones, young man in hanbok sweats over the baduk board, holding a stone, hanok room, sweating, trembling hand, hanok room, wooden baduk board with stones, flickering candle",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, modern clothes, car, building, smartphone, computer, chinese characters, calligraphy, red seal stamp, japanese, kimono",
+  "seed" : 694748373,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "love-06-panel-4",
+  "comic" : "love-06",
+  "concept" : "JOSEON",
+  "prompt" : "korean traditional genre painting, joseon era village, ink lines with soft color wash, hanji paper texture, young woman in hanbok, braided hair, pink chima, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, wooden baduk board with many stones, young woman in hanbok stares at the baduk board in disbelief, hanok room, shocked, hands on cheeks, hanok room, wooden baduk board with many stones, low table",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, modern clothes, car, building, smartphone, computer, chinese characters, calligraphy, red seal stamp, japanese, kimono",
+  "seed" : 694748373,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "love-06-panel-5",
+  "comic" : "love-06",
+  "concept" : "JOSEON",
+  "prompt" : "korean traditional genre painting, joseon era village, ink lines with soft color wash, hanji paper texture, sunset sky, three people in hanbok, side by side, both fully visible, (young man in hanbok, black gat, blue jeogori) on the left, (old man in hanbok, white topknot, brown jeogori) in the middle, (young woman in hanbok, braided hair, pink chima) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, stone wall, the young woman in hanbok smiles at the young man in hanbok at the gate, the old man in hanbok waves from the porch, hanok gate, the young woman in hanbok relieved smile, the young man in hanbok happy, bowing, the old man in hanbok waving, grinning, hanok gate, stone wall, persimmon tree, sunset sky",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, modern clothes, car, building, smartphone, computer, chinese characters, calligraphy, red seal stamp, japanese, kimono",
+  "seed" : 694748373,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "family-09-panel-1",
+  "comic" : "family-09",
+  "concept" : "PICTURE_BOOK",
+  "prompt" : "children's picture book, crayon and colored pencil drawing, simple shapes, white paper, a little girl and an old man, side by side, both fully visible, (little girl, twin buns, red raincoat) on the left, (old man, white beard, straw hat) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, wide shot, morning mist, the little girl follows the old man carrying a watering can down a hill path, village hill, the little girl curious, tiptoeing behind, the old man sly smile, looking back, village hill path, morning mist, wildflowers, small vegetable garden below",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed" : 398959835,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "family-09-panel-2",
+  "comic" : "family-09",
+  "concept" : "PICTURE_BOOK",
+  "prompt" : "children's picture book, crayon and colored pencil drawing, simple shapes, white paper, little girl, twin buns, red raincoat, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, tomato plants, little girl points at a name sign by a tomato plant, vegetable garden, surprised, pointing at sign, small vegetable garden, tomato plants, wooden name signs, lettuce rows",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed" : 398959835,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "family-09-panel-3",
+  "comic" : "family-09",
+  "concept" : "PICTURE_BOOK",
+  "prompt" : "children's picture book, crayon and colored pencil drawing, simple shapes, white paper, old man, white beard, straw hat, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, close up shot, tall tomato plant with red tomatoes, old man gently touches the tomato plant with the name sign, vegetable garden, warm smile, soft eyes, small vegetable garden, tall tomato plant with red tomatoes, wooden name sign",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed" : 398959835,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "family-09-panel-4",
+  "comic" : "family-09",
+  "concept" : "PICTURE_BOOK",
+  "prompt" : "children's picture book, crayon and colored pencil drawing, simple shapes, white paper, old man, white beard, straw hat, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, red chili pepper plants, old man points at a red chili pepper plant, vegetable garden, teasing grin, small vegetable garden, red chili pepper plants, wooden name signs",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed" : 398959835,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "family-09-panel-5",
+  "comic" : "family-09",
+  "concept" : "PICTURE_BOOK",
+  "prompt" : "children's picture book, crayon and colored pencil drawing, simple shapes, white paper, a little girl and an old man, side by side, both fully visible, (little girl, twin buns, red raincoat) on the left, (old man, white beard, straw hat) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, tiny sapling, the little girl holds a tiny sapling, the old man kneels with a tomato basket, vegetable garden, the little girl determined smile, holding sapling, the old man happy, eyes crinkled, small vegetable garden, basket of red tomatoes, tiny sapling, sunny sky",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed" : 398959835,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "mystery-02-panel-1",
+  "comic" : "mystery-02",
+  "concept" : "NEWSPAPER",
+  "prompt" : "simple cartoon, bold clean outlines, flat muted colors, plain white background, simple background, a young woman and a young man, side by side, both fully visible, (young woman, short bob, round glasses) on the left, (young man, curly hair, headband) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, front-load washing machine, the young woman counts socks into a washing machine, the young man watches, laundry room, the young woman serious, counting socks, the young man arms crossed, smirking, laundry room, front-load washing machine, laundry basket, drying rack",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, color, colorful, red, blue, halftone, screentone, dot pattern, film grain, noise, scan lines, glitch, blurry, signboard, distorted face",
+  "seed" : 252227204,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "mystery-02-panel-2",
+  "comic" : "mystery-02",
+  "concept" : "NEWSPAPER",
+  "prompt" : "simple cartoon, bold clean outlines, flat muted colors, plain white background, simple background, young woman, short bob, round glasses, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, close up shot, pile of socks on floor, young woman holds eleven socks and stares, laundry room, shocked, holding socks, laundry room, open washing machine door, pile of socks on floor",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, color, colorful, red, blue, halftone, screentone, dot pattern, film grain, noise, scan lines, glitch, blurry, signboard, distorted face",
+  "seed" : 252227204,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "mystery-02-panel-3",
+  "comic" : "mystery-02",
+  "concept" : "NEWSPAPER",
+  "prompt" : "simple cartoon, bold clean outlines, flat muted colors, plain white background, simple background, young man, curly hair, headband, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, small wooden dog house underneath, young man leans over a small brown dog house under the drying rack, laundry room, leaning over shoulder, laundry room, drying rack, small wooden dog house underneath",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, color, colorful, red, blue, halftone, screentone, dot pattern, film grain, noise, scan lines, glitch, blurry, signboard, distorted face",
+  "seed" : 252227204,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "mystery-02-panel-4",
+  "comic" : "mystery-02",
+  "concept" : "NEWSPAPER",
+  "prompt" : "simple cartoon, bold clean outlines, flat muted colors, plain white background, simple background, young woman, short bob, round glasses, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, close up shot, inside small wooden dog house, a small brown dog sits on single socks in its house, young woman gasps, laundry room, jaw dropped, eyes wide, laundry room, inside small wooden dog house, heap of mismatched socks",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, color, colorful, red, blue, halftone, screentone, dot pattern, film grain, noise, scan lines, glitch, blurry, signboard, distorted face",
+  "seed" : 252227204,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "mystery-02-panel-5",
+  "comic" : "mystery-02",
+  "concept" : "NEWSPAPER",
+  "prompt" : "simple cartoon, bold clean outlines, flat muted colors, plain white background, simple background, young man, curly hair, headband, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, small wooden dog house, young man holds up a sock by a small brown dog, laundry room, deadpan, holding sock, laundry room, small wooden dog house, heap of mismatched socks, washing machine",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, color, colorful, red, blue, halftone, screentone, dot pattern, film grain, noise, scan lines, glitch, blurry, signboard, distorted face",
+  "seed" : 252227204,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "funny-15-panel-1",
+  "comic" : "funny-15",
+  "concept" : "ANIMALS",
+  "prompt" : "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, a bear and a rabbit, animal characters, no humans, side by side, both fully visible, (bear, orange scarf) on the left, (rabbit, blue hoodie) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, round robot vacuum, the bear starts a round robot vacuum, the rabbit points at a sock, living room, the bear carefree, pressing button, the rabbit worried, pointing at sock, living room, round robot vacuum, striped sock on floor, sofa",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, human, person, realistic animal, insect, bug, character sheet, sticker sheet, emoji, icons, doodles, repeated faces, pattern",
+  "seed" : 821411334,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "funny-15-panel-2",
+  "comic" : "funny-15",
+  "concept" : "ANIMALS",
+  "prompt" : "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, rabbit, blue hoodie, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, round robot vacuum stuck under sofa, rabbit finds the round robot vacuum stuck under the sofa with a sock, living room, shocked, hands on cheeks, living room, round robot vacuum stuck under sofa, striped sock",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, human, person, realistic animal, insect, bug, character sheet, sticker sheet, emoji, icons, doodles, repeated faces, pattern",
+  "seed" : 821411334,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "funny-15-panel-3",
+  "comic" : "funny-15",
+  "concept" : "ANIMALS",
+  "prompt" : "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, rabbit, blue hoodie, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, close up shot, round robot vacuum stuck under sofa, a small brown puppy guards the round robot vacuum, rabbit gasps, living room, amazed, hands on cheeks, living room, round robot vacuum stuck under sofa, striped sock, small brown puppy",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, human, person, realistic animal, insect, bug, character sheet, sticker sheet, emoji, icons, doodles, repeated faces, pattern",
+  "seed" : 821411334,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "funny-15-panel-4",
+  "comic" : "funny-15",
+  "concept" : "ANIMALS",
+  "prompt" : "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, bear, orange scarf, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, wide shot, round robot vacuum, a small brown puppy naps by the round robot vacuum, bear smiles, living room, soft smile, hands together, living room, round robot vacuum, small brown puppy asleep, sofa, warm lamp",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, human, person, realistic animal, insect, bug, character sheet, sticker sheet, emoji, icons, doodles, repeated faces, pattern",
+  "seed" : 821411334,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "mystery-08-panel-1",
+  "comic" : "mystery-08",
+  "concept" : "WUXIA",
+  "prompt" : "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting, night, dark sky with stars, dark night lighting, little boy swordsman, child, blue robe, wooden sword, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, wide shot, lit cabin on far mountain, little boy swordsman points at a glowing cabin on the mountain at night, village hill, determined, pointing, village hill, night, dark sky with stars, lit cabin on far mountain",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, modern clothes, car, building, smartphone, computer, gun, chinese characters, calligraphy, red seal stamp, daylight, bright sky, sunny",
+  "seed" : 778199924,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "mystery-08-panel-2",
+  "comic" : "mystery-08",
+  "concept" : "WUXIA",
+  "prompt" : "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting, two martial artists, side by side, both fully visible, (little boy swordsman, child, blue robe, wooden sword) on the left, (little girl swordswoman, child, pink robe, paper lantern) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, half-open wooden door, the little boy swordsman and the little girl swordswoman creep toward a half-open cabin door, mountain cabin, the little boy swordsman brave face, sword ready, the little girl swordswoman peeking, eyes wide, mountain cabin, half-open wooden door, pine trees, daylight",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, modern clothes, car, building, smartphone, computer, gun, chinese characters, calligraphy, red seal stamp",
+  "seed" : 778199924,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "mystery-08-panel-3",
+  "comic" : "mystery-08",
+  "concept" : "WUXIA",
+  "prompt" : "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting, old swordsman, gray robe, brass telescope, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, huge brass telescope on tripod, old swordsman steps out beside a huge brass telescope, mountain cabin, stern then smiling, mountain cabin, wooden deck, huge brass telescope on tripod, pine trees",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, modern clothes, car, building, smartphone, computer, gun, chinese characters, calligraphy, red seal stamp",
+  "seed" : 778199924,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "mystery-08-panel-4",
+  "comic" : "mystery-08",
+  "concept" : "WUXIA",
+  "prompt" : "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting, night, sky full of stars, dark night lighting, little boy swordsman, child, blue robe, wooden sword, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, close up shot, ringed Saturn visible, little boy swordsman looks through a huge brass telescope at Saturn, mountain cabin, awestruck, eye on telescope, mountain cabin, night, sky full of stars, ringed Saturn visible",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, modern clothes, car, building, smartphone, computer, gun, chinese characters, calligraphy, red seal stamp, daylight, bright sky, sunny",
+  "seed" : 778199924,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "mystery-08-panel-5",
+  "comic" : "mystery-08",
+  "concept" : "WUXIA",
+  "prompt" : "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting, night, sky full of stars, dark night lighting, old swordsman, gray robe, brass telescope, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, wide shot, brass telescope, old swordsman smiles beside the huge brass telescope under a starry sky, mountain cabin, gentle smile, mountain cabin, night, sky full of stars, brass telescope, glowing window",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, modern clothes, car, building, smartphone, computer, gun, chinese characters, calligraphy, red seal stamp, daylight, bright sky, sunny",
+  "seed" : 778199924,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "funny-12-panel-1",
+  "comic" : "funny-12",
+  "concept" : "ANIMALS",
+  "prompt" : "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, a bear and a rabbit, animal characters, no humans, side by side, both fully visible, (bear, red cap) on the left, (rabbit, green apron) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, dumpling sample stand, the bear eyes a dumpling sample tray, the rabbit holds a shopping basket, supermarket aisle, the bear drooling, pointing at tray, the rabbit eyebrow raised, holding basket, supermarket aisle, dumpling sample stand, steaming sample tray, freezer shelves",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, human, person, realistic animal, insect, bug, character sheet, sticker sheet, emoji, icons, doodles, repeated faces, pattern",
+  "seed" : 332981179,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "funny-12-panel-2",
+  "comic" : "funny-12",
+  "concept" : "ANIMALS",
+  "prompt" : "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, bear, red cap, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, dumpling sample stand, bear pulls a red cap low and sneaks to the dumpling stand, supermarket, sneaky grin, cap pulled low, supermarket aisle, dumpling sample stand, steaming sample tray, freezer shelves",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, human, person, realistic animal, insect, bug, character sheet, sticker sheet, emoji, icons, doodles, repeated faces, pattern",
+  "seed" : 332981179,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "funny-12-panel-3",
+  "comic" : "funny-12",
+  "concept" : "ANIMALS",
+  "prompt" : "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, bear, red cap, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, close up shot, dumpling sample stand, bear in a red cap freezes holding a dumpling toothpick by the sample tray, supermarket aisle, frozen, sweat drop, supermarket aisle, dumpling sample stand, steaming sample tray",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, human, person, realistic animal, insect, bug, character sheet, sticker sheet, emoji, icons, doodles, repeated faces, pattern",
+  "seed" : 332981179,
+  "width" : 768,
+  "height" : 768
+}, {
+  "name" : "funny-12-panel-4",
+  "comic" : "funny-12",
+  "concept" : "ANIMALS",
+  "prompt" : "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, rabbit, green apron, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, medium shot, two bags of frozen dumplings, rabbit laughs holding two dumpling bags, supermarket checkout, laughing, shaking head, supermarket checkout, two bags of frozen dumplings, cash register",
+  "negativePrompt" : "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person, human, person, realistic animal, insect, bug, character sheet, sticker sheet, emoji, icons, doodles, repeated faces, pattern",
+  "seed" : 332981179,
+  "width" : 768,
+  "height" : 768
+} ]
