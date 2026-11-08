@@ -32,6 +32,7 @@ def test_main은_설정을_읽고_워커를_돌린다(monkeypatch: pytest.Monkey
 
 def test_IMAGE_MODEL이_flux면_FLUX_schnell_백엔드로_그린다() -> None:
     from model_runtime.backends.flux import FluxBackend
+    from model_runtime.backends.image_fallback import FallbackImage
 
     s = Settings.from_env(
         {
@@ -42,7 +43,9 @@ def test_IMAGE_MODEL이_flux면_FLUX_schnell_백엔드로_그린다() -> None:
             "FLUX_STEPS": "6",
         }
     )
-    image = entry.build_image_backend(s)
+    wrapped = entry.build_image_backend(s)
+    assert isinstance(wrapped, FallbackImage)
+    image = wrapped.active
     assert isinstance(image, FluxBackend)
     assert image.quantized_dir == "C:/flux-nf4"
     assert image.steps == 6

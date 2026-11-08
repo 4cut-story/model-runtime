@@ -70,6 +70,8 @@ class Settings:
     # NF4로 줄인 transformer·T5를 저장해 둘 폴더. 비우면 시작할 때마다 다시 줄인다
     flux_quantized_dir: str = ""
     flux_steps: int = 4
+    # FLUX를 올리는 동안 두는 표시 파일. 워커가 시작할 때 남아 있으면 SDXL로 그린다
+    flux_marker: str = ".flux-loading"
     poll_min: float = 2.0
     poll_max: float = 10.0
     heartbeat_interval: float = 30.0
@@ -109,4 +111,5 @@ class Settings:
             flux_model=env.get("FLUX_MODEL", DEFAULT_FLUX_MODEL).strip(),
             flux_quantized_dir=env.get("FLUX_QUANTIZED_DIR", "").strip(),
             flux_steps=int(env.get("FLUX_STEPS", "4")),
+            flux_marker=env.get("FLUX_MARKER", ".flux-loading").strip(),
         )
