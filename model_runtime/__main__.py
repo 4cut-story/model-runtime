@@ -52,6 +52,7 @@ def build_image_backend(settings: Settings) -> Any:
             settings.flux_model,
             settings.flux_quantized_dir,
             steps=settings.flux_steps,
+            guidance=settings.flux_guidance,
             keep_in_ram=settings.keep_in_ram,
         )
         # FLUX가 실패하거나 올리다 워커가 죽으면 사람 손 없이 SDXL로 되돌린다
