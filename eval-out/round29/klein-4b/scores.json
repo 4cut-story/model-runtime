@@ -1,0 +1,25 @@
+{
+ "label": "FLUX.2 klein 4B (4 step, 참조 없음)",
+ "status": "비교용",
+ "license": "Apache 2.0",
+ "reference": false,
+ "scores": [
+  90.8,
+  92.2
+ ],
+ "average": 91.5,
+ "criticalComics": 3,
+ "perComic": {
+  "solo-01": 89.0,
+  "funny-03": 90.8,
+  "twist-08": 92.9,
+  "funny-12": 93.0,
+  "funny-15": 89.5,
+  "love-07": 89.7,
+  "family-09": 91.9,
+  "mystery-02": 87.7,
+  "love-06": 94.5,
+  "mystery-08": 91.5
+ },
+ "note": "klein-4b-ref와 같은 모델을 참조 그림 없이 글만으로 그렸어요. 같은 사람인지(C2)는 9/10편에서 걸렸고(참조 있음은 5/10), DB 그림과 닮음은 good 2·partial 28·poor 12(참조 있음은 good 17·partial 23·poor 2). 컷당 4.2초, VRAM 최대 2.9GB."
+}
