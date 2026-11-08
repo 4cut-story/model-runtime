@@ -1,0 +1,25 @@
+{
+ "label": "FLUX.2 klein base 4B + 캐릭터 참조 (50 step)",
+ "status": "비교용",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  90.7,
+  92.1
+ ],
+ "average": 91.4,
+ "criticalComics": 2,
+ "perComic": {
+  "solo-01": 90.5,
+  "funny-03": 91.3,
+  "twist-08": 90.8,
+  "funny-12": 93.4,
+  "funny-15": 86.4,
+  "love-07": 94.8,
+  "family-09": 90.0,
+  "mystery-02": 88.6,
+  "love-06": 91.9,
+  "mystery-08": 93.9
+ },
+ "note": "klein 4B의 증류 전 원본(guidance 4.0, 50 step)으로 캐릭터 참조를 넣고 그렸어요. 심각 오류는 2편(solo-01 5컷 다리가 몸과 떨어짐, mystery-02 4컷 강아지에 사람 얼굴이 섞임). 같은 사람인지(C2)는 8/10편에서 걸렸고, DB 그림과 닮음은 good 9·partial 31·poor 2, 굳은 자세는 20번 중 4번, 컷 사이 옷·소품 바뀜은 46명 중 34명. 컷당 114.9초(4 step 판의 약 18배), VRAM 최대 3.7GB라 실서비스에는 너무 느려요."
+}
