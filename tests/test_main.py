@@ -42,6 +42,7 @@ def test_IMAGE_MODEL이_flux면_FLUX_schnell_백엔드로_그린다() -> None:
             "FLUX_QUANTIZED_DIR": "C:/flux-nf4",
             "FLUX_STEPS": "6",
             "FLUX_GUIDANCE": "3.5",
+            "FLUX_QUANT": "FP8",
         }
     )
     wrapped = entry.build_image_backend(s)
@@ -51,6 +52,7 @@ def test_IMAGE_MODEL이_flux면_FLUX_schnell_백엔드로_그린다() -> None:
     assert image.quantized_dir == "C:/flux-nf4"
     assert image.steps == 6
     assert image.guidance == 3.5
+    assert image.quant == "fp8"
     assert image.encode_reference(b"png") is None
     assert image.model_info()["flux"] == "black-forest-labs/FLUX.1-schnell"
 
@@ -58,4 +60,12 @@ def test_IMAGE_MODEL이_flux면_FLUX_schnell_백엔드로_그린다() -> None:
 def test_IMAGE_MODEL이_틀리면_시작하지_않는다() -> None:
     s = Settings(api_url="https://x", token="t", worker_id="w", image_model="dalle")
     with pytest.raises(ValueError, match="IMAGE_MODEL"):
+        entry.build_image_backend(s)
+
+
+def test_FLUX_QUANT가_틀리면_시작하지_않는다() -> None:
+    s = Settings(
+        api_url="https://x", token="t", worker_id="w", image_model="flux", flux_quant="int3"
+    )
+    with pytest.raises(ValueError, match="FLUX_QUANT"):
         entry.build_image_backend(s)

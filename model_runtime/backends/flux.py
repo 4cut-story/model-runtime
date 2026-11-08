@@ -29,6 +29,7 @@ from . import Reference
 log = logging.getLogger(__name__)
 
 DEFAULT_FLUX_MODEL = "black-forest-labs/FLUX.1-schnell"
+QUANTS = ("auto", "nf4", "fp8")
 
 
 class FluxBackend:
@@ -40,6 +41,7 @@ class FluxBackend:
         keep_in_ram: bool = True,
         max_sequence_length: int = 512,
         guidance: float = 0.0,
+        quant: str = "auto",
     ) -> None:
         self.model_name = model_name
         self.quantized_dir = quantized_dir
@@ -48,6 +50,11 @@ class FluxBackend:
         self.max_sequence_length = max_sequence_length
         # schnell은 0. dev는 guidance를 모델 입력으로 받는다(CFG처럼 두 번 돌지 않는다). 3.5 권장
         self.guidance = guidance
+        # auto: bitsandbytes가 있으면 nf4, 없으면 fp8. fp8은 8bit 저장·bf16 계산이다
+        # (bitsandbytes int8은 CPU offload로 옮길 수 없어 쓰지 않는다)
+        if quant not in QUANTS:
+            raise ValueError(f"FLUX_QUANT는 {', '.join(QUANTS)} 중 하나여야 한다: {quant}")
+        self.quant = quant
         self.mode = ""
         self._pipe: Any = None
 
@@ -70,9 +77,15 @@ class FluxBackend:
         from diffusers import FluxTransformer2DModel
         from transformers import T5EncoderModel
 
-        try:
-            import bitsandbytes  # noqa: F401
-        except ImportError:
+        mode = self.quant
+        if mode == "auto":
+            try:
+                import bitsandbytes  # noqa: F401
+
+                mode = "nf4"
+            except ImportError:
+                mode = "fp8"
+        if mode == "fp8":
             self.mode = "fp8"
             transformer = FluxTransformer2DModel.from_pretrained(
                 self.model_name, subfolder="transformer", torch_dtype=torch.bfloat16
