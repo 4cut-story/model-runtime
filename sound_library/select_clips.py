@@ -17,7 +17,7 @@ import random
 import re
 from pathlib import Path
 
-from categories import AMBIENCE, EFFECT, FMA_GENRES, Category
+from categories import AMBIENCE, EFFECT, FMA_GENRES, FMA_WIDE, FSD_WIDE, TAG_WIDE, Category
 from remote_zip import RemoteZip
 
 ZENODO = "https://zenodo.org/records/4060432/files/"
@@ -30,6 +30,8 @@ FSD_PARTS = {
     + [f"{ZENODO}FSD50K.dev_audio.zip?download=1"],
 }
 FMA_ZIP = "https://os.unil.cloud.switch.ch/fma/fma_medium.zip"
+# 2차부터: 전곡(fma_full)에서 고른다. CC0·CC BY 곡이 medium보다 훨씬 많다. 받을 때 30초로 자른다
+FMA_FULL_ZIP = "https://os.unil.cloud.switch.ch/fma/fma_full.zip"
 
 LICENSES = {
     "http://creativecommons.org/publicdomain/zero/1.0/": "CC0-1.0",
@@ -50,6 +52,9 @@ AMBIENT_TAGS = {
     "nature",
     "loop",
 }
+
+
+SAMPLE_TAGS = {"single-note", "multisample", "good-sounds", "velocity", "crossword", "alphabet"}
 
 
 def fma_license(url: str) -> str | None:
@@ -97,23 +102,29 @@ def fsd_pool(meta: Path) -> list[dict]:
     return out
 
 
-def fma_pool(raw_tracks: Path) -> list[dict]:
+def fma_pool(raw_tracks: Path, full: bool = False) -> list[dict]:
     csv.field_size_limit(10**9)
-    zipped = RemoteZip([FMA_ZIP])
+    zipped = RemoteZip([FMA_FULL_ZIP if full else FMA_ZIP])
+    folder = "fma_full" if full else "fma_medium"
     out = []
     with open(raw_tracks, encoding="utf-8") as f:
         for row in csv.DictReader(f):
             lic = fma_license(row["license_url"])
             tid = int(row["track_id"])
-            name = f"fma_medium/{tid // 1000:03d}/{tid:06d}.mp3"
+            name = f"{folder}/{tid // 1000:03d}/{tid:06d}.mp3"
             if lic is None or name not in zipped.entries:
                 continue
-            genres = [g["genre_title"] for g in ast.literal_eval(row["track_genres"] or "[]")]
+            # 카테고리 라벨은 띄어쓰기를 _로 적는다 (Synth Pop → Synth_Pop)
+            genres = [
+                g["genre_title"].replace(" ", "_")
+                for g in ast.literal_eval(row["track_genres"] or "[]")
+            ]
             out.append(
                 {
                     "source": "FMA",
                     "source_id": str(tid),
                     "zip_name": name,
+                    "fma_full": full,
                     "duration": 30.0,
                     "title_original": row["track_title"],
                     "author": row["artist_name"],
@@ -159,7 +170,27 @@ def classify(c: dict, cats: list[Category]) -> Category | None:
     return None
 
 
-def pick(pool: list[dict], cats: list[Category], total: int, seen: set[str]) -> list[dict]:
+def spread(items: list[dict], per_author: int) -> list[dict]:
+    """점수 순서를 지키되 같은 올린 사람(작가)의 클립은 per_author개까지만 앞에 둔다."""
+    seen: dict[str, int] = {}
+    head, tail = [], []
+    for c in items:
+        n = seen.get(c["author"], 0)
+        (head if n < per_author else tail).append(c)
+        seen[c["author"]] = n + 1
+    return head + tail
+
+
+def pick(
+    pool: list[dict],
+    cats: list[Category],
+    total: int,
+    seen: set[str],
+    cap: int = 0,
+    per_author: int = 0,
+    caps: dict[str, int] | None = None,
+) -> list[dict]:
+    """카테고리마다 고르게 나눠 고른다. cap이 있으면 한 카테고리에서 그 수까지만 고른다."""
     buckets: dict[str, list[dict]] = {c.code: [] for c in cats}
     for c in pool:
         if f"{c['source']}:{c['source_id']}" in seen:
@@ -171,6 +202,11 @@ def pick(pool: list[dict], cats: list[Category], total: int, seen: set[str]) -> 
     by_code = {c.code: c for c in cats}
     for code, items in buckets.items():
         items.sort(key=lambda x: score(x, by_code[code]), reverse=True)
+        if per_author:
+            items[:] = spread(items, per_author)
+        limit = (caps or {}).get(code, cap)
+        if limit:
+            del items[limit:]
     chosen: list[dict] = []
     left = total
     open_codes = [c.code for c in cats if buckets[c.code]]
@@ -197,25 +233,75 @@ def main() -> None:
     ap.add_argument("--ambience", type=int, default=550)
     ap.add_argument("--effect", type=int, default=150)
     ap.add_argument("--music", type=int, default=300)
-    ap.add_argument("--exclude", type=Path, help="이미 고른 candidates.jsonl (2차에서 뺀다)")
+    ap.add_argument(
+        "--exclude",
+        type=Path,
+        nargs="*",
+        default=[],
+        help="이미 고른 candidates.jsonl (빼고 고른다)",
+    )
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--seed", type=int, default=7)
+    ap.add_argument(
+        "--wide",
+        action="store_true",
+        help="2차부터: 넓힌 카테고리까지 쓰고 FMA 전곡에서 고른다 (--fsd-total, --music, --cap)",
+    )
+    ap.add_argument("--tags", action="store_true", help="3차부터: 태그 카테고리를 먼저 본다")
+    ap.add_argument("--fsd-total", type=int, default=3700)
+    ap.add_argument("--cap", type=int, default=30, help="--wide에서 카테고리 하나의 상한")
+    ap.add_argument(
+        "--per-author", type=int, default=3, help="--wide에서 카테고리 안 작가 한 명의 상한"
+    )
+    ap.add_argument(
+        "--old-cap",
+        type=int,
+        default=8,
+        help="--wide에서 1차 카테고리 하나의 상한 (넓히는 게 먼저다)",
+    )
     a = ap.parse_args()
     random.seed(a.seed)
     seen: set[str] = set()
-    if a.exclude and a.exclude.exists():
-        for line in a.exclude.read_text(encoding="utf-8").splitlines():
+    for path in a.exclude:
+        for line in path.read_text(encoding="utf-8").splitlines():
             c = json.loads(line)
             seen.add(f"{c['source']}:{c['source_id']}")
     fsd = fsd_pool(a.fsd)
+    if a.wide:
+        earlier = AMBIENCE + EFFECT + FMA_GENRES + (FSD_WIDE + FMA_WIDE if a.tags else [])
+        old = {c.code: a.old_cap for c in earlier}
+        kw = {"cap": a.cap, "per_author": a.per_author, "caps": old}
+        cats = AMBIENCE + EFFECT + FSD_WIDE
+        if a.tags:  # 악기 낱음 샘플은 배경음으로 쓰기 어렵다
+            fsd = [c for c in fsd if not SAMPLE_TAGS & {t.lower() for t in c["tags"]}]
+            cats = TAG_WIDE + cats
+        chosen = pick(fsd, cats, a.fsd_total, seen, **kw)
+        music_cap = {"cap": a.cap, "per_author": a.per_author, "caps": old}
+        chosen += pick(
+            fma_pool(a.fma, full=True), FMA_WIDE + FMA_GENRES, a.music, seen, **music_cap
+        )
+        write(a.out, chosen)
+        return
     chosen = pick(fsd, AMBIENCE, a.ambience, seen)
     seen |= {f"{c['source']}:{c['source_id']}" for c in chosen}
     chosen += pick(fsd, EFFECT, a.effect, seen)
     chosen += pick(fma_pool(a.fma), FMA_GENRES, a.music, seen)
-    with open(a.out, "w", encoding="utf-8") as f:
+    write(a.out, chosen)
+
+
+def jsonline(c: dict) -> str:
+    """한 줄 JSON. str.splitlines가 줄바꿈으로 보는 글자(U+2028 등)는 이스케이프한다."""
+    line = json.dumps(c, ensure_ascii=False)
+    for ch in ("\x85", "\u2028", "\u2029"):
+        line = line.replace(ch, f"\\u{ord(ch):04x}")
+    return line
+
+
+def write(out: Path, chosen: list[dict]) -> None:
+    with open(out, "w", encoding="utf-8") as f:
         for c in chosen:
-            f.write(json.dumps(c, ensure_ascii=False) + "\n")
-    print(f"{len(chosen)}개를 골랐다 → {a.out}")
+            f.write(jsonline(c) + "\n")
+    print(f"{len(chosen)}개, 카테고리 {len({c['category'] for c in chosen})}개를 골랐다 → {out}")
 
 
 if __name__ == "__main__":

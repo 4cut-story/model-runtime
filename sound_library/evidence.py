@@ -22,7 +22,15 @@ def key(c: dict[str, object]) -> str:
     return f"{str(c['source']).lower()}-{c['source_id']}"
 
 
-def line(c: dict[str, object], x: dict[str, object], label: str) -> str:
+def line(c: dict[str, object], x: dict[str, object] | None, label: str) -> str:
+    if x is None:  # CLAP 전: 원본 정보만
+        tags = ",".join(c["tags"][:8])  # type: ignore[index]
+        labels = ",".join(c["labels"][:4])  # type: ignore[index]
+        note = str(c.get("note") or "").replace("\n", " ")[:90]
+        return (
+            f"{key(c)} | {label} | {str(c['title_original'])[:50]} | {tags} | {labels} | {note}"
+            f" | {c['duration']}s"
+        )
     moods = x["moods"]
     assert isinstance(moods, dict)
     top = sorted(moods, key=lambda q: -moods[q])[:3]
@@ -51,6 +59,8 @@ def main() -> None:
     ap.add_argument("--done", type=Path, nargs="*", default=[])
     ap.add_argument("--start", type=int, default=0)
     ap.add_argument("--n", type=int, default=50)
+    ap.add_argument("--kind", help="AMBIENCE·EFFECT·MUSIC 중 하나만")
+    ap.add_argument("--no-clap", action="store_true", help="CLAP 결과 없이 원본 정보만 본다")
     a = ap.parse_args()
     labels = {c.code: c.label for c in ALL}
     clap = {}
@@ -60,11 +70,19 @@ def main() -> None:
     done: set[str] = set()
     for f in a.done:
         if f.exists():
-            done |= {json.loads(r)["key"] for r in f.read_text(encoding="utf-8").splitlines()}
+            for r in f.read_text(encoding="utf-8").splitlines():
+                if r.strip():
+                    done.add(r.split("|")[0].strip() if "|" in r else json.loads(r)["key"])
     cands = [json.loads(r) for r in a.candidates.read_text(encoding="utf-8").splitlines()]
-    todo = [c for c in cands if key(c) in clap and key(c) not in done]
+    todo = [
+        c
+        for c in cands
+        if (a.no_clap or key(c) in clap)
+        and key(c) not in done
+        and (not a.kind or c["kind"] == a.kind)
+    ]
     for c in todo[a.start : a.start + a.n]:
-        print(line(c, clap[key(c)], labels[c["category"]]))
+        print(line(c, clap.get(key(c)), labels[c["category"]]))
     print("남은 수", len(todo))
 
 
