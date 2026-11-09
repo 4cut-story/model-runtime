@@ -1,0 +1,25 @@
+{
+ "label": "FLUX 3 klein + 캐릭터 참조 + 프롬프트 개선 2 (16 step)",
+ "status": "비교용",
+ "license": "FLUX Kommunity 라이선스(사용 조건 있음)",
+ "reference": true,
+ "scores": [
+  96.3,
+  95.7
+ ],
+ "average": 96.0,
+ "criticalComics": 2,
+ "perComic": {
+  "solo-01": 96.0,
+  "funny-03": 95.2,
+  "twist-08": 89.0,
+  "funny-12": 99.1,
+  "funny-15": 92.8,
+  "love-07": 96.3,
+  "family-09": 99.2,
+  "mystery-02": 89.0,
+  "love-06": 98.5,
+  "mystery-08": 94.8
+ },
+ "note": "klein fixlook2(96.6점)와 같은 프롬프트로 47컷을 모두 그렸어요. 평균 96.0점으로 fixlook2와 비슷하지만 조금 낮아요. 옷과 소품은 45건 중 36건이 그대로 이어졌어요. 심각 오류는 2편이에요: twist-08 3컷 할머니 팔이 셋, mystery-02 1컷 강아지가 둘로 그려지고 집주인이 남자처럼 보임. 정면으로 선 딱딱한 자세(love-07, funny-15)와 가짜 글자도 남았어요. 컷당 27.0초, VRAM 최대 12.8GB로 klein 4B(컷당 6.1초)보다 4배 넘게 느리고 라이선스 조건도 있어서 쓰지 않아요."
+}
