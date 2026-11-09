@@ -1,0 +1,38 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 20b판, 1024px 6 step, negative 비움, 긍정문 구도",
+ "status": "후보",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  96.0,
+  96.5
+ ],
+ "average": 96.2,
+ "criticalComics": 4,
+ "perComic": {
+  "solo-01": 98.4,
+  "funny-03": 98.2,
+  "twist-08": 98.6,
+  "funny-12": 93.4,
+  "funny-15": 96.8,
+  "love-07": 89.0,
+  "family-09": 95.4,
+  "mystery-02": 89.0,
+  "love-06": 97.1,
+  "mystery-08": 89.0
+ },
+ "strict": {
+  "average": 81.7,
+  "items": {
+   "X1": 77.5,
+   "X2": 85.9,
+   "X3": 83.8,
+   "X4": 83.8
+  },
+  "baseline": {
+   "variant": "klein-4b-ref-fixlookS",
+   "average": 61.5
+  }
+ },
+ "note": "20b판: 20판 콘티를 그대로 쓰고 그리기만 바꿈(1024px, 6 step, negative 비움, 구도 문구를 긍정문으로, 물건 쥔 컷 손 모으기, 어른 몸 비율 문구). 컷당 11.7초(20판 5.4초), VRAM 최대 4.34GiB. 심각 4편(mystery-02 1컷 은솔 둘, love-07 8컷 이랑 아이 비율, funny-12 엄마와 아들 같은 얼굴, mystery-08 칼·대롱 중복). 점수 96.2, 실패 165건으로 20판보다 나쁨."
+}
