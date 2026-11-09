@@ -1,0 +1,38 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 4판 (4 step)",
+ "status": "후보",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  95.2,
+  95.7
+ ],
+ "average": 95.5,
+ "criticalComics": 2,
+ "perComic": {
+  "solo-01": 98.7,
+  "funny-03": 98.0,
+  "twist-08": 93.0,
+  "funny-12": 95.1,
+  "funny-15": 89.0,
+  "love-07": 95.7,
+  "family-09": 95.2,
+  "mystery-02": 94.6,
+  "love-06": 95.2,
+  "mystery-08": 95.4
+ },
+ "strict": {
+  "average": 74.5,
+  "items": {
+   "X1": 79.7,
+   "X2": 79.7,
+   "X3": 69.9,
+   "X4": 70.7
+  },
+  "baseline": {
+   "variant": "klein-4b-ref-fixlookS",
+   "average": 61.5
+  }
+ },
+ "note": "콘티 틀 4판(한 컷은 한 명이 기본, 두 명은 떨어져 서게, 실루엣으로 읽히는 큰 동작 하나, 다리 동작은 wide에만, 표정에 몸에 지닌 것 빼기, 글자 들어가기 쉬운 면은 plain)으로 Claude가 다시 썼어요. 62컷 중 두 명 컷 23개(3판 43개). 심각 오류는 2편으로 줄었어요(funny-15 비슷한 회색 동물 둘이 섞임, twist-08 팔 셋). 남은 문제는 신발·옷이 컷마다 바뀌는 것, 콘티 머리 모양이 참조 외모 뒤에 덧붙는 것, 'order kiosk'의 가짜 글자, 실내 비예요. 컷당 5.8초."
+}
