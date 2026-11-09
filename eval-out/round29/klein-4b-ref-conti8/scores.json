@@ -1,0 +1,38 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 6판 (4 step)",
+ "status": "후보",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  94.2,
+  94.7
+ ],
+ "average": 94.5,
+ "criticalComics": 3,
+ "perComic": {
+  "solo-01": 98.4,
+  "funny-03": 96.5,
+  "twist-08": 89.0,
+  "funny-12": 96.9,
+  "funny-15": 92.7,
+  "love-07": 91.5,
+  "family-09": 95.7,
+  "mystery-02": 95.7,
+  "love-06": 96.1,
+  "mystery-08": 89.0
+ },
+ "strict": {
+  "average": 69.7,
+  "items": {
+   "X1": 73.5,
+   "X2": 79.5,
+   "X3": 56.1,
+   "X4": 70.5
+  },
+  "baseline": {
+   "variant": "klein-4b-ref-fixlookS",
+   "average": 61.5
+  }
+ },
+ "note": "콘티 틀 6판(탁자 사이에 마주 보는 두 사람 금지, 두 팔이 서로 다른 동작 금지, 반려동물은 네 발·옷 없음, 참조 그림이 있는 인물의 신발은 그림이 정함)으로 Claude가 다시 썼어요. 66컷. 5판(96.1)보다 낮아요. 심각 오류 3편이 모두 두 사람 컷에서 났어요: twist-08 머리 없는 몸 하나 더, love-07 두 사람 팔이 하나로 합쳐짐, mystery-08 할아버지와 아이의 옷·소품이 뒤섞임. 옷·신발 유지는 40명 중 14명 same으로 5판(9명)보다 나아요. 컷당 5.7초."
+}
