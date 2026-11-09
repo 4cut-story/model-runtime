@@ -1,0 +1,39 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 23판, 22판에 하나뿐인 물건은 그림 전체에 하나만이라고 덧붙임",
+ "status": "후보",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  97.4,
+  97.9
+ ],
+ "average": 97.7,
+ "criticalComics": 3,
+ "perComic": {
+  "solo-01": 98.0,
+  "funny-03": 99.5,
+  "twist-08": 99.3,
+  "funny-12": 89.0,
+  "funny-15": 97.3,
+  "love-07": 94.5,
+  "family-09": 93.7,
+  "mystery-02": 97.1,
+  "love-06": 98.2,
+  "mystery-08": 89.0
+ },
+ "strict": {
+  "average": 82.2,
+  "items": {
+   "X1": 84.6,
+   "X2": 85.4,
+   "X3": 86.2,
+   "X4": 73.8
+  },
+  "baseline": {
+   "variant": "klein-4b-ref-fixlookS",
+   "average": 61.5
+  }
+ },
+ "appeal": 6.8,
+ "note": "23판: 22판에 더해 콘티가 a single·one lone으로 정한 물건은 only one ... in the whole picture를 붙임. 컷당 5.5초, VRAM 최대 3.68GiB. funny-03 키오스크 둘은 사라짐. 심각 3편(funny-12 엄마·아들 같은 얼굴: 콘티 문제, 채점자 두 명, mystery-08 5컷 망원경 둘: 두 명, family-09 2컷 할아버지 눈동자 없음: 한 명). 점수 97.7, 실패 116건."
+}
