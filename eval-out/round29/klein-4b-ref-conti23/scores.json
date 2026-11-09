@@ -1,0 +1,38 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 19판, 두 사람 컷·물건 쥔 컷 나눠 그리기 (4 step)",
+ "status": "후보",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  94.3,
+  94.2
+ ],
+ "average": 96.6,
+ "criticalComics": 5,
+ "perComic": {
+  "solo-01": 97.1,
+  "funny-03": 98.8,
+  "twist-08": 93.8,
+  "funny-12": 96.3,
+  "funny-15": 89.0,
+  "love-07": 93.0,
+  "family-09": 97.8,
+  "mystery-02": 89.0,
+  "love-06": 95.1,
+  "mystery-08": 92.8
+ },
+ "strict": {
+  "average": 78.2,
+  "items": {
+   "X1": 75.5,
+   "X2": 86.4,
+   "X3": 79.6,
+   "X4": 73.5
+  },
+  "baseline": {
+   "variant": "klein-4b-ref-fixlookS",
+   "average": 61.5
+  }
+ },
+ "note": "19판(18판에 '컷에 나오는 사람' 규칙을 16판 형태로 되돌리고, 물건 쥔 컷 시선 치환 버그 수정). 두 사람 컷 실패는 줄었지만 심각 5편: funny-15 1컷 청소기 둘(시선 치환이 물건 이름 뒤 낱말 때문에 안 먹음)·4컷 토끼 둘, mystery-02 1·2컷 배경 세탁기 둘, mystery-08 4컷 손 셋('looking at forward' 버그), twist-08 8컷 기는 자세 팔다리 뭉개짐, love-07 8컷 아이 체형. 점수 96.6, 심각 5편, 실패 166건."
+}
