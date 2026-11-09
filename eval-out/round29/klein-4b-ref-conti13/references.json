@@ -1,0 +1,618 @@
+{
+ "round": 29,
+ "source": "conti13 by dbLook; per-story lookIds from conti3 (corrected); teal -> NZcc for DAILY, US075 for love-07; empty dbLook -> no reference",
+ "panels": {
+  "solo-01-panel-1": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "PSk5gY4wvimLF-KEu5M04",
+     "storyName": "나래"
+    }
+   ],
+   "withLookId": 1
+  },
+  "solo-01-panel-2": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "PSk5gY4wvimLF-KEu5M04",
+     "storyName": "나래"
+    }
+   ],
+   "withLookId": 1
+  },
+  "solo-01-panel-3": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "NZccb0kPIeTBNdaawDdga",
+     "storyName": "채희"
+    }
+   ],
+   "withLookId": 1
+  },
+  "solo-01-panel-4": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "NZccb0kPIeTBNdaawDdga",
+     "storyName": "채희"
+    }
+   ],
+   "withLookId": 1
+  },
+  "solo-01-panel-5": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "NZccb0kPIeTBNdaawDdga",
+     "storyName": "채희"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-03-panel-1": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "yExBB82rxhP2ZNj3908y0",
+     "storyName": "해담"
+    },
+    {
+     "speaker": "B",
+     "lookId": "gChXfzcb-TvrEcrTQrNqW",
+     "storyName": "하늘"
+    }
+   ],
+   "withLookId": 2
+  },
+  "funny-03-panel-2": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "gChXfzcb-TvrEcrTQrNqW",
+     "storyName": "하늘"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-03-panel-3": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "yExBB82rxhP2ZNj3908y0",
+     "storyName": "해담"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-03-panel-4": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "gChXfzcb-TvrEcrTQrNqW",
+     "storyName": "하늘"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-03-panel-5": {
+   "inScene": [
+    {
+     "speaker": "C",
+     "lookId": "5Fw-Y1QYfZv7Q4lCFNoWc",
+     "storyName": "지우"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-03-panel-6": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "gChXfzcb-TvrEcrTQrNqW",
+     "storyName": "하늘"
+    }
+   ],
+   "withLookId": 1
+  },
+  "twist-08-panel-1": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "un2pc1jifrGENcbe2__Li",
+     "storyName": "윤슬"
+    },
+    {
+     "speaker": "C",
+     "lookId": "CN9d5nO78jJ_H23YzePBn",
+     "storyName": "도담"
+    }
+   ],
+   "withLookId": 2
+  },
+  "twist-08-panel-2": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "NZccb0kPIeTBNdaawDdga",
+     "storyName": "채희"
+    }
+   ],
+   "withLookId": 1
+  },
+  "twist-08-panel-3": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "un2pc1jifrGENcbe2__Li",
+     "storyName": "윤슬"
+    }
+   ],
+   "withLookId": 1
+  },
+  "twist-08-panel-4": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "un2pc1jifrGENcbe2__Li",
+     "storyName": "윤슬"
+    }
+   ],
+   "withLookId": 1
+  },
+  "twist-08-panel-5": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "NZccb0kPIeTBNdaawDdga",
+     "storyName": "채희"
+    }
+   ],
+   "withLookId": 1
+  },
+  "twist-08-panel-6": {
+   "inScene": [
+    {
+     "speaker": "C",
+     "lookId": "CN9d5nO78jJ_H23YzePBn",
+     "storyName": "도담"
+    }
+   ],
+   "withLookId": 1
+  },
+  "twist-08-panel-7": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "NZccb0kPIeTBNdaawDdga",
+     "storyName": "채희"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-12-panel-1": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  },
+  "funny-12-panel-2": {
+   "inScene": [
+    {
+     "speaker": "A"
+    },
+    {
+     "speaker": "B",
+     "lookId": "5gzzlvKrrU81JPesnH1uz",
+     "storyName": "하늘"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-12-panel-3": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "5gzzlvKrrU81JPesnH1uz",
+     "storyName": "하늘"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-12-panel-4": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  },
+  "funny-12-panel-5": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "5gzzlvKrrU81JPesnH1uz",
+     "storyName": "하늘"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-15-panel-1": {
+   "inScene": [
+    {
+     "speaker": "A"
+    },
+    {
+     "speaker": "B",
+     "lookId": "-e3xDDD_MZlZrG85dWbix",
+     "storyName": "해솔"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-15-panel-2": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  },
+  "funny-15-panel-3": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "-e3xDDD_MZlZrG85dWbix",
+     "storyName": "해솔"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-15-panel-4": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  },
+  "funny-15-panel-5": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "-e3xDDD_MZlZrG85dWbix",
+     "storyName": "해솔"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-15-panel-6": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  },
+  "love-07-panel-1": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "mxXOQdRxZQz5KqH3YR7mW",
+     "storyName": "새봄"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-07-panel-2": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "mxXOQdRxZQz5KqH3YR7mW",
+     "storyName": "새봄"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-07-panel-3": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "US075HrDL41gNGwZyhv6j",
+     "storyName": "이랑"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-07-panel-4": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "mxXOQdRxZQz5KqH3YR7mW",
+     "storyName": "새봄"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-07-panel-5": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "US075HrDL41gNGwZyhv6j",
+     "storyName": "이랑"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-07-panel-6": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "mxXOQdRxZQz5KqH3YR7mW",
+     "storyName": "새봄"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-07-panel-7": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "US075HrDL41gNGwZyhv6j",
+     "storyName": "이랑"
+    }
+   ],
+   "withLookId": 1
+  },
+  "family-09-panel-1": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  },
+  "family-09-panel-2": {
+   "inScene": [
+    {
+     "speaker": "B"
+    }
+   ],
+   "withLookId": 0
+  },
+  "family-09-panel-3": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  },
+  "family-09-panel-4": {
+   "inScene": [
+    {
+     "speaker": "B"
+    }
+   ],
+   "withLookId": 0
+  },
+  "family-09-panel-5": {
+   "inScene": [
+    {
+     "speaker": "B"
+    }
+   ],
+   "withLookId": 0
+  },
+  "family-09-panel-6": {
+   "inScene": [
+    {
+     "speaker": "A"
+    },
+    {
+     "speaker": "B"
+    }
+   ],
+   "withLookId": 0
+  },
+  "mystery-02-panel-1": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "ZDcT-c8BVS92PKuu5s4rU",
+     "storyName": "은솔"
+    },
+    {
+     "speaker": "B",
+     "lookId": "jreBRqU2k507sMlB8Vipv",
+     "storyName": "주원"
+    }
+   ],
+   "withLookId": 2
+  },
+  "mystery-02-panel-2": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "ZDcT-c8BVS92PKuu5s4rU",
+     "storyName": "은솔"
+    }
+   ],
+   "withLookId": 1
+  },
+  "mystery-02-panel-3": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "ZDcT-c8BVS92PKuu5s4rU",
+     "storyName": "은솔"
+    }
+   ],
+   "withLookId": 1
+  },
+  "mystery-02-panel-4": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "ZDcT-c8BVS92PKuu5s4rU",
+     "storyName": "은솔"
+    }
+   ],
+   "withLookId": 1
+  },
+  "mystery-02-panel-5": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "ZDcT-c8BVS92PKuu5s4rU",
+     "storyName": "은솔"
+    }
+   ],
+   "withLookId": 1
+  },
+  "mystery-02-panel-6": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "jreBRqU2k507sMlB8Vipv",
+     "storyName": "주원"
+    }
+   ],
+   "withLookId": 1
+  },
+  "mystery-02-panel-7": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "jreBRqU2k507sMlB8Vipv",
+     "storyName": "주원"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-06-panel-1": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "9kHVqA0sCcrF0bM5JldQS",
+     "storyName": "가온"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-06-panel-2": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "w8qPz79rbTZt3Dqb17BVj",
+     "storyName": "나래"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-06-panel-3": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "9kHVqA0sCcrF0bM5JldQS",
+     "storyName": "가온"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-06-panel-4": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "9kHVqA0sCcrF0bM5JldQS",
+     "storyName": "가온"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-06-panel-5": {
+   "inScene": [
+    {
+     "speaker": "C",
+     "lookId": "vUESqz66fLB4jqmP__cyB",
+     "storyName": "보람"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-06-panel-6": {
+   "inScene": [
+    {
+     "speaker": "C",
+     "lookId": "vUESqz66fLB4jqmP__cyB",
+     "storyName": "보람"
+    },
+    {
+     "speaker": "B",
+     "lookId": "w8qPz79rbTZt3Dqb17BVj",
+     "storyName": "나래"
+    }
+   ],
+   "withLookId": 2
+  },
+  "mystery-08-panel-1": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  },
+  "mystery-08-panel-2": {
+   "inScene": [
+    {
+     "speaker": "B"
+    }
+   ],
+   "withLookId": 0
+  },
+  "mystery-08-panel-3": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  },
+  "mystery-08-panel-4": {
+   "inScene": [
+    {
+     "speaker": "C",
+     "lookId": "__GI98zqnSHs3FqzAa07y",
+     "storyName": "지우"
+    }
+   ],
+   "withLookId": 1
+  },
+  "mystery-08-panel-5": {
+   "inScene": [
+    {
+     "speaker": "A"
+    },
+    {
+     "speaker": "C",
+     "lookId": "__GI98zqnSHs3FqzAa07y",
+     "storyName": "지우"
+    }
+   ],
+   "withLookId": 1
+  },
+  "mystery-08-panel-6": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  }
+ }
+}
