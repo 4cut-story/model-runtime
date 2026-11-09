@@ -199,7 +199,11 @@ class Worker:
             refs = self.references(image.get("references") or [], embeds, computed)
             started = self.clock()
             png = self.backends.draw(image, refs)
-            panels.append(_panel_stats(image, refs, int((self.clock() - started) * 1000)))
+            stats = _panel_stats(image, refs, int((self.clock() - started) * 1000))
+            edit = image.get("edit")
+            if edit and self.backends.reference_kind() == "image":
+                png = self._edit(image, edit, png, embeds, computed, stats)
+            panels.append(stats)
             response = self.uploader.put(
                 image["uploadUrl"], content=png, headers={"Content-Type": "image/png"}
             )
@@ -209,6 +213,29 @@ class Worker:
         if computed:
             result["embeds"] = computed
         return result
+
+    def _edit(
+        self,
+        image: dict[str, Any],
+        edit: dict[str, Any],
+        base: bytes,
+        embeds: dict[str, bytes | None],
+        computed: list[str],
+        stats: dict[str, Any],
+    ) -> bytes:
+        """2단 그리기의 2차: 1차 그림을 첫 입력 그림으로 넣고 edit.prompt로 고쳐 그린다.
+
+        물건을 드는 컷은 1차에 빈손 자세를, 2차에 물건 하나만 더한다. 두 사람 컷은 1차에 앞사람을,
+        2차에 뒷사람을 더한다. 한 번에 그리면 물건이나 인물이 둘로 그려졌다(회차 29 콘티 16~25판).
+        참조 그림을 그대로 받는 모델(FLUX.2 klein)에서만 쓴다. 아니면 1차 그림을 그대로 쓴다.
+        """
+        refs = [Reference("__base__", base, 1.0, "full")]
+        refs += self.references(edit.get("references") or [], embeds, computed)
+        second = {**image, "prompt": str(edit["prompt"])}
+        started = self.clock()
+        png = self.backends.draw(second, refs)
+        stats["editMs"] = int((self.clock() - started) * 1000)
+        return png
 
     def references(
         self, items: list[dict[str, Any]], embeds: dict[str, bytes | None], computed: list[str]
