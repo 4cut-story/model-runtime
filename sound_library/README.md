@@ -11,6 +11,7 @@ conversation-service의 `background_sounds` 표와 MinIO에 넣는 스크립트�
 | 4 | `evidence.py` | 설명을 쓸 근거(원본 제목·태그·라벨, CLAP 점수)를 클립마다 한 줄로 보여 준다 |
 | 5 | `merge_descriptions.py` | 직접 쓴 한국어 설명을 `descriptions.jsonl`로 바꾼다 |
 | 6 | `register_sounds.py` | 설명을 BGE-M3로 임베딩하고 MP3를 MinIO에, 행을 DB에 넣는다 (다시 돌려도 된다) |
+| 6a | `embed_texts.py` | 임베딩 서버에 닿지 않는 PC용. 설명 임베딩을 미리 만들어 두고 `register_sounds.py --text-embeddings`로 넘긴다 (1차: `data/text-1.jsonl.gz`) |
 
 `describe_clips.py`는 Gemini 무료 등급으로 설명을 쓰던 스크립트다. 하루 20번 제한이 있어 1차 43개만 이걸로 썼고,
 나머지는 Claude(유료 API가 아닌 대화)가 근거를 보고 직접 썼다.

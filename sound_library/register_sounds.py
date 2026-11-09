@@ -5,6 +5,7 @@
 
 - 미리 듣기 MP3: sounds/{공개 ID}/audio.mp3 (audio/mpeg)
 - 소리 임베딩: CLAP 512차원 (clap.jsonl), 설명 임베딩: BGE-M3 1024차원 (임베딩 서버로 이 스크립트가 만든다)
+- 임베딩 서버에 닿지 않는 곳에서는 embed_texts.py로 미리 만든 파일을 --text-embeddings로 넘긴다
 - (source, source_id)가 같으면 공개 ID와 파일을 두고 내용만 바꾼다. 다시 돌려도 된다.
 - 설명에서 exclude=true(카테고리와 다른 소리, 노래가 든 음악 등)인 클립은 넣지 않는다.
 
@@ -14,6 +15,7 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 import re
 import secrets
@@ -42,9 +44,16 @@ def load_env(path: Path) -> dict[str, str]:
     return env
 
 
+def read_lines(path: Path) -> list[str]:
+    raw = path.read_bytes()
+    if path.suffix == ".gz":
+        raw = gzip.decompress(raw)
+    return raw.decode("utf-8").splitlines()
+
+
 def jsonl(path: Path) -> dict[str, dict]:
     out = {}
-    for line in path.read_text(encoding="utf-8").splitlines():
+    for line in read_lines(path):
         if line.strip():
             x = json.loads(line)
             out[x["key"]] = x
@@ -69,6 +78,22 @@ def embed_texts(url: str, texts: list[str]) -> list[list[float]]:
     return out
 
 
+def select_rows(candidates: Path, clap: dict, desc: dict) -> tuple[list[dict], list[dict]]:
+    """설명과 CLAP이 다 있고 제외되지 않은 후보. 들어 보니 다른 카테고리면 설명 쪽을 따른다."""
+    from categories import ALL
+
+    kinds = {c.code: c.kind for c in ALL}
+    cands = [json.loads(x) for x in read_lines(candidates)]
+    rows = [
+        c for c in cands if key(c) in clap and key(c) in desc and not desc[key(c)].get("exclude")
+    ]
+    for c in rows:
+        moved = desc[key(c)].get("category")
+        if moved:
+            c["category"], c["kind"] = moved, kinds[moved]
+    return cands, rows
+
+
 def search_text(d: dict, label: str) -> str:
     moods = ", ".join(MOODS[m][0] for m in d["moods"] if m in MOODS)
     places = ", ".join(d["places"])
@@ -87,6 +112,7 @@ def main() -> None:
     ap.add_argument("--descriptions", type=Path, required=True)
     ap.add_argument("--env", type=Path, required=True)
     ap.add_argument("--embedding-url", default="https://emb.java21.net")
+    ap.add_argument("--text-embeddings", type=Path, help="embed_texts.py가 만든 설명 임베딩 파일")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
 
@@ -95,17 +121,14 @@ def main() -> None:
     from minio import Minio
 
     labels = {c.code: c.label for c in ALL}
-    kinds = {c.code: c.kind for c in ALL}
-    cands = [json.loads(x) for x in a.candidates.read_text(encoding="utf-8").splitlines()]
     clap, desc = jsonl(a.clap), jsonl(a.descriptions)
-    rows = [
-        c for c in cands if key(c) in clap and key(c) in desc and not desc[key(c)].get("exclude")
-    ]
-    for c in rows:  # 들어 보니 다른 카테고리면 설명 쪽 카테고리를 따른다
-        moved = desc[key(c)].get("category")
-        if moved:
-            c["category"], c["kind"] = moved, kinds[moved]
+    cands, rows = select_rows(a.candidates, clap, desc)
     print(f"등록할 배경음 {len(rows)}개 (후보 {len(cands)}개)")
+    given = jsonl(a.text_embeddings) if a.text_embeddings else {}
+    if given:
+        missing = [key(c) for c in rows if key(c) not in given]
+        if missing:
+            raise SystemExit(f"--text-embeddings에 없는 클립 {len(missing)}개: {missing[:5]}")
     if a.dry_run:
         return
 
@@ -154,7 +177,10 @@ def main() -> None:
     for i in range(0, len(rows), 32):
         batch = rows[i : i + 32]
         texts = [search_text(desc[key(c)], labels[c["category"]]) for c in batch]
-        vectors = embed_texts(a.embedding_url, texts)
+        if given:
+            vectors = [given[key(c)]["embedding"] for c in batch]
+        else:
+            vectors = embed_texts(a.embedding_url, texts)
         with conn.cursor() as cur:
             for c, tv in zip(batch, vectors, strict=True):
                 d, k = desc[key(c)], key(c)
