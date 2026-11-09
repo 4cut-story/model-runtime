@@ -1,0 +1,39 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 22판, 21판에 동작에 나온 물건을 시선 말에서 looking at it으로",
+ "status": "후보",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  97.6,
+  97.9
+ ],
+ "average": 97.8,
+ "criticalComics": 3,
+ "perComic": {
+  "solo-01": 92.5,
+  "funny-03": 89.0,
+  "twist-08": 99.3,
+  "funny-12": 97.6,
+  "funny-15": 94.1,
+  "love-07": 96.9,
+  "family-09": 99.0,
+  "mystery-02": 97.1,
+  "love-06": 99.3,
+  "mystery-08": 89.0
+ },
+ "strict": {
+  "average": 83.2,
+  "items": {
+   "X1": 83.0,
+   "X2": 89.4,
+   "X3": 87.2,
+   "X4": 74.5
+  },
+  "baseline": {
+   "variant": "klein-4b-ref-fixlookS",
+   "average": 61.5
+  }
+ },
+ "appeal": 6.8,
+ "note": "22판: 21판에 더해 동작에 이미 나온 물건은 시선 말에서 이름을 다시 쓰지 않고 looking at it. 컷당 5.6초, VRAM 최대 3.68GiB. mystery-02 1컷 인물 복제는 사라짐. 심각 3편(funny-03 3컷 키오스크 둘, mystery-08 5컷 망원경 둘: 둘 다 채점자 두 명, solo-01 4컷 아이 비율: 한 명). 점수 97.8, 실패 121건."
+}
