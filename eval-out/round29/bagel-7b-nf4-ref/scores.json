@@ -1,0 +1,25 @@
+{
+ "label": "BAGEL 7B MoT (NF4) + 캐릭터 참조 + 프롬프트 개선 2",
+ "status": "실패(그리지 못함)",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [],
+ "average": null,
+ "criticalComics": null,
+ "perComic": {},
+ "failure": {
+  "stage": "가중치 로드(NF4로 줄이며 읽는 단계). 47컷 중 한 컷도 그리지 못함",
+  "error": "python.exe 강제 종료, 0xc0000005 access violation (torch_cpu.dll). accelerate load_and_quantize_model이 ema.safetensors(29GB)를 읽는 중",
+  "tries": [
+   "1차: device_map으로 GPU 14GiB + CPU 40GiB 나눠 올림 → 5번째 층을 CPU로 옮기다 종료",
+   "2차: 공식 app.py처럼 전부 GPU에 올림 → 가중치를 읽기 시작하자마자 종료"
+  ],
+  "machine": "RTX 5060 Ti 16GB, RAM 32GB, Windows",
+  "code": "github.com/ByteDance-Seed/Bagel 공식 코드, app.py mode 2(NF4)",
+  "model": "ByteDance-Seed/BAGEL-7B-MoT",
+  "likelyCause": "29GB bf16 원본 전체를 RAM에 펼친 뒤 NF4로 줄이는 방식이라 RAM 32GB로는 모자라고(1차에 CPU 40GiB를 잡은 것도 실제 RAM보다 큼), Windows용 torch에서 그 경로가 메모리 접근 오류로 끝난 것으로 봄. 오류 메시지만으로 원인을 하나로 확정하지는 못함",
+  "retry": "미리 NF4/INT8로 줄여 둔 가중치(또는 GGUF)를 받거나, RAM이 더 큰 PC·Linux에서 한 번 양자화해 저장한 뒤 읽기. 페이지 파일을 늘려 다시 시도하는 방법도 있음",
+  "cleanup": "받은 가중치 캐시는 지움"
+ },
+ "note": "BAGEL은 가중치를 읽다가 두 번 모두 프로세스가 죽어서 한 컷도 그리지 못했어요. 29GB 원본을 RAM 32GB PC에서 NF4로 줄이며 읽는 단계에서 torch가 메모리 접근 오류(0xc0000005)로 종료됐어요. 운영 모델이 klein 4B로 정해져서 다시 시도하지 않았고, 다시 하려면 미리 양자화한 가중치를 쓰거나 RAM이 더 큰 환경에서 한 번 줄여 저장해야 해요."
+}
