@@ -1,0 +1,1087 @@
+[
+ {
+  "name": "solo-01-panel-1",
+  "comic": "solo-01",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, dark gray sky in the window, dark night lighting, young woman, brown hair bun, round glasses, green shirt, gray straight-leg jeans, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, single bed with white blanket, young woman sits up in bed, blanket over her legs, holding round red twin-bell alarm clock with plain white face at chest, small bedroom, shocked, mouth wide open, looking at the round red twin-bell alarm clock with plain white face, small bedroom, single bed with white blanket, tall wooden wardrobe, dim morning, dark gray sky in the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 659181762,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young woman, brown hair bun, round glasses, green shirt",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "solo-01-panel-2",
+  "comic": "solo-01",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, dark gray sky in the window, dark night lighting, young woman, brown hair bun, round glasses, green shirt, gray straight-leg jeans, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, single bed with white blanket, young woman holds up single red striped cotton sock by its cuff at chest, small bedroom, puzzled frown, head tilted, looking at the single red striped cotton sock, small bedroom, single bed with white blanket, tall wooden wardrobe, dim morning, dark gray sky in the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 659181762,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young woman, brown hair bun, round glasses, green shirt",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "solo-01-panel-3",
+  "comic": "solo-01",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, dark gray sky in the window, dark night lighting, young woman, brown ponytail, white shirt, teal overalls, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, white counter, young woman holds up one slice of burnt black toast by its crust at chest, small kitchen, grimacing, eyebrows down, looking at the one slice of burnt black toast, small kitchen, white counter, silver toaster, window above sink, dim morning, dark gray sky in the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 659181762,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "young woman, brown ponytail, white shirt, teal overalls",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "solo-01-panel-4",
+  "comic": "solo-01",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, heavy rain falling on the street, young woman, brown ponytail, white shirt, teal overalls, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, gray concrete steps, young woman stands in the rain, soaked hair and clothes, fists on cheeks, apartment building front outside, wide-eyed, mouth open, looking at viewer, apartment building front outside, gray concrete steps, glass entrance door, gray morning, heavy rain falling on the street",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 659181762,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "young woman, brown ponytail, white shirt, teal overalls",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "solo-01-panel-5",
+  "comic": "solo-01",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, dark gray sky in the window, dark night lighting, young woman, brown ponytail, white shirt, teal overalls, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, single bed with white blanket, young woman lies on her back in bed, blanket over her legs, small bedroom, blissful smile, eyes closed, looking up, small bedroom, single bed with white blanket, tall wooden wardrobe, dim morning, dark gray sky in the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 659181767,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "young woman, brown ponytail, white shirt, teal overalls",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "funny-03-panel-1",
+  "comic": "funny-03",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, a young woman and an old woman, side by side, both fully visible, (young woman, brown ponytail, pink hoodie, blue jeans) on the left, (old woman, short gray hair, round glasses, navy cardigan, straight-leg black trousers) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly two characters, each drawn only once, same outfit and same props in every panel, wide shot, red-and-white counter, the old woman puts fists on hips before one tall white touchscreen kiosk with plain glowing screen, the young woman stands apart, arms down, burger restaurant, the old woman proud grin, chin up, looking at the one tall white touchscreen kiosk with plain glowing screen, the young woman worried smile, looking at the one tall white touchscreen kiosk with plain glowing screen, burger restaurant, red-and-white counter, bright ceiling lights, kitchen grill behind counter, bright daylight through big front windows",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 165202323,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young woman, brown ponytail, pink hoodie",
+    "side": "LEFT"
+   },
+   {
+    "speaker": "B",
+    "dbLook": "old woman, short gray hair, round glasses, navy cardigan",
+    "side": "RIGHT"
+   }
+  ]
+ },
+ {
+  "name": "funny-03-panel-2",
+  "comic": "funny-03",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, young woman, brown ponytail, pink hoodie, blue jeans, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, red-and-white counter, young woman holds up one fist at chest beside one tall white touchscreen kiosk with plain glowing screen, burger restaurant, gentle encouraging smile, looking at viewer, burger restaurant, red-and-white counter, bright ceiling lights, kitchen grill behind counter, bright daylight through big front windows",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 165202323,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young woman, brown ponytail, pink hoodie",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "funny-03-panel-3",
+  "comic": "funny-03",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, old woman, short gray hair, round glasses, navy cardigan, straight-leg black trousers, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, red-and-white counter, old woman presses the burger picture on one tall white touchscreen kiosk with plain glowing screen screen again, burger restaurant, puzzled frown, squinting, looking at the one tall white touchscreen kiosk with plain glowing screen, burger restaurant, red-and-white counter, bright ceiling lights, kitchen grill behind counter, bright daylight through big front windows",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 165202323,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "old woman, short gray hair, round glasses, navy cardigan",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "funny-03-panel-4",
+  "comic": "funny-03",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, young woman, brown ponytail, pink hoodie, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, red-and-white counter, young woman raises both fists in shock beside one tall white touchscreen kiosk with plain glowing screen, burger restaurant, wide-eyed, mouth open, looking at the one tall white touchscreen kiosk with plain glowing screen, burger restaurant, red-and-white counter, bright ceiling lights, kitchen grill behind counter, bright daylight through big front windows",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 165202323,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young woman, brown ponytail, pink hoodie",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "funny-03-panel-5",
+  "comic": "funny-03",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, old woman, short gray hair, round glasses, navy cardigan, straight-leg black trousers, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, red-and-white counter, old woman presses both fists to her cheeks, bowing head, burger restaurant, embarrassed laugh, eyes shut, looking down, burger restaurant, red-and-white counter, bright ceiling lights, kitchen grill behind counter, bright daylight through big front windows",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 165202323,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "old woman, short gray hair, round glasses, navy cardigan",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "funny-03-panel-6",
+  "comic": "funny-03",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, young man, spiky black hair, red uniform cap, red shirt, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, kitchen grill glowing behind the counter, young man holds up flat steel spatula with black handle at chest behind the counter, burger restaurant, awkward nervous smile, looking at viewer, burger restaurant, red-and-white counter, bright ceiling lights, kitchen grill behind counter, kitchen grill glowing behind the counter",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 165249837,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "C",
+    "dbLook": "young man, spiky black hair, red uniform cap, red shirt",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "funny-03-panel-7",
+  "comic": "funny-03",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, old woman, short gray hair, round glasses, navy cardigan, straight-leg black trousers, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, red-and-white counter, old woman stands beside heap of twelve paper-wrapped burgers on the counter on the counter, fists on hips, burger restaurant, sly triumphant grin, looking at viewer, burger restaurant, red-and-white counter, bright ceiling lights, kitchen grill behind counter, bright daylight through big front windows",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 165257756,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "old woman, short gray hair, round glasses, navy cardigan",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "twist-08-panel-1",
+  "comic": "twist-08",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, a young woman and an old woman, side by side, both fully visible, (young woman, blonde bob, round glasses, yellow hoodie, blue jeans) on the left, (old woman, white knit beanie, red hoodie, long navy skirt) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly two characters, each drawn only once, same outfit and same props in every panel, wide shot, beige sofa, the old woman sits on the sofa holding slim smartphone in a pink case at chest, feet on floor, the young woman stands apart, arms down, cozy living room, the old woman focused, slight smile, looking at the slim smartphone in a pink case, the young woman curious, head tilted, looking at the slim smartphone in a pink case, cozy living room, beige sofa, wooden floor, big bright window, bright daylight from the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 855762240,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young woman, blonde bob, round glasses, yellow hoodie",
+    "side": "LEFT"
+   },
+   {
+    "speaker": "C",
+    "dbLook": "old woman, white knit beanie, red hoodie",
+    "side": "RIGHT"
+   }
+  ]
+ },
+ {
+  "name": "twist-08-panel-2",
+  "comic": "twist-08",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, young woman, blonde bob, round glasses, yellow hoodie, blue jeans, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, beige sofa, young woman raises both fists to her chin, leaning forward, cozy living room, squinting, suspicious, looking at viewer, cozy living room, beige sofa, wooden floor, big bright window, bright daylight from the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 855762240,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young woman, blonde bob, round glasses, yellow hoodie",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "twist-08-panel-3",
+  "comic": "twist-08",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, young woman, brown ponytail, white shirt, teal overalls, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, beige sofa, young woman presses both fists to her cheeks, cozy living room, raised eyebrows, open mouth, looking at viewer, cozy living room, beige sofa, wooden floor, big bright window, bright daylight from the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 855762240,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "young woman, brown ponytail, white shirt, teal overalls",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "twist-08-panel-4",
+  "comic": "twist-08",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, young woman, blonde bob, round glasses, yellow hoodie, blue jeans, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, beige sofa, young woman crouches behind the sofa holding slim smartphone in a pink case at chest, screen glowing, cozy living room, sneaky, biting lip, looking at the slim smartphone in a pink case, cozy living room, beige sofa, wooden floor, big bright window, bright daylight from the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 855762240,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young woman, blonde bob, round glasses, yellow hoodie",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "twist-08-panel-5",
+  "comic": "twist-08",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, young woman, blonde bob, round glasses, yellow hoodie, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, big bright window, young woman holds up slim smartphone in a pink case at chest, screen showing a big pancake picture, cozy living room, jaw dropped, wide-eyed, looking at viewer, cozy living room, beige sofa, wooden floor, big bright window, bright daylight from the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 855801835,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young woman, blonde bob, round glasses, yellow hoodie",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "twist-08-panel-6",
+  "comic": "twist-08",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, young woman, brown ponytail, white shirt, teal overalls, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, beige sofa, young woman throws both fists up beside her face, cozy living room, shocked, eyes popping, looking at viewer, cozy living room, beige sofa, wooden floor, big bright window, bright daylight from the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 855809754,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "young woman, brown ponytail, white shirt, teal overalls",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "twist-08-panel-7",
+  "comic": "twist-08",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, old woman, white knit beanie, red hoodie, long navy skirt, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, white cabinets, old woman holds black round frying pan with a long handle by its handle at chest, golden pancake sizzling inside, home kitchen, proud grin, one eyebrow up, looking at viewer, home kitchen, white cabinets, gas stove, ring light on a stand, bright daylight from the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 855762247,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "C",
+    "dbLook": "old woman, white knit beanie, red hoodie",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "twist-08-panel-8",
+  "comic": "twist-08",
+  "prompt": "simple cartoon, thick outlines, flat colors, simple background, young woman, brown ponytail, white shirt, teal overalls, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, bright daylight from the window, young woman jumps in the kitchen with both fists raised to her chest, home kitchen, ecstatic, big laugh, looking at viewer, home kitchen, white cabinets, gas stove, ring light on a stand, bright daylight from the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 855762248,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "young woman, brown ponytail, white shirt, teal overalls",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "funny-12-panel-1",
+  "comic": "funny-12",
+  "prompt": "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, two animal characters, no humans, side by side, both fully visible, (brown bear, red sweater, blue jeans, white sneakers) on the left, (brown bear, red sweater, red cap, long navy skirt) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly two characters, each drawn only once, same outfit and same props in every panel, wide shot, small food tasting stand with steamer, the brown bear on the left walks toward the tasting stand with fists raised, the brown bear on the right stands apart, arms down, supermarket aisle, the brown bear on the left eager drooling grin, looking at forward, the brown bear on the right raised eyebrows, doubtful, looking at forward, supermarket aisle, small food tasting stand with steamer, bright ceiling lights, bright daytime store lighting",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 332981179,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "",
+    "side": "LEFT"
+   },
+   {
+    "speaker": "B",
+    "dbLook": "brown bear, red sweater, red cap",
+    "side": "RIGHT"
+   }
+  ]
+ },
+ {
+  "name": "funny-12-panel-2",
+  "comic": "funny-12",
+  "prompt": "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, brown bear, red sweater, blue jeans, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, small food tasting stand with steamer, brown bear pulls yellow baseball cap with short curved brim down low over the eyes, holding its brim, supermarket aisle, sly confident smirk, looking at viewer, supermarket aisle, small food tasting stand with steamer, bright ceiling lights, bright daytime store lighting",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 332981179,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "funny-12-panel-3",
+  "comic": "funny-12",
+  "prompt": "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, brown bear, red sweater, red cap, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, small food tasting stand with steamer, brown bear holds up one plump steamed dumpling on a wooden toothpick by its toothpick at chest, supermarket aisle, knowing amused grin, looking at viewer, supermarket aisle, small food tasting stand with steamer, bright ceiling lights, bright daytime store lighting",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 332981179,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "brown bear, red sweater, red cap",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "funny-12-panel-4",
+  "comic": "funny-12",
+  "prompt": "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, brown bear, red sweater, blue jeans, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, small food tasting stand with steamer, brown bear holds yellow baseball cap with short curved brim by its brim at chest, head bowed, supermarket aisle, sheepish grin, blushing, looking down, supermarket aisle, small food tasting stand with steamer, bright ceiling lights, bright daytime store lighting",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 332981179,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "funny-12-panel-5",
+  "comic": "funny-12",
+  "prompt": "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, brown bear, red sweater, red cap, long navy skirt, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, small food tasting stand with steamer, brown bear stands holding closed white plastic shopping bag with two handles by its handles at chest, supermarket aisle, laughing, eyes closed, looking at viewer, supermarket aisle, small food tasting stand with steamer, bright ceiling lights, bright daytime store lighting",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 332981184,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "brown bear, red sweater, red cap",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "funny-15-panel-1",
+  "comic": "funny-15",
+  "prompt": "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, orange fox, yellow hoodie, blue straight-leg jeans, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, low blue sofa, orange fox holds round flat gray robot vacuum cleaner, black bumper in front by its edges, pressing its start button, cozy living room, relaxed confident grin, looking at the round flat gray robot vacuum cleaner, cozy living room, low blue sofa, light wooden floor, big window, bright morning daylight from the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 821411334,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "funny-15-panel-2",
+  "comic": "funny-15",
+  "prompt": "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, two animal characters, no humans, side by side, both fully visible, (orange fox, yellow hoodie, blue straight-leg jeans, white sneakers) on the left, (gray rabbit, orange hoodie, gray straight-leg trousers) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly two characters, each drawn only once, same outfit and same props in every panel, wide shot, light wooden floor, the gray rabbit crouches beside one red striped cotton sock on the floor, the orange fox stands apart, arms down, cozy living room, the gray rabbit worried, eyebrows raised, looking at the one red striped cotton sock, the orange fox carefree smile, looking at the one red striped cotton sock, cozy living room, low blue sofa, light wooden floor, big window, bright morning daylight from the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 821411334,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "",
+    "side": "LEFT"
+   },
+   {
+    "speaker": "B",
+    "dbLook": "gray rabbit, orange hoodie",
+    "side": "RIGHT"
+   }
+  ]
+ },
+ {
+  "name": "funny-15-panel-3",
+  "comic": "funny-15",
+  "prompt": "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, orange evening glow through the window, gray rabbit, orange hoodie, gray straight-leg trousers, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, low blue sofa, gray rabbit kneels by the sofa, looking at round flat gray robot vacuum cleaner, black bumper stuck underneath, one red striped cotton sock in its bumper, cozy living room, jaw dropped, wide-eyed, looking at the round flat gray robot vacuum cleaner, cozy living room, low blue sofa, light wooden floor, big window, orange evening glow through the window, long shadows",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 821411334,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "gray rabbit, orange hoodie",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "funny-15-panel-4",
+  "comic": "funny-15",
+  "prompt": "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, orange evening glow through the window, orange fox, yellow hoodie, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, low blue sofa, orange fox raises both fists at cheeks, bursting into laughter, cozy living room, laughing, eyes squeezed shut, looking down, cozy living room, low blue sofa, light wooden floor, big window, orange evening glow through the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 821411334,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "funny-15-panel-5",
+  "comic": "funny-15",
+  "prompt": "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, orange evening glow through the window, gray rabbit, orange hoodie, gray straight-leg trousers, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, low blue sofa, gray rabbit crouches with fists at chest, tiny fluffy brown puppy on four legs, no clothes sits at gray rabbit's feet beside round flat gray robot vacuum cleaner, black bumper, cozy living room, touched, sparkling eyes, looking at the tiny fluffy brown puppy on four legs, cozy living room, low blue sofa, light wooden floor, big window, orange evening glow through the window, long shadows",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 821450929,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "gray rabbit, orange hoodie",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "funny-15-panel-6",
+  "comic": "funny-15",
+  "prompt": "storybook scene, cute anthropomorphic animal characters wearing clothes, round shapes, pastel colors, simple background, orange evening glow through the window, orange fox, yellow hoodie, blue straight-leg jeans, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, low blue sofa, orange fox holds one red striped cotton sock at chest by its cuff, grinning, cozy living room, amused warm grin, looking at viewer, cozy living room, low blue sofa, light wooden floor, big window, orange evening glow through the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 821411340,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "love-07-panel-1",
+  "comic": "love-07",
+  "prompt": "hand-painted anime style, watercolor background, soft warm light, gentle colors, heavy rain falling on the street, young man, black short hair, navy sweater, blue jeans, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, wet gray pavement, young man walks in heavy rain holding small clear plastic umbrella with white curved handle by its handle over his head, city sidewalk, calm gentle eyes, looking at viewer, city sidewalk, wet gray pavement, row of green street trees, heavy rain falling on the street, gloomy gray afternoon sky",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 668610223,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young man, black short hair, navy sweater",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "love-07-panel-2",
+  "comic": "love-07",
+  "prompt": "hand-painted anime style, watercolor background, soft warm light, gentle colors, heavy rain falling on the street, young woman, brown ponytail, white shirt, teal overalls, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, wet gray pavement, young woman presses both fists to her chest, dry hair and clothes, city sidewalk, worried frown, looking at viewer, city sidewalk, wet gray pavement, row of green street trees, heavy rain falling on the street, gloomy gray afternoon sky",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 668610223,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "young woman, brown ponytail, white shirt, teal overalls",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "love-07-panel-3",
+  "comic": "love-07",
+  "prompt": "hand-painted anime style, watercolor background, soft warm light, gentle colors, heavy rain falling on the street, young man, black short hair, navy sweater, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, wet gray pavement, young man tilts small clear plastic umbrella with white curved handle sideways by its handle, one shoulder soaked, wet hair, city sidewalk, easy reassuring smile, looking at viewer, city sidewalk, wet gray pavement, row of green street trees, heavy rain falling on the street, gloomy gray afternoon sky",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 668610223,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young man, black short hair, navy sweater",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "love-07-panel-4",
+  "comic": "love-07",
+  "prompt": "hand-painted anime style, watercolor background, soft warm light, gentle colors, heavy rain falling on the street, young woman, brown ponytail, white shirt, teal overalls, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, wet gray pavement, young woman puts both fists on her hips, dry hair and clothes, city sidewalk, narrowed teasing eyes, looking at viewer, city sidewalk, wet gray pavement, row of green street trees, heavy rain falling on the street, gloomy gray afternoon sky",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 668610223,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "young woman, brown ponytail, white shirt, teal overalls",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "love-07-panel-5",
+  "comic": "love-07",
+  "prompt": "hand-painted anime style, watercolor background, soft warm light, gentle colors, heavy rain falling on the street, young man, black short hair, navy sweater, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, wet gray pavement, young man lowers his head, soaked hair dripping, holding small clear plastic umbrella with white curved handle handle at chest, city sidewalk, shy soft smile, looking down, city sidewalk, wet gray pavement, row of green street trees, heavy rain falling on the street, gloomy gray afternoon sky",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 668610223,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young man, black short hair, navy sweater",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "love-07-panel-6",
+  "comic": "love-07",
+  "prompt": "hand-painted anime style, watercolor background, soft warm light, gentle colors, heavy rain falling beyond the shelter, a young man and a young woman, side by side, both fully visible, (young man, black short hair, navy sweater, blue jeans) on the left, (young woman, brown ponytail, white shirt, teal overalls) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly two characters, each drawn only once, same outfit and same props in every panel, wide shot, glass shelter with blue roof, the young man holds small clear plastic umbrella with white curved handle by its handle at his side, shoulder soaked, the young woman stands apart, arms down, bus stop, the young man warm earnest smile, looking at the small clear plastic umbrella with white curved handle, the young woman surprised soft eyes, looking at the small clear plastic umbrella with white curved handle, bus stop, glass shelter with blue roof, long metal bench, heavy rain falling beyond the shelter, gray afternoon sky",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 668657737,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young man, black short hair, navy sweater",
+    "side": "LEFT"
+   },
+   {
+    "speaker": "B",
+    "dbLook": "young woman, brown ponytail, white shirt, teal overalls",
+    "side": "RIGHT"
+   }
+  ]
+ },
+ {
+  "name": "love-07-panel-7",
+  "comic": "love-07",
+  "prompt": "hand-painted anime style, watercolor background, soft warm light, gentle colors, young woman, brown ponytail, white shirt, teal overalls, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, glass shelter with blue roof, young woman stands holding huge navy and white striped golf umbrella by its handle over her head, canopy open wide, bus stop, bright bashful smile, looking at viewer, bus stop, glass shelter with blue roof, long metal bench, next morning, light drizzle, soft pale gray sky",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 668665656,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "young woman, brown ponytail, white shirt, teal overalls",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "family-09-panel-1",
+  "comic": "family-09",
+  "prompt": "children's picture book, crayon and colored pencil drawing, simple shapes, white paper, little boy, short black hair, yellow T-shirt, blue jeans, white sneakers, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, wooden gate, little boy runs across the yard toward the wooden gate, fists pumping, countryside house yard, curious, wide eyes, looking at gate, countryside house yard, low stone wall, wooden gate, persimmon tree, early morning, soft golden sunlight",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 398959835,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "family-09-panel-2",
+  "comic": "family-09",
+  "prompt": "children's picture book, crayon and colored pencil drawing, simple shapes, white paper, old man, white beard, straw hat, green checkered shirt, straight-leg brown trousers, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, low stone wall, old man puts both fists on his hips, chest puffed out, countryside house yard, sly grin, looking down, countryside house yard, low stone wall, wooden gate, persimmon tree, early morning, soft golden sunlight",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 398959835,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "old man, white beard, straw hat",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "family-09-panel-3",
+  "comic": "family-09",
+  "prompt": "children's picture book, crayon and colored pencil drawing, simple shapes, white paper, old man, white beard, straw hat, green checkered shirt, straight-leg brown trousers, black rubber boots, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, brown soil rows, old man walks between soil rows toward green tomato plant, red tomatoes, wooden stake, small vegetable garden at mountain foot, proud smile, looking at the green tomato plant, small vegetable garden at mountain foot, brown soil rows, green hills, early morning, soft golden sunlight on the hills",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 398959835,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "old man, white beard, straw hat",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "family-09-panel-4",
+  "comic": "family-09",
+  "prompt": "children's picture book, crayon and colored pencil drawing, simple shapes, white paper, little boy, short black hair, yellow T-shirt, blue jeans, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, green hills, little boy holds the top edge of blank wooden board on stake, painted red tomato next to green tomato plant, red tomatoes, wooden stake, small vegetable garden at mountain foot, surprised, wide-eyed, looking at the blank wooden board on stake, small vegetable garden at mountain foot, brown soil rows, green hills, early morning, soft golden sunlight",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 398959835,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "family-09-panel-5",
+  "comic": "family-09",
+  "prompt": "children's picture book, crayon and colored pencil drawing, simple shapes, white paper, old man, white beard, straw hat, green checkered shirt, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, green hills, old man cups a red tomato on green tomato plant, red tomatoes, wooden stake, leaning close, small vegetable garden at mountain foot, teary warm smile, looking down, small vegetable garden at mountain foot, brown soil rows, green hills, early morning, warm golden sunlight",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 398959835,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "old man, white beard, straw hat",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "family-09-panel-6",
+  "comic": "family-09",
+  "prompt": "children's picture book, crayon and colored pencil drawing, simple shapes, white paper, old man, white beard, straw hat, green checkered shirt, straight-leg brown trousers, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, green hills, old man lifts one red pepper on small green pepper plant with red chili peppers, chuckling, small vegetable garden at mountain foot, playful grin, looking at the small green pepper plant with red chili peppers, small vegetable garden at mountain foot, brown soil rows, green hills, early morning, soft golden sunlight",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 399007349,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "old man, white beard, straw hat",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "family-09-panel-7",
+  "comic": "family-09",
+  "prompt": "children's picture book, crayon and colored pencil drawing, simple shapes, white paper, a little boy and an old man, side by side, both fully visible, (little boy, short black hair, yellow T-shirt, blue jeans, white sneakers) on the left, (old man, white beard, straw hat, green checkered shirt, straight-leg brown trousers, black rubber boots) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly two characters, each drawn only once, same outfit and same props in every panel, wide shot, green hills, the little boy holds tiny green seedling in black plastic pot at chest, the old man stands apart, arms down, small vegetable garden at mountain foot, the little boy determined bright smile, looking at the tiny green seedling in black plastic pot, the old man touched, teary smile, looking at the tiny green seedling in black plastic pot, small vegetable garden at mountain foot, brown soil rows, green hills, warm morning sunlight, long soft shadows",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 398959842,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "",
+    "side": "LEFT"
+   },
+   {
+    "speaker": "B",
+    "dbLook": "old man, white beard, straw hat",
+    "side": "RIGHT"
+   }
+  ]
+ },
+ {
+  "name": "mystery-02-panel-1",
+  "comic": "mystery-02",
+  "prompt": "simple cartoon, bold clean outlines, flat muted colors, plain white background, simple background, a young woman and a young man, side by side, both fully visible, (young woman, short black hair, round glasses, plaid shirt, straight-leg black trousers) on the left, (young man, curly black hair, white headband, white lab coat, blue jeans) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly two characters, each drawn only once, same outfit and same props in every panel, wide shot, white tiled floor, the young woman presses the start button on one white front-loading washing machine, round glass door, the young man stands apart, arms down, small home laundry room, the young woman suspicious frown, looking at the one white front-loading washing machine, the young man deadpan, half-lidded eyes, looking at the one white front-loading washing machine, small home laundry room, metal drying rack, white tiled floor, wide window, bright daylight from the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 252227204,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young woman, short black hair, round glasses, plaid shirt",
+    "side": "LEFT"
+   },
+   {
+    "speaker": "B",
+    "dbLook": "young man, curly black hair, white headband, white lab coat",
+    "side": "RIGHT"
+   }
+  ]
+ },
+ {
+  "name": "mystery-02-panel-2",
+  "comic": "mystery-02",
+  "prompt": "simple cartoon, bold clean outlines, flat muted colors, plain white background, simple background, young woman, short black hair, round glasses, plaid shirt, straight-leg black trousers, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, metal drying rack, young woman holds up one striped sock at chest by its cuff, small home laundry room, narrowed eyes, tight lips, looking at viewer, small home laundry room, metal drying rack, white tiled floor, wide window, bright daylight from the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 252227204,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young woman, short black hair, round glasses, plaid shirt",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "mystery-02-panel-3",
+  "comic": "mystery-02",
+  "prompt": "simple cartoon, bold clean outlines, flat muted colors, plain white background, simple background, young woman, short black hair, round glasses, plaid shirt, straight-leg black trousers, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, white tiled floor, young woman kneels at one white front-loading washing machine, round glass door, peering into its open round door, small home laundry room, puzzled, brows knitted, looking at the one white front-loading washing machine, small home laundry room, metal drying rack, white tiled floor, wide window, bright daylight from the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 252227204,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young woman, short black hair, round glasses, plaid shirt",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "mystery-02-panel-4",
+  "comic": "mystery-02",
+  "prompt": "simple cartoon, bold clean outlines, flat muted colors, plain white background, simple background, young woman, short black hair, round glasses, plaid shirt, straight-leg black trousers, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, metal drying rack, young woman crouches by small wooden doghouse with arched door, pointed roof, heap of striped socks spilling out of small wooden doghouse with arched door, pointed roof spilling out its door, small home laundry room, wide-eyed, jaw dropped, looking at the heap of striped socks spilling out of small wooden doghouse with arched door, small home laundry room, metal drying rack, white tiled floor, wide window, bright daylight from the window, metal drying rack above",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 252227204,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young woman, short black hair, round glasses, plaid shirt",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "mystery-02-panel-5",
+  "comic": "mystery-02",
+  "prompt": "simple cartoon, bold clean outlines, flat muted colors, plain white background, simple background, young man, curly black hair, white headband, white lab coat, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, metal drying rack, young man clenches both fists at chest, leaning toward viewer, small home laundry room, squinting detective glare, looking at viewer, small home laundry room, metal drying rack, white tiled floor, wide window, bright daylight from the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 252227204,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "young man, curly black hair, white headband, white lab coat",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "mystery-02-panel-6",
+  "comic": "mystery-02",
+  "prompt": "simple cartoon, bold clean outlines, flat muted colors, plain white background, simple background, young man, curly black hair, white headband, white lab coat, blue jeans, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, white tiled floor, young man lifts tiny white fluffy puppy on four legs, no clothes at chest by its belly, a sock in its mouth, small home laundry room, dry smirk, looking at the tiny white fluffy puppy on four legs, small home laundry room, metal drying rack, white tiled floor, wide window, bright daylight from the window",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 252274718,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "young man, curly black hair, white headband, white lab coat",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "love-06-panel-1",
+  "comic": "love-06",
+  "prompt": "korean traditional genre painting, joseon era village, ink lines with soft color wash, hanji paper texture, young man in hanbok, black topknot, blue robe, straight-leg white trousers, white cotton socks, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, wooden lattice doors with white hanji paper, young man in hanbok bows deeply by the lattice door, holding small closed red silk-wrapped gift box with top knot by its knot at his side, hanok room, stiff nervous bow, looking down, hanok room, wooden lattice doors with white hanji paper, yellow oiled-paper floor, bright daylight through the lattice doors",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 694748373,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young man in hanbok, black topknot, blue robe",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "love-06-panel-2",
+  "comic": "love-06",
+  "prompt": "korean traditional genre painting, joseon era village, ink lines with soft color wash, hanji paper texture, two people in hanbok, side by side, both fully visible, (young man in hanbok, black topknot, blue robe, straight-leg white trousers, white cotton socks) on the left, (old man in hanbok, gray hair, gray beard, brown vest, straight-leg gray trousers, white cotton socks) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly two characters, each drawn only once, same outfit and same props in every panel, wide shot, wooden lattice doors with white hanji paper, the young man in hanbok holds small closed red silk-wrapped gift box with top knot at his chest by its knot, the old man in hanbok stands apart, arms down, hanok room, the young man in hanbok tense eager smile, looking at the small closed red silk-wrapped gift box with top knot, the old man in hanbok amused raised eyebrows, looking at the small closed red silk-wrapped gift box with top knot, hanok room, wooden lattice doors with white hanji paper, yellow oiled-paper floor, bright daylight through the lattice doors",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 694748373,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young man in hanbok, black topknot, blue robe",
+    "side": "LEFT"
+   },
+   {
+    "speaker": "B",
+    "dbLook": "old man in hanbok, gray hair, gray beard, brown vest",
+    "side": "RIGHT"
+   }
+  ]
+ },
+ {
+  "name": "love-06-panel-3",
+  "comic": "love-06",
+  "prompt": "korean traditional genre painting, joseon era village, ink lines with soft color wash, hanji paper texture, old man in hanbok, gray hair, gray beard, brown vest, white cotton socks, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, wooden lattice doors with white hanji paper, old man in hanbok holds small closed red silk-wrapped gift box with top knot at his chest by its knot, hanok room, sly pleased smile, looking at viewer, hanok room, wooden lattice doors with white hanji paper, yellow oiled-paper floor, bright daylight through the lattice doors",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 694748373,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "old man in hanbok, gray hair, gray beard, brown vest",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "love-06-panel-4",
+  "comic": "love-06",
+  "prompt": "korean traditional genre painting, joseon era village, ink lines with soft color wash, hanji paper texture, young man in hanbok, black topknot, blue robe, straight-leg white trousers, white cotton socks, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, wooden lattice doors with white hanji paper, young man in hanbok lifts one tiny white stone with two fingers above flat square wooden go board, black grid lines, few stones, hanok room, shy hopeful grin, looking at the flat square wooden go board, hanok room, wooden lattice doors with white hanji paper, yellow oiled-paper floor, bright daylight through the lattice doors",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 694748373,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young man in hanbok, black topknot, blue robe",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "love-06-panel-5",
+  "comic": "love-06",
+  "prompt": "korean traditional genre painting, joseon era village, ink lines with soft color wash, hanji paper texture, young man in hanbok, black topknot, blue robe, white cotton socks, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, wooden lattice doors with white hanji paper, young man in hanbok presses both fists to his cheeks, sweat beads on forehead, hanok room, panicked wide eyes, looking at viewer, hanok room, wooden lattice doors with white hanji paper, yellow oiled-paper floor, bright daylight through the lattice doors",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 694748373,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "young man in hanbok, black topknot, blue robe",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "love-06-panel-6",
+  "comic": "love-06",
+  "prompt": "korean traditional genre painting, joseon era village, ink lines with soft color wash, hanji paper texture, young woman in hanbok, black hair bun, pink hairpin, pink jeogori, long red chima, white cotton socks, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, wooden lattice doors with white hanji paper, young woman in hanbok raises both fists at her chest in triumph, hanok room, sly delighted grin, looking at viewer, hanok room, wooden lattice doors with white hanji paper, yellow oiled-paper floor, bright daylight through the lattice doors",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 694795887,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "C",
+    "dbLook": "young woman in hanbok, black hair bun, pink hairpin, pink jeogori",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "love-06-panel-7",
+  "comic": "love-06",
+  "prompt": "korean traditional genre painting, joseon era village, ink lines with soft color wash, hanji paper texture, young woman in hanbok, black hair bun, pink hairpin, pink jeogori, long red chima, white cotton socks, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, wooden lattice doors with white hanji paper, young woman in hanbok stands holding flat square wooden go board, black grid lines, few stones in front of her by its edges, hanok room, laughing, beaming, looking at viewer, hanok room, wooden lattice doors with white hanji paper, yellow oiled-paper floor, bright daylight through the lattice doors",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 694748380,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "C",
+    "dbLook": "young woman in hanbok, black hair bun, pink hairpin, pink jeogori",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "mystery-08-panel-1",
+  "comic": "mystery-08",
+  "prompt": "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting, night, navy starry sky, dark night lighting, little boy swordsman, child, blue robe, wooden sword, short dagger, straight-leg white trousers, black cloth shoes, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, wooden cabin on distant hill, little boy swordsman stands on the path gripping his belt, staring up at the hill, mountain village dirt path, narrowed curious eyes, looking at hill, mountain village dirt path, tall pine trees, wooden cabin on distant hill, night, navy starry sky, glowing cabin window mid-frame",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 778199924,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "little swordsman, blue robe, wooden sword",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "mystery-08-panel-2",
+  "comic": "mystery-08",
+  "prompt": "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting, night, deep navy sky full of twinkling stars, dark night lighting, little girl swordswoman, child, pink robe, paper lantern, jade hairpin, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, tall pine trees, little girl swordswoman clutches her robe collar at her chest, trembling, mountain village dirt path, pale, trembling lips, looking off to the side at someone, mountain village dirt path, tall pine trees, wooden cabin on distant hill, night, deep navy sky full of twinkling stars",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 778199924,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "B",
+    "dbLook": "little swordswoman, pink robe, paper lantern",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "mystery-08-panel-3",
+  "comic": "mystery-08",
+  "prompt": "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting, two martial artists, side by side, both fully visible, (little boy swordsman, child, blue robe, wooden sword, short dagger, straight-leg white trousers, black cloth shoes) on the left, (little girl swordswoman, child, pink robe, paper lantern, jade hairpin, straight-leg black trousers, white cloth shoes) on the right, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly two characters, each drawn only once, same outfit and same props in every panel, wide shot, half-open wooden door, the little girl swordswoman grips the half-open door edge, the little boy swordsman stands apart, arms down, old wooden mountain cabin, the little girl swordswoman nervous squint, looking at door, the little boy swordsman wide-eyed, gulping, looking at door, old wooden mountain cabin, thatched roof, half-open wooden door, stone steps, bright daylight, short noon shadows",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 778199924,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "little swordsman, blue robe, wooden sword",
+    "side": "LEFT"
+   },
+   {
+    "speaker": "B",
+    "dbLook": "little swordswoman, pink robe, paper lantern",
+    "side": "RIGHT"
+   }
+  ]
+ },
+ {
+  "name": "mystery-08-panel-4",
+  "comic": "mystery-08",
+  "prompt": "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting, old swordsman, gray topknot, goatee, gray robe, straight-leg gray trousers, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, half-open wooden door, old swordsman leans out of the doorway gripping the door frame, old wooden mountain cabin, raised brows, warm grin, looking at viewer, old wooden mountain cabin, thatched roof, half-open wooden door, stone steps, bright daylight, dim cabin interior behind",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 778199924,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "C",
+    "dbLook": "old swordsman, gray topknot, goatee, gray robe",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "mystery-08-panel-5",
+  "comic": "mystery-08",
+  "prompt": "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting, orange sunset glow, old swordsman, gray topknot, goatee, gray robe, straight-leg gray trousers, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, medium shot from the waist up, half-open wooden door, old swordsman grips single long brass telescope tube with one eyepiece on tripod tube at chest height, presenting it proudly, old wooden mountain cabin, proud beaming smile, looking at the single long brass telescope tube with one eyepiece on tripod, old wooden mountain cabin, thatched roof, half-open wooden door, stone steps, orange sunset glow, long shadows",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 778199924,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "C",
+    "dbLook": "old swordsman, gray topknot, goatee, gray robe",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "mystery-08-panel-6",
+  "comic": "mystery-08",
+  "prompt": "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting, night, deep navy sky full of twinkling stars, dark night lighting, old swordsman, gray topknot, goatee, gray robe, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, close-up shot, head and shoulders filling the frame, half-open wooden door, old swordsman holds single long brass telescope tube with one eyepiece on tripod eyepiece at his chest, laughing heartily, old wooden mountain cabin, hearty laugh, crinkled eyes, looking at viewer, old wooden mountain cabin, thatched roof, half-open wooden door, stone steps, night, deep navy sky full of twinkling stars",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 778247438,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "C",
+    "dbLook": "old swordsman, gray topknot, goatee, gray robe",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "mystery-08-panel-7",
+  "comic": "mystery-08",
+  "prompt": "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting, night, dark night lighting, little boy swordsman, child, blue robe, wooden sword, short dagger, straight-leg white trousers, black cloth shoes, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, wide shot, half-open wooden door, little boy swordsman bends forward peering into the eyepiece of single long brass telescope tube with one eyepiece on tripod, old wooden mountain cabin, awestruck open mouth, looking at the single long brass telescope tube with one eyepiece on tripod, old wooden mountain cabin, thatched roof, half-open wooden door, stone steps, night, ringed planet low above mountains, middle of frame",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 778199931,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "little swordsman, blue robe, wooden sword",
+    "side": "CENTER"
+   }
+  ]
+ }
+]
