@@ -1,0 +1,45 @@
+{
+ "settings": {
+  "IMAGE_MODEL": "klein",
+  "DIFFUSION_GUIDANCE": "1.0",
+  "DIFFUSION_STEPS": "4",
+  "MODEL_KEEP_IN_RAM": "false"
+ },
+ "reference": true,
+ "loadSeconds": 34.1,
+ "backend": "DiffusionBackend",
+ "panelSeconds": {
+  "mystery-08-panel-5": 9.24,
+  "mystery-08-panel-5-b": 7.51
+ },
+ "referencesUsed": {
+  "mystery-08-panel-5": [],
+  "mystery-08-panel-5-b": [
+   {
+    "character": "__base__:mystery-08-panel-5",
+    "region": "full"
+   }
+  ]
+ },
+ "stageSeconds": {
+  "1": {
+   "mystery-08-panel-5": 9.24
+  },
+  "2": {
+   "mystery-08-panel-5-b": 7.51
+  }
+ },
+ "failed": {},
+ "peakRamGiB": 8.0,
+ "modelInfo": {
+  "klein": "black-forest-labs/FLUX.2-klein-4B",
+  "quantization": "nf4",
+  "steps": 4,
+  "guidance": 1.0,
+  "cpuOffload": true,
+  "ipAdapter": null,
+  "references": "image"
+ },
+ "peakVramGiB": 3.68,
+ "secondsPerPanel": 8.38
+}
