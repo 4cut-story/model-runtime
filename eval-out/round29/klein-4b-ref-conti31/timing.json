@@ -1,0 +1,43 @@
+{
+ "settings": {
+  "IMAGE_MODEL": "klein",
+  "DIFFUSION_GUIDANCE": "1.0",
+  "DIFFUSION_STEPS": "4",
+  "MODEL_KEEP_IN_RAM": "false"
+ },
+ "reference": true,
+ "loadSeconds": 45.0,
+ "backend": "DiffusionBackend",
+ "panelSeconds": {
+  "mystery-08-panel-4": 7.69,
+  "mystery-08-panel-5": 4.1
+ },
+ "referencesUsed": {
+  "mystery-08-panel-4": [
+   {
+    "character": "지우",
+    "region": "center"
+   }
+  ],
+  "mystery-08-panel-5": []
+ },
+ "stageSeconds": {
+  "1": {
+   "mystery-08-panel-4": 7.69,
+   "mystery-08-panel-5": 4.1
+  }
+ },
+ "failed": {},
+ "peakRamGiB": 8.09,
+ "modelInfo": {
+  "klein": "black-forest-labs/FLUX.2-klein-4B",
+  "quantization": "nf4",
+  "steps": 4,
+  "guidance": 1.0,
+  "cpuOffload": true,
+  "ipAdapter": null,
+  "references": "image"
+ },
+ "peakVramGiB": 3.68,
+ "secondsPerPanel": 5.89
+}

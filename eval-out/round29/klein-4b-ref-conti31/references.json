@@ -1,0 +1,24 @@
+{
+ "round": 29,
+ "source": "conti31 by dbLook; per-story lookIds from conti3 (corrected); teal -> NZcc for DAILY, US075 for love-07; empty dbLook -> no reference",
+ "panels": {
+  "mystery-08-panel-4": {
+   "inScene": [
+    {
+     "speaker": "C",
+     "lookId": "__GI98zqnSHs3FqzAa07y",
+     "storyName": "지우"
+    }
+   ],
+   "withLookId": 1
+  },
+  "mystery-08-panel-5": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  }
+ }
+}
