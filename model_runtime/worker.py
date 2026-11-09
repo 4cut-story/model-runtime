@@ -194,6 +194,7 @@ class Worker:
         embeds: dict[str, bytes | None] = {}
         computed: list[str] = []
         panels: list[dict[str, Any]] = []
+        motions: list[str] = []
         self._stats["panels"] = panels
         for image in images:
             refs = self.references(image.get("references") or [], embeds, computed)
@@ -209,10 +210,42 @@ class Worker:
             )
             response.raise_for_status()
             uploaded.append(image["name"])
+            motion = image.get("motion")
+            if (
+                isinstance(motion, dict)
+                and self.backends.reference_kind() == "image"
+                and self._motion(image, motion, png, stats)
+            ):
+                motions.append(image["name"])
         result: dict[str, Any] = {"uploaded": uploaded}
         if computed:
             result["embeds"] = computed
+        if motions:
+            result["motions"] = motions
         return result
+
+    def _motion(
+        self, image: dict[str, Any], motion: dict[str, Any], base: bytes, stats: dict[str, Any]
+    ) -> bool:
+        """라이브 모드 두 번째 그림 (docs specs/003-live-mode).
+
+        완성된 컷 그림을 첫 입력 그림으로 넣고 motion.prompt로 배경만 바꿔 한 장 더 그려
+        motion.uploadUrl에 올린다. 시드·크기는 컷과 같다. 실패해도 작업은 성공이다(그 컷은 한 장).
+        """
+        try:
+            second = {**image, "prompt": str(motion["prompt"])}
+            second.pop("regions", None)
+            started = self.clock()
+            png = self.backends.draw(second, [Reference("__base__", base, 1.0, "full")])
+            stats["motionMs"] = int((self.clock() - started) * 1000)
+            response = self.uploader.put(
+                motion["uploadUrl"], content=png, headers={"Content-Type": "image/png"}
+            )
+            response.raise_for_status()
+            return True
+        except Exception as e:  # 두 번째 그림 때문에 만화를 실패시키지 않는다
+            log.warning("움직임 그림을 만들지 못해 한 장으로 둔다: %s (%s)", image.get("name"), e)
+            return False
 
     def _edit(
         self,
