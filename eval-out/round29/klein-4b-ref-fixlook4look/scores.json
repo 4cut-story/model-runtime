@@ -1,0 +1,25 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 외모 글 보강만 (4 step)",
+ "status": "비교용",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  96.0,
+  95.8
+ ],
+ "average": 95.9,
+ "criticalComics": 1,
+ "perComic": {
+  "solo-01": 95.1,
+  "funny-03": 96.5,
+  "twist-08": 97.3,
+  "funny-12": 98.4,
+  "funny-15": 96.2,
+  "love-07": 93.6,
+  "family-09": 95.2,
+  "mystery-02": 96.8,
+  "love-06": 97.4,
+  "mystery-08": 89.0
+ },
+ "note": "fixlook(95.2점) 입력에서 인물 외모 글에 아래옷·신발·띠까지 적는 것만 더했어요(fixlook2의 LOOK 부분). 평균 95.9점으로 0.7점 올랐고, 컷 사이 옷·소품 유지가 43건 중 33건(fixlook 28건)으로 좋아졌어요. mystery-02는 91.9점에서 96.8점, funny-15는 88.5점에서 96.2점이에요. 심각 오류는 1편(mystery-08 4컷 같은 아이가 둘)이고, 목검이 쇠칼로 바뀌는 소품 문제와 가짜 글자는 그대로예요. 컷당 6.06초."
+}
