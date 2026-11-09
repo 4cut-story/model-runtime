@@ -1,0 +1,39 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 24판, 23판에 받침 위 물건은 손에 쥐지 않게, 성별·동물이 다른 참조 모습은 쓰지 않음",
+ "status": "후보",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  97.3,
+  97.6
+ ],
+ "average": 97.4,
+ "criticalComics": 1,
+ "perComic": {
+  "solo-01": 95.0,
+  "funny-03": 99.8,
+  "twist-08": 98.0,
+  "funny-12": 97.6,
+  "funny-15": 96.3,
+  "love-07": 96.8,
+  "family-09": 98.2,
+  "mystery-02": 96.1,
+  "love-06": 98.7,
+  "mystery-08": 89.0
+ },
+ "strict": {
+  "average": 84.8,
+  "items": {
+   "X1": 84.3,
+   "X2": 89.3,
+   "X3": 87.9,
+   "X4": 77.9
+  },
+  "baseline": {
+   "variant": "klein-4b-ref-fixlookS",
+   "average": 61.5
+  }
+ },
+ "appeal": 6.7,
+ "note": "24판: 23판에 더해 삼각대·탁자 위 하나뿐인 물건은 'stands on its tripod, nothing held in the hands'를 붙이고, 콘티 외모와 성별·동물이 다른 캐릭터 참조 모습은 쓰지 않음(운영 match 규칙과 같게). 컷당 5.4초, VRAM 최대 3.68GiB. funny-12 엄마·아들 같은 얼굴, family-09 눈동자는 사라짐. 심각 1편(mystery-08 5컷 소협이 둘로 그려짐: 채점자 두 명). 점수 97.4, 엄격 84.8, 실패 108건."
+}
