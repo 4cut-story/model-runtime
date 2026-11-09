@@ -21,9 +21,10 @@ def key(c: dict) -> str:
 
 
 def convert(raw: bytes, suffix: str, out: Path) -> float:
-    with tempfile.NamedTemporaryFile(suffix=suffix) as f:
-        f.write(raw)
-        f.flush()
+    # Windows는 열려 있는 임시 파일을 다른 프로세스가 못 연다. 폴더째 만들고 닫은 뒤 ffmpeg에 넘긴다
+    with tempfile.TemporaryDirectory() as tmp:
+        src = Path(tmp) / f"in{suffix}"
+        src.write_bytes(raw)
         subprocess.run(
             [
                 "ffmpeg",
@@ -31,7 +32,7 @@ def convert(raw: bytes, suffix: str, out: Path) -> float:
                 "error",
                 "-y",
                 "-i",
-                f.name,
+                str(src),
                 "-t",
                 "30",
                 "-af",
