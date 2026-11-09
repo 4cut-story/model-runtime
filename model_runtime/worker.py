@@ -198,10 +198,19 @@ class Worker:
         self._stats["panels"] = panels
         for image in images:
             refs = self.references(image.get("references") or [], embeds, computed)
+            edit = image.get("edit")
+            # 그림 문제(같은 인물 둘, 이상한 발)를 GPU PC에서 짚게 컷마다 프롬프트를 남긴다.
+            # 콘티 그림 설명(영어)만 남기고 대사·녹음은 남기지 않는다.
+            log.info(
+                "컷 %s 프롬프트: %s | 참조: %s | 2차: %s",
+                image.get("name"),
+                image.get("prompt"),
+                [r.character for r in refs],
+                edit.get("prompt") if isinstance(edit, dict) else None,
+            )
             started = self.clock()
             png = self.backends.draw(image, refs)
             stats = _panel_stats(image, refs, int((self.clock() - started) * 1000))
-            edit = image.get("edit")
             if edit and self.backends.reference_kind() == "image":
                 png = self._edit(image, edit, png, embeds, computed, stats)
             panels.append(stats)

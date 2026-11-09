@@ -43,3 +43,19 @@ def test_FR006_참조_그림을_받지_않는_모델은_edit을_건너뛰고_1�
         w.draw_all([first])
     assert [n for n, _ in backends.drawn] == ["panel-1"]
     assert "editMs" not in w._stats["panels"][0]
+
+
+def test_FR006_컷마다_그림_프롬프트와_참조와_2차_프롬프트를_로그에_남긴다(caplog) -> None:  # type: ignore[no-untyped-def]
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+    first = image(1)
+    first["edit"] = {"prompt": "add one telescope", "references": [fresh()]}
+    caplog.set_level("INFO", logger="model_runtime.worker")
+    with respx.mock:
+        respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        respx.get("http://minio/get/a.png").mock(return_value=httpx.Response(200, content=b"png-a"))
+        w.draw_all([first])
+    line = next(r.getMessage() for r in caplog.records if "프롬프트" in r.getMessage())
+    assert "컷 panel-1 프롬프트: p" in line
+    assert "2차: add one telescope" in line
