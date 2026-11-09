@@ -40,6 +40,10 @@ KINDS: dict[str, dict[str, Any]] = {
 }
 # 참조 그림을 입력으로 받는 모델
 IMAGE_REFERENCE_KINDS = ("klein",)
+# 그리기 전에 남아 있어야 하는 VRAM. klein nf4 768px는 참조 4장·2단 그리기까지 최고 3.68GiB를 썼다.
+# SDXL 기준(10GB)을 그대로 쓰면 Ollama 모델(약 5.3GB)이 올라 있을 때 그릴 수 있는데도 VRAM_BUSY로
+# 모두 돌려보냈다(시험 31회). 없는 모델은 SDXL 기준을 쓴다.
+REQUIRED_VRAM_GIB = {"klein": 5}
 # 참조 그림은 이만큼까지만 넘긴다(컷 하나에 나오는 캐릭터 수)
 MAX_REFERENCES = 4
 QUANTS = ("nf4", "nunchaku", "none")
@@ -70,6 +74,8 @@ class DiffusionBackend:
         self.quant = quant
         self.single_file = single_file
         self.keep_in_ram = keep_in_ram
+        gib = REQUIRED_VRAM_GIB.get(kind)
+        self.required_vram: int | None = gib * 1024**3 if gib is not None else None
         self._pipe: Any = None
 
     def load(self) -> None:  # pragma: no cover - GPU 전용

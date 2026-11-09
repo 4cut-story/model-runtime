@@ -132,9 +132,12 @@ class RealBackends:
     def prepare(self, model: str) -> None:
         free = self._vram()
         need = REQUIRED_VRAM.get(model, 0)
+        if model == "SDXL":
+            # 그림 모델이 필요 VRAM을 정해 두었으면 그 값을 쓴다(klein 5GB)
+            need = getattr(self.sdxl, "required_vram", None) or need
         if free is not None and free < need:
             raise VramBusyError(
-                f"{model}에 필요한 VRAM {need // GIB}GB, 남은 VRAM {free / GIB:.1f}GB"
+                f"{model}에 필요한 VRAM {need / GIB:.0f}GB, 남은 VRAM {free / GIB:.1f}GB"
             )
 
     def unload(self, model: str) -> None:

@@ -88,6 +88,12 @@ class FallbackImage:
         data = self._fallback.draw(image, references)
         return data
 
+    @property
+    def required_vram(self) -> int | None:
+        """지금 그리는 모델이 정한 필요 VRAM. SDXL로 되돌린 뒤에는 SDXL 기준(None)."""
+        need: int | None = getattr(self.active, "required_vram", None)
+        return need
+
     def encode_reference(self, image: bytes) -> bytes | None:
         data: bytes | None = self.active.encode_reference(image)
         return data

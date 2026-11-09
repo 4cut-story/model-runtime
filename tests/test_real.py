@@ -147,3 +147,13 @@ def test_nvidia_smi가_실패하면_모른다(monkeypatch: pytest.MonkeyPatch) -
 def test_CUDA_VISIBLE_DEVICES가_UUID면_0번_GPU를_본다(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "GPU-abc")
     assert real._gpu_index() == 0
+
+
+def test_그림_모델이_정한_필요_VRAM을_쓴다() -> None:
+    """FR-008: klein은 약 3.7GB만 쓰므로 Ollama 모델이 올라 있어도(남은 7GB) 그린다."""
+    backends, _, sdxl, _ = make(7 * GIB)
+    sdxl.required_vram = 5 * GIB  # type: ignore[attr-defined]
+    backends.prepare("SDXL")
+    sdxl.required_vram = None  # type: ignore[attr-defined]
+    with pytest.raises(VramBusyError):
+        backends.prepare("SDXL")

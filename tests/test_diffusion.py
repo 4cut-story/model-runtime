@@ -116,3 +116,11 @@ def test_REQ018_참조_방식은_감싼_그림_백엔드를_따른다() -> None:
     klein = FallbackImage(DiffusionBackend("klein"), lambda: object(), Path("/nonexistent"))
     assert klein.reference_kind() == "image"
     assert reference_kind(object()) == "embed"
+
+
+def test_klein은_필요_VRAM을_5GB로_정하고_다른_모델은_정하지_않는다() -> None:
+    """FR-008: klein nf4는 최고 3.68GiB를 써서 SDXL 기준 10GB 대신 5GB만 남아 있으면 그린다."""
+    from model_runtime.backends.diffusion import DiffusionBackend
+
+    assert DiffusionBackend("klein").required_vram == 5 * 1024**3
+    assert DiffusionBackend("sd35").required_vram is None
