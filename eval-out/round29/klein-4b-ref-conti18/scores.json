@@ -1,0 +1,38 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 15b판 (4 step)",
+ "status": "탈락",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  95.9,
+  96.4
+ ],
+ "average": 96.2,
+ "criticalComics": 8,
+ "perComic": {
+  "solo-01": 99.4,
+  "funny-03": 89.0,
+  "twist-08": 93.0,
+  "funny-12": 89.0,
+  "funny-15": 89.0,
+  "love-07": 89.0,
+  "family-09": 89.0,
+  "mystery-02": 89.0,
+  "love-06": 97.7,
+  "mystery-08": 89.0
+ },
+ "strict": {
+  "average": 79.0,
+  "items": {
+   "X1": 77.1,
+   "X2": 86.1,
+   "X3": 75.7,
+   "X4": 75.7
+  },
+  "baseline": {
+   "variant": "klein-4b-ref-fixlookS",
+   "average": 61.5
+  }
+ },
+ "note": "콘티 틀 15b판: 15판에 두 사람 컷(앞뒤 배치, 한 명은 앞에 크게 한 명은 뒤에 작게)을 다시 허용. 두 사람 컷에서 인물 섞임·역할 바뀜·복제가 다시 나와 심각 오류 만화가 5편에서 8편으로 늘고 점수도 97.2에서 96.2로 내려가 한 사람 컷(15판)을 유지한다."
+}
