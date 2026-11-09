@@ -1,0 +1,38 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 10판 (4 step)",
+ "status": "후보",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  96.4,
+  96.6
+ ],
+ "average": 96.5,
+ "criticalComics": 3,
+ "perComic": {
+  "solo-01": 98.0,
+  "funny-03": 99.3,
+  "twist-08": 98.0,
+  "funny-12": 95.9,
+  "funny-15": 91.0,
+  "love-07": 96.5,
+  "family-09": 96.2,
+  "mystery-02": 95.1,
+  "love-06": 93.8,
+  "mystery-08": 89.0
+ },
+ "strict": {
+  "average": 74.3,
+  "items": {
+   "X1": 65.0,
+   "X2": 84.2,
+   "X3": 79.2,
+   "X4": 69.2
+  },
+  "baseline": {
+   "variant": "klein-4b-ref-fixlookS",
+   "average": 61.5
+  }
+ },
+ "note": "콘티 틀 10판(소품 하나는 물건 한 개, 핵심 물건은 가슴 높이, 가구 위 다리 위치, 시선은 동작 대상, 들고 다니는 물건은 쥐는 곳)으로 Claude가 다시 썼어요. 심각 오류 편은 4편에서 3편(양말이 두 짝처럼, 두 사람 팔이 합쳐짐, 컷 안 작은 컷과 등불 둘)으로 줄었지만 평균 96.5, 엄격 74.3으로 9판보다 낮아요. 실패 항목 105개. 옷·신발 유지는 40명 중 20명 same."
+}
