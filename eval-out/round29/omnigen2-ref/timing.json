@@ -1,0 +1,208 @@
+{
+ "reference": true,
+ "model": "OmniGen2/OmniGen2",
+ "code": "github.com/VectorSpaceLab/OmniGen2 (official)",
+ "steps": 50,
+ "textGuidance": 5.0,
+ "imageGuidance": 2.0,
+ "offload": "enable_model_cpu_offload",
+ "dtype": "bf16",
+ "loadSeconds": 67.5,
+ "panelSeconds": {
+  "love-07-panel-1": 185.0,
+  "love-07-panel-2": 73.5,
+  "love-07-panel-3": 71.26,
+  "love-07-panel-4": 70.65,
+  "love-07-panel-5": 177.91,
+  "solo-01-panel-1": 70.87,
+  "solo-01-panel-2": 69.99,
+  "solo-01-panel-3": 70.33,
+  "solo-01-panel-4": 70.26,
+  "solo-01-panel-5": 70.14,
+  "love-06-panel-1": 298.19,
+  "love-06-panel-2": 189.43,
+  "love-06-panel-3": 189.42,
+  "love-06-panel-4": 189.3,
+  "love-06-panel-5": 428.61,
+  "family-09-panel-1": 72.82,
+  "family-09-panel-2": 69.65,
+  "family-09-panel-3": 67.74,
+  "family-09-panel-4": 67.58,
+  "family-09-panel-5": 72.55,
+  "funny-03-panel-1": 176.92,
+  "funny-03-panel-2": 69.6,
+  "funny-03-panel-3": 69.64,
+  "funny-03-panel-4": 69.6,
+  "funny-03-panel-5": 69.8,
+  "mystery-02-panel-1": 177.03,
+  "mystery-02-panel-2": 69.6,
+  "mystery-02-panel-3": 69.72,
+  "mystery-02-panel-4": 69.82,
+  "mystery-02-panel-5": 69.84,
+  "twist-08-panel-1": 176.89,
+  "twist-08-panel-2": 69.54,
+  "twist-08-panel-3": 69.64,
+  "twist-08-panel-4": 176.82,
+  "funny-15-panel-1": 235.02,
+  "funny-15-panel-2": 186.48,
+  "funny-15-panel-3": 186.59,
+  "funny-15-panel-4": 69.46,
+  "mystery-08-panel-1": 68.11,
+  "mystery-08-panel-2": 69.63,
+  "mystery-08-panel-3": 186.72,
+  "mystery-08-panel-4": 68.19,
+  "mystery-08-panel-5": 186.84,
+  "funny-12-panel-1": 176.5,
+  "funny-12-panel-2": 69.41,
+  "funny-12-panel-3": 69.39,
+  "funny-12-panel-4": 69.34
+ },
+ "referencesUsed": {
+  "love-07-panel-1": [
+   "새봄",
+   "이랑"
+  ],
+  "love-07-panel-2": [
+   "새봄"
+  ],
+  "love-07-panel-3": [
+   "이랑"
+  ],
+  "love-07-panel-4": [
+   "이랑"
+  ],
+  "love-07-panel-5": [
+   "이랑",
+   "새봄"
+  ],
+  "solo-01-panel-1": [
+   "나래"
+  ],
+  "solo-01-panel-2": [
+   "나래"
+  ],
+  "solo-01-panel-3": [
+   "보람"
+  ],
+  "solo-01-panel-4": [
+   "보람"
+  ],
+  "solo-01-panel-5": [
+   "보람"
+  ],
+  "love-06-panel-1": [
+   "가온",
+   "나래"
+  ],
+  "love-06-panel-2": [
+   "나래"
+  ],
+  "love-06-panel-3": [
+   "가온"
+  ],
+  "love-06-panel-4": [
+   "보람"
+  ],
+  "love-06-panel-5": [
+   "보람",
+   "가온",
+   "나래"
+  ],
+  "family-09-panel-1": [
+   "다온"
+  ],
+  "family-09-panel-2": [
+   "다온"
+  ],
+  "family-09-panel-3": [],
+  "family-09-panel-4": [],
+  "family-09-panel-5": [
+   "다온"
+  ],
+  "funny-03-panel-1": [
+   "하늘",
+   "해담"
+  ],
+  "funny-03-panel-2": [
+   "하늘"
+  ],
+  "funny-03-panel-3": [
+   "해담"
+  ],
+  "funny-03-panel-4": [
+   "지우"
+  ],
+  "funny-03-panel-5": [
+   "하늘"
+  ],
+  "mystery-02-panel-1": [
+   "은솔",
+   "주원"
+  ],
+  "mystery-02-panel-2": [
+   "은솔"
+  ],
+  "mystery-02-panel-3": [
+   "주원"
+  ],
+  "mystery-02-panel-4": [
+   "은솔"
+  ],
+  "mystery-02-panel-5": [
+   "주원"
+  ],
+  "twist-08-panel-1": [
+   "윤슬",
+   "단비"
+  ],
+  "twist-08-panel-2": [
+   "윤슬"
+  ],
+  "twist-08-panel-3": [
+   "도담"
+  ],
+  "twist-08-panel-4": [
+   "도담",
+   "단비"
+  ],
+  "funny-15-panel-1": [
+   "유진",
+   "해솔"
+  ],
+  "funny-15-panel-2": [
+   "해솔"
+  ],
+  "funny-15-panel-3": [
+   "해솔"
+  ],
+  "funny-15-panel-4": [
+   "유진"
+  ],
+  "mystery-08-panel-1": [],
+  "mystery-08-panel-2": [],
+  "mystery-08-panel-3": [
+   "지우"
+  ],
+  "mystery-08-panel-4": [],
+  "mystery-08-panel-5": [
+   "지우"
+  ],
+  "funny-12-panel-1": [
+   "하늘",
+   "지우"
+  ],
+  "funny-12-panel-2": [
+   "하늘"
+  ],
+  "funny-12-panel-3": [
+   "하늘"
+  ],
+  "funny-12-panel-4": [
+   "지우"
+  ]
+ },
+ "failed": {},
+ "peakRamGiB": 19.66,
+ "peakVramGiB": 9.1,
+ "secondsPerPanel": 119.6
+}
