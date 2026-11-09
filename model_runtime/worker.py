@@ -47,6 +47,13 @@ class Heartbeat(threading.Thread):
         self._stopped.set()
 
 
+def _sized(image: dict[str, Any], live: dict[str, Any] | None) -> dict[str, Any]:
+    """live에 크기가 있으면 그 크기로 바꾼 컷 요청."""
+    if not live or not live.get("width") or not live.get("height"):
+        return image
+    return {**image, "width": int(live["width"]), "height": int(live["height"])}
+
+
 class Worker:
     def __init__(
         self,
@@ -195,6 +202,7 @@ class Worker:
         computed: list[str] = []
         panels: list[dict[str, Any]] = []
         motions: list[str] = []
+        lives: list[str] = []
         self._stats["panels"] = panels
         for image in images:
             refs = self.references(image.get("references") or [], embeds, computed)
@@ -219,19 +227,49 @@ class Worker:
             )
             response.raise_for_status()
             uploaded.append(image["name"])
+            if self.backends.reference_kind() != "image":
+                continue
+            live = image.get("live")
+            wide = self._live(image, live, png, stats) if isinstance(live, dict) else None
+            if wide is not None:
+                lives.append(image["name"])
             motion = image.get("motion")
-            if (
-                isinstance(motion, dict)
-                and self.backends.reference_kind() == "image"
-                and self._motion(image, motion, png, stats)
-            ):
-                motions.append(image["name"])
+            if isinstance(motion, dict):
+                # 넓은 그림이 있으면 두 번째 그림도 넓은 그림을 바탕으로 같은 크기로 그린다 (FR-034)
+                target = image if wide is None else _sized(image, live)
+                if self._motion(target, motion, png if wide is None else wide, stats):
+                    motions.append(image["name"])
         result: dict[str, Any] = {"uploaded": uploaded}
         if computed:
             result["embeds"] = computed
         if motions:
             result["motions"] = motions
+        if lives:
+            result["lives"] = lives
         return result
+
+    def _live(
+        self, image: dict[str, Any], live: dict[str, Any], base: bytes, stats: dict[str, Any]
+    ) -> bytes | None:
+        """라이브 모드 전용 넓은 그림 (docs specs/003-live-mode FR-030).
+
+        완성된 컷 그림을 첫 입력 그림으로 넣고 live.prompt로 같은 인물·장면을 live.width×live.height
+        (16:9)로 넓혀 그려 live.uploadUrl에 올린다. 실패하면 None이다(그 컷은 v1 컷 그림).
+        """
+        try:
+            wide = {**_sized(image, live), "prompt": str(live["prompt"])}
+            wide.pop("regions", None)
+            started = self.clock()
+            png = self.backends.draw(wide, [Reference("__base__", base, 1.0, "full")])
+            stats["liveMs"] = int((self.clock() - started) * 1000)
+            response = self.uploader.put(
+                live["uploadUrl"], content=png, headers={"Content-Type": "image/png"}
+            )
+            response.raise_for_status()
+            return png
+        except Exception as e:  # 넓은 그림 때문에 만화를 실패시키지 않는다
+            log.warning("넓은 그림을 만들지 못해 컷 그림을 쓴다: %s (%s)", image.get("name"), e)
+            return None
 
     def _motion(
         self, image: dict[str, Any], motion: dict[str, Any], base: bytes, stats: dict[str, Any]
