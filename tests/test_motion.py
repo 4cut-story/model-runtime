@@ -182,3 +182,44 @@ def test_FR048_깊이_지도를_만들지_못해도_작업은_성공이다() -> 
         result = w.draw_all([img])
     assert result["lives"] == ["panel-1"]
     assert "depths" not in result
+
+
+def test_FR049_깊이_지도가_있으면_움직임_그림의_앞쪽_인물은_첫_그림으로_덮는다(monkeypatch) -> None:
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+    calls: list[tuple[bytes, bytes, bytes]] = []
+
+    def fake_keep(base: bytes, frame: bytes, depth: bytes) -> bytes:
+        calls.append((base, frame, depth))
+        return b"kept"
+
+    monkeypatch.setattr("model_runtime.worker.keep_near", fake_keep)
+    img = live_image(1, motion=True)
+    img["live"]["depthUploadUrl"] = "http://minio/put/depth-1"
+    with respx.mock:
+        put = respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        result = w.draw_all([img])
+    assert result["motions"] == ["panel-1"]
+    assert len(calls) == 1
+    motion = next(c for c in put.calls if c.request.url.path == "/put/motion-1")
+    assert motion.request.content == b"kept"
+
+
+def test_FR049_인물을_고정하지_못하면_새_그림을_그대로_올린다(monkeypatch) -> None:
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+
+    def broken(base: bytes, frame: bytes, depth: bytes) -> bytes:
+        raise ValueError("bad png")
+
+    monkeypatch.setattr("model_runtime.worker.keep_near", broken)
+    img = live_image(1, motion=True)
+    img["live"]["depthUploadUrl"] = "http://minio/put/depth-1"
+    with respx.mock:
+        put = respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        result = w.draw_all([img])
+    assert result["motions"] == ["panel-1"]
+    motion = next(c for c in put.calls if c.request.url.path == "/put/motion-1")
+    assert motion.request.content == tiny_png()
