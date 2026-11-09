@@ -1,0 +1,7 @@
+{
+  "loadError": "python.exe crashed (0xc0000005 access violation in torch_cpu.dll) while accelerate load_and_quantize_model read ema.safetensors (29 GB) for NF4. Two tries: device_map GPU 14GiB + CPU 40GiB (crash at layer 5 moving to CPU), and all on GPU like app.py (crash at start of weight load). RAM 32 GB. Skipped per plan.",
+  "code": "github.com/ByteDance-Seed/Bagel (official, app.py mode 2 NF4)",
+  "model": "ByteDance-Seed/BAGEL-7B-MoT",
+  "reference": true,
+  "panelsRendered": 0
+}
