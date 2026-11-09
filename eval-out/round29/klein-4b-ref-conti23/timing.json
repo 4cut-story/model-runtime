@@ -1,0 +1,651 @@
+{
+ "settings": {
+  "IMAGE_MODEL": "klein",
+  "DIFFUSION_GUIDANCE": "1.0",
+  "DIFFUSION_STEPS": "4",
+  "MODEL_KEEP_IN_RAM": "false"
+ },
+ "reference": true,
+ "loadSeconds": 36.3,
+ "backend": "DiffusionBackend",
+ "panelSeconds": {
+  "solo-01-panel-1": 5.93,
+  "solo-01-panel-2": 5.69,
+  "solo-01-panel-2-b": 7.37,
+  "solo-01-panel-3": 5.58,
+  "solo-01-panel-3-b": 7.46,
+  "solo-01-panel-4": 5.57,
+  "solo-01-panel-5": 5.56,
+  "solo-01-panel-6": 5.54,
+  "funny-03-panel-1": 5.45,
+  "funny-03-panel-2": 5.46,
+  "funny-03-panel-3": 5.59,
+  "funny-03-panel-4": 5.72,
+  "funny-03-panel-5": 5.66,
+  "funny-03-panel-6": 5.57,
+  "funny-03-panel-7": 5.44,
+  "funny-03-panel-8": 5.66,
+  "funny-03-panel-8-b": 7.27,
+  "twist-08-panel-1": 5.54,
+  "twist-08-panel-2": 5.57,
+  "twist-08-panel-3": 5.55,
+  "twist-08-panel-4": 5.55,
+  "twist-08-panel-5": 5.7,
+  "twist-08-panel-5-b": 7.41,
+  "twist-08-panel-6": 5.45,
+  "twist-08-panel-7": 5.36,
+  "twist-08-panel-8": 5.4,
+  "twist-08-panel-9": 5.3,
+  "twist-08-panel-9-b": 7.03,
+  "twist-08-panel-10": 5.29,
+  "twist-08-panel-10-b": 7.08,
+  "funny-12-panel-1": 4.24,
+  "funny-12-panel-1-b": 7.27,
+  "funny-12-panel-2": 5.36,
+  "funny-12-panel-3": 4.15,
+  "funny-12-panel-4": 5.36,
+  "funny-12-panel-5": 4.13,
+  "funny-12-panel-5-b": 7.11,
+  "funny-12-panel-6": 5.35,
+  "funny-12-panel-6-b": 7.11,
+  "funny-15-panel-1": 4.19,
+  "funny-15-panel-1-b": 7.24,
+  "funny-15-panel-2": 7.16,
+  "funny-15-panel-3": 4.09,
+  "funny-15-panel-4": 7.05,
+  "funny-15-panel-5": 7.04,
+  "funny-15-panel-6": 4.08,
+  "love-07-panel-1": 5.33,
+  "love-07-panel-2": 5.31,
+  "love-07-panel-3": 5.37,
+  "love-07-panel-4": 5.46,
+  "love-07-panel-5": 5.41,
+  "love-07-panel-6": 5.3,
+  "love-07-panel-6-b": 7.06,
+  "love-07-panel-7": 5.3,
+  "love-07-panel-8": 5.31,
+  "family-09-panel-1": 4.08,
+  "family-09-panel-2": 4.08,
+  "family-09-panel-3": 4.11,
+  "family-09-panel-4": 4.18,
+  "family-09-panel-5": 4.24,
+  "family-09-panel-6": 4.3,
+  "family-09-panel-6-b": 7.16,
+  "family-09-panel-7": 4.09,
+  "family-09-panel-8": 4.09,
+  "mystery-02-panel-1": 5.31,
+  "mystery-02-panel-2": 5.31,
+  "mystery-02-panel-3": 5.37,
+  "mystery-02-panel-3-b": 7.08,
+  "mystery-02-panel-4": 5.34,
+  "mystery-02-panel-5": 5.49,
+  "mystery-02-panel-6": 5.45,
+  "mystery-02-panel-7": 5.34,
+  "mystery-02-panel-8": 5.3,
+  "mystery-02-panel-9": 5.36,
+  "mystery-02-panel-9-b": 7.08,
+  "love-06-panel-1": 7.12,
+  "love-06-panel-2": 7.07,
+  "love-06-panel-3": 7.15,
+  "love-06-panel-4": 7.23,
+  "love-06-panel-5": 7.25,
+  "love-06-panel-6": 7.05,
+  "mystery-08-panel-1": 4.11,
+  "mystery-08-panel-2": 4.1,
+  "mystery-08-panel-3": 4.1,
+  "mystery-08-panel-4": 4.13,
+  "mystery-08-panel-5": 7.15,
+  "mystery-08-panel-6": 7.06,
+  "mystery-08-panel-7": 7.13,
+  "mystery-08-panel-8": 4.28
+ },
+ "referencesUsed": {
+  "solo-01-panel-1": [
+   {
+    "character": "나래",
+    "region": "center"
+   }
+  ],
+  "solo-01-panel-2": [
+   {
+    "character": "나래",
+    "region": "center"
+   }
+  ],
+  "solo-01-panel-2-b": [
+   {
+    "character": "__base__:solo-01-panel-2",
+    "region": "full"
+   }
+  ],
+  "solo-01-panel-3": [
+   {
+    "character": "채희",
+    "region": "center"
+   }
+  ],
+  "solo-01-panel-3-b": [
+   {
+    "character": "__base__:solo-01-panel-3",
+    "region": "full"
+   }
+  ],
+  "solo-01-panel-4": [
+   {
+    "character": "채희",
+    "region": "center"
+   }
+  ],
+  "solo-01-panel-5": [
+   {
+    "character": "채희",
+    "region": "center"
+   }
+  ],
+  "solo-01-panel-6": [
+   {
+    "character": "채희",
+    "region": "center"
+   }
+  ],
+  "funny-03-panel-1": [
+   {
+    "character": "해담",
+    "region": "center"
+   }
+  ],
+  "funny-03-panel-2": [
+   {
+    "character": "하늘",
+    "region": "center"
+   }
+  ],
+  "funny-03-panel-3": [
+   {
+    "character": "해담",
+    "region": "center"
+   }
+  ],
+  "funny-03-panel-4": [
+   {
+    "character": "하늘",
+    "region": "center"
+   }
+  ],
+  "funny-03-panel-5": [
+   {
+    "character": "해담",
+    "region": "center"
+   }
+  ],
+  "funny-03-panel-6": [
+   {
+    "character": "하늘",
+    "region": "center"
+   }
+  ],
+  "funny-03-panel-7": [
+   {
+    "character": "지우",
+    "region": "center"
+   }
+  ],
+  "funny-03-panel-8": [
+   {
+    "character": "하늘",
+    "region": "center"
+   }
+  ],
+  "funny-03-panel-8-b": [
+   {
+    "character": "__base__:funny-03-panel-8",
+    "region": "full"
+   }
+  ],
+  "twist-08-panel-1": [
+   {
+    "character": "윤슬",
+    "region": "center"
+   }
+  ],
+  "twist-08-panel-2": [
+   {
+    "character": "채희",
+    "region": "center"
+   }
+  ],
+  "twist-08-panel-3": [
+   {
+    "character": "윤슬",
+    "region": "center"
+   }
+  ],
+  "twist-08-panel-4": [
+   {
+    "character": "채희",
+    "region": "center"
+   }
+  ],
+  "twist-08-panel-5": [
+   {
+    "character": "윤슬",
+    "region": "center"
+   }
+  ],
+  "twist-08-panel-5-b": [
+   {
+    "character": "__base__:twist-08-panel-5",
+    "region": "full"
+   }
+  ],
+  "twist-08-panel-6": [
+   {
+    "character": "채희",
+    "region": "center"
+   }
+  ],
+  "twist-08-panel-7": [
+   {
+    "character": "도담",
+    "region": "center"
+   }
+  ],
+  "twist-08-panel-8": [
+   {
+    "character": "윤슬",
+    "region": "center"
+   }
+  ],
+  "twist-08-panel-9": [
+   {
+    "character": "도담",
+    "region": "center"
+   }
+  ],
+  "twist-08-panel-9-b": [
+   {
+    "character": "__base__:twist-08-panel-9",
+    "region": "full"
+   }
+  ],
+  "twist-08-panel-10": [
+   {
+    "character": "채희",
+    "region": "center"
+   }
+  ],
+  "twist-08-panel-10-b": [
+   {
+    "character": "__base__:twist-08-panel-10",
+    "region": "full"
+   }
+  ],
+  "funny-12-panel-1": [],
+  "funny-12-panel-1-b": [
+   {
+    "character": "__base__:funny-12-panel-1",
+    "region": "full"
+   }
+  ],
+  "funny-12-panel-2": [
+   {
+    "character": "하늘",
+    "region": "center"
+   }
+  ],
+  "funny-12-panel-3": [],
+  "funny-12-panel-4": [
+   {
+    "character": "하늘",
+    "region": "center"
+   }
+  ],
+  "funny-12-panel-5": [],
+  "funny-12-panel-5-b": [
+   {
+    "character": "__base__:funny-12-panel-5",
+    "region": "full"
+   }
+  ],
+  "funny-12-panel-6": [
+   {
+    "character": "하늘",
+    "region": "center"
+   }
+  ],
+  "funny-12-panel-6-b": [
+   {
+    "character": "__base__:funny-12-panel-6",
+    "region": "full"
+   }
+  ],
+  "funny-15-panel-1": [],
+  "funny-15-panel-1-b": [
+   {
+    "character": "__base__:funny-15-panel-1",
+    "region": "full"
+   }
+  ],
+  "funny-15-panel-2": [
+   {
+    "character": "해솔",
+    "region": "center"
+   }
+  ],
+  "funny-15-panel-3": [],
+  "funny-15-panel-4": [
+   {
+    "character": "해솔",
+    "region": "center"
+   }
+  ],
+  "funny-15-panel-5": [
+   {
+    "character": "해솔",
+    "region": "center"
+   }
+  ],
+  "funny-15-panel-6": [],
+  "love-07-panel-1": [
+   {
+    "character": "새봄",
+    "region": "center"
+   }
+  ],
+  "love-07-panel-2": [
+   {
+    "character": "이랑",
+    "region": "center"
+   }
+  ],
+  "love-07-panel-3": [
+   {
+    "character": "새봄",
+    "region": "center"
+   }
+  ],
+  "love-07-panel-4": [
+   {
+    "character": "이랑",
+    "region": "center"
+   }
+  ],
+  "love-07-panel-5": [
+   {
+    "character": "새봄",
+    "region": "center"
+   }
+  ],
+  "love-07-panel-6": [
+   {
+    "character": "이랑",
+    "region": "center"
+   }
+  ],
+  "love-07-panel-6-b": [
+   {
+    "character": "__base__:love-07-panel-6",
+    "region": "full"
+   }
+  ],
+  "love-07-panel-7": [
+   {
+    "character": "새봄",
+    "region": "center"
+   }
+  ],
+  "love-07-panel-8": [
+   {
+    "character": "이랑",
+    "region": "center"
+   }
+  ],
+  "family-09-panel-1": [],
+  "family-09-panel-2": [],
+  "family-09-panel-3": [],
+  "family-09-panel-4": [],
+  "family-09-panel-5": [],
+  "family-09-panel-6": [],
+  "family-09-panel-6-b": [
+   {
+    "character": "__base__:family-09-panel-6",
+    "region": "full"
+   }
+  ],
+  "family-09-panel-7": [],
+  "family-09-panel-8": [],
+  "mystery-02-panel-1": [
+   {
+    "character": "은솔",
+    "region": "center"
+   }
+  ],
+  "mystery-02-panel-2": [
+   {
+    "character": "주원",
+    "region": "center"
+   }
+  ],
+  "mystery-02-panel-3": [
+   {
+    "character": "은솔",
+    "region": "center"
+   }
+  ],
+  "mystery-02-panel-3-b": [
+   {
+    "character": "__base__:mystery-02-panel-3",
+    "region": "full"
+   }
+  ],
+  "mystery-02-panel-4": [
+   {
+    "character": "주원",
+    "region": "center"
+   }
+  ],
+  "mystery-02-panel-5": [
+   {
+    "character": "은솔",
+    "region": "center"
+   }
+  ],
+  "mystery-02-panel-6": [
+   {
+    "character": "은솔",
+    "region": "center"
+   }
+  ],
+  "mystery-02-panel-7": [
+   {
+    "character": "은솔",
+    "region": "center"
+   }
+  ],
+  "mystery-02-panel-8": [
+   {
+    "character": "주원",
+    "region": "center"
+   }
+  ],
+  "mystery-02-panel-9": [
+   {
+    "character": "주원",
+    "region": "center"
+   }
+  ],
+  "mystery-02-panel-9-b": [
+   {
+    "character": "__base__:mystery-02-panel-9",
+    "region": "full"
+   }
+  ],
+  "love-06-panel-1": [
+   {
+    "character": "가온",
+    "region": "center"
+   }
+  ],
+  "love-06-panel-2": [
+   {
+    "character": "나래",
+    "region": "center"
+   }
+  ],
+  "love-06-panel-3": [
+   {
+    "character": "보람",
+    "region": "center"
+   }
+  ],
+  "love-06-panel-4": [
+   {
+    "character": "가온",
+    "region": "center"
+   }
+  ],
+  "love-06-panel-5": [
+   {
+    "character": "보람",
+    "region": "center"
+   }
+  ],
+  "love-06-panel-6": [
+   {
+    "character": "보람",
+    "region": "center"
+   }
+  ],
+  "mystery-08-panel-1": [],
+  "mystery-08-panel-2": [],
+  "mystery-08-panel-3": [],
+  "mystery-08-panel-4": [],
+  "mystery-08-panel-5": [
+   {
+    "character": "지우",
+    "region": "center"
+   }
+  ],
+  "mystery-08-panel-6": [
+   {
+    "character": "지우",
+    "region": "center"
+   }
+  ],
+  "mystery-08-panel-7": [
+   {
+    "character": "지우",
+    "region": "center"
+   }
+  ],
+  "mystery-08-panel-8": []
+ },
+ "stageSeconds": {
+  "1": {
+   "solo-01-panel-1": 5.93,
+   "solo-01-panel-2": 5.69,
+   "solo-01-panel-3": 5.58,
+   "solo-01-panel-4": 5.57,
+   "solo-01-panel-5": 5.56,
+   "solo-01-panel-6": 5.54,
+   "funny-03-panel-1": 5.45,
+   "funny-03-panel-2": 5.46,
+   "funny-03-panel-3": 5.59,
+   "funny-03-panel-4": 5.72,
+   "funny-03-panel-5": 5.66,
+   "funny-03-panel-6": 5.57,
+   "funny-03-panel-7": 5.44,
+   "funny-03-panel-8": 5.66,
+   "twist-08-panel-1": 5.54,
+   "twist-08-panel-2": 5.57,
+   "twist-08-panel-3": 5.55,
+   "twist-08-panel-4": 5.55,
+   "twist-08-panel-5": 5.7,
+   "twist-08-panel-6": 5.45,
+   "twist-08-panel-7": 5.36,
+   "twist-08-panel-8": 5.4,
+   "twist-08-panel-9": 5.3,
+   "twist-08-panel-10": 5.29,
+   "funny-12-panel-1": 4.24,
+   "funny-12-panel-2": 5.36,
+   "funny-12-panel-3": 4.15,
+   "funny-12-panel-4": 5.36,
+   "funny-12-panel-5": 4.13,
+   "funny-12-panel-6": 5.35,
+   "funny-15-panel-1": 4.19,
+   "funny-15-panel-2": 7.16,
+   "funny-15-panel-3": 4.09,
+   "funny-15-panel-4": 7.05,
+   "funny-15-panel-5": 7.04,
+   "funny-15-panel-6": 4.08,
+   "love-07-panel-1": 5.33,
+   "love-07-panel-2": 5.31,
+   "love-07-panel-3": 5.37,
+   "love-07-panel-4": 5.46,
+   "love-07-panel-5": 5.41,
+   "love-07-panel-6": 5.3,
+   "love-07-panel-7": 5.3,
+   "love-07-panel-8": 5.31,
+   "family-09-panel-1": 4.08,
+   "family-09-panel-2": 4.08,
+   "family-09-panel-3": 4.11,
+   "family-09-panel-4": 4.18,
+   "family-09-panel-5": 4.24,
+   "family-09-panel-6": 4.3,
+   "family-09-panel-7": 4.09,
+   "family-09-panel-8": 4.09,
+   "mystery-02-panel-1": 5.31,
+   "mystery-02-panel-2": 5.31,
+   "mystery-02-panel-3": 5.37,
+   "mystery-02-panel-4": 5.34,
+   "mystery-02-panel-5": 5.49,
+   "mystery-02-panel-6": 5.45,
+   "mystery-02-panel-7": 5.34,
+   "mystery-02-panel-8": 5.3,
+   "mystery-02-panel-9": 5.36,
+   "love-06-panel-1": 7.12,
+   "love-06-panel-2": 7.07,
+   "love-06-panel-3": 7.15,
+   "love-06-panel-4": 7.23,
+   "love-06-panel-5": 7.25,
+   "love-06-panel-6": 7.05,
+   "mystery-08-panel-1": 4.11,
+   "mystery-08-panel-2": 4.1,
+   "mystery-08-panel-3": 4.1,
+   "mystery-08-panel-4": 4.13,
+   "mystery-08-panel-5": 7.15,
+   "mystery-08-panel-6": 7.06,
+   "mystery-08-panel-7": 7.13,
+   "mystery-08-panel-8": 4.28
+  },
+  "2": {
+   "solo-01-panel-2-b": 7.37,
+   "solo-01-panel-3-b": 7.46,
+   "funny-03-panel-8-b": 7.27,
+   "twist-08-panel-5-b": 7.41,
+   "twist-08-panel-9-b": 7.03,
+   "twist-08-panel-10-b": 7.08,
+   "funny-12-panel-1-b": 7.27,
+   "funny-12-panel-5-b": 7.11,
+   "funny-12-panel-6-b": 7.11,
+   "funny-15-panel-1-b": 7.24,
+   "love-07-panel-6-b": 7.06,
+   "family-09-panel-6-b": 7.16,
+   "mystery-02-panel-3-b": 7.08,
+   "mystery-02-panel-9-b": 7.08
+  }
+ },
+ "failed": {},
+ "peakRamGiB": 8.01,
+ "modelInfo": {
+  "klein": "black-forest-labs/FLUX.2-klein-4B",
+  "quantization": "nf4",
+  "steps": 4,
+  "guidance": 1.0,
+  "cpuOffload": true,
+  "ipAdapter": null,
+  "references": "image"
+ },
+ "peakVramGiB": 3.68,
+ "secondsPerPanel": 5.68
+}
