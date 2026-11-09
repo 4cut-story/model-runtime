@@ -1,0 +1,38 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 7판 (4 step)",
+ "status": "후보",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  96.4,
+  96.0
+ ],
+ "average": 96.2,
+ "criticalComics": 3,
+ "perComic": {
+  "solo-01": 99.0,
+  "funny-03": 96.7,
+  "twist-08": 98.8,
+  "funny-12": 89.0,
+  "funny-15": 94.8,
+  "love-07": 98.8,
+  "family-09": 95.9,
+  "mystery-02": 88.4,
+  "love-06": 96.5,
+  "mystery-08": 89.0
+ },
+ "strict": {
+  "average": 74.1,
+  "items": {
+   "X1": 70.9,
+   "X2": 83.6,
+   "X3": 68.7,
+   "X4": 76.9
+  },
+  "baseline": {
+   "variant": "klein-4b-ref-fixlookS",
+   "average": 61.5
+  }
+ },
+ "note": "콘티 틀 7판(두 사람 컷은 편당 두 컷까지·넓은 구도, 한 물건을 두 사람이 함께 쥐지 않기, 손이 빈 동작 대신 물건을 쥔 동작)과 참조 인물의 슬리퍼·맨발 신발 마디 빼기로 Claude가 다시 썼어요. 67컷, 두 사람 컷 15개. 본점수는 콘티 틀 중 가장 높고 실패 항목 수도 가장 적어요(179개). 심각 오류 3편: funny-12 곰 손 셋, mystery-08 문간에 같은 아이 둘·컷 안 가로줄·아이가 어른으로, mystery-02 발 셋. 옷·신발 유지는 38명 중 18명 same. 컷당 5.5초."
+}
