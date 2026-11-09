@@ -239,6 +239,10 @@ class Worker:
                 target = image if wide is None else _sized(image, live)
                 if self._motion(target, motion, png if wide is None else wide, stats):
                     motions.append(image["name"])
+                    nxt = motion.get("next")
+                    # 세 번째 그림(FR-044)은 넓은 그림 컷만 쓴다. 같은 바탕에서 다르게 바꿔 그린다
+                    if wide is not None and isinstance(nxt, dict):
+                        self._motion(target, nxt, wide, stats, "motionNextMs")
         result: dict[str, Any] = {"uploaded": uploaded}
         if computed:
             result["embeds"] = computed
@@ -272,7 +276,12 @@ class Worker:
             return None
 
     def _motion(
-        self, image: dict[str, Any], motion: dict[str, Any], base: bytes, stats: dict[str, Any]
+        self,
+        image: dict[str, Any],
+        motion: dict[str, Any],
+        base: bytes,
+        stats: dict[str, Any],
+        stat: str = "motionMs",
     ) -> bool:
         """라이브 모드 두 번째 그림 (docs specs/003-live-mode).
 
@@ -284,7 +293,7 @@ class Worker:
             second.pop("regions", None)
             started = self.clock()
             png = self.backends.draw(second, [Reference("__base__", base, 1.0, "full")])
-            stats["motionMs"] = int((self.clock() - started) * 1000)
+            stats[stat] = int((self.clock() - started) * 1000)
             response = self.uploader.put(
                 motion["uploadUrl"], content=png, headers={"Content-Type": "image/png"}
             )
