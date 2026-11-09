@@ -27,7 +27,11 @@ from fetch_clips import key
 from select_clips import jsonline
 
 CATS = {c.code: c for c in ALL}
-KIND = {"AMBIENCE": "장소·환경음(계속 깔리는 소리)", "EFFECT": "효과음(한 번 나는 소리)"}
+KIND = {
+    "AMBIENCE": "장소·환경음(계속 깔리는 소리)",
+    "EFFECT": "효과음(한 번 나는 소리)",
+    "MUSIC": "배경음악(곡). 소리를 내는 것에는 악기를 쓴다",
+}
 UNKNOWN = {"", "모름", "알 수 없음", "없음", "unknown", "none"}
 
 PROMPT = """너는 만화 서비스의 배경음 사서다. 아래 근거로 이 소리가 실제로 어떻게 들리는지 한국어로 자세히 정리해라.
@@ -84,7 +88,10 @@ def compose(x: dict, kind: str) -> str:
     continuous = x.get("continuous")
     if continuous is None:
         continuous = kind == "AMBIENCE"
-    parts.append("이어짐: 계속 깔리는 배경음" if continuous else "이어짐: 한 번 나는 효과음")
+    if kind == "MUSIC":
+        parts.append("이어짐: 계속 흐르는 배경음악")
+    else:
+        parts.append("이어짐: 계속 깔리는 배경음" if continuous else "이어짐: 한 번 나는 효과음")
     place = known(x.get("place"))
     indoor = known(x.get("indoor"))
     if place or indoor:
@@ -142,7 +149,9 @@ def describe(c: dict, x: dict, model: str) -> dict:
     quality = int(x.get("quality") or 3)
     # 배경음으로 분류됐는데 한 번 나는 소리면 계속 틀 수 없어 뺀다(와인병 부딪히는 소리)
     one_shot = c["kind"] == "AMBIENCE" and x.get("continuous") is False
-    exclude = (not x.get("matches", True)) or bool(x.get("speech")) or quality <= 2 or one_shot
+    # 음악의 노랫소리는 말소리로 보지 않는다(노래가 든 곡은 앞 차수에서 이미 뺐다)
+    speech = bool(x.get("speech")) and c["kind"] != "MUSIC"
+    exclude = (not x.get("matches", True)) or speech or quality <= 2 or one_shot
     return {
         "key": key(c),
         "model": model,
