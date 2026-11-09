@@ -1,0 +1,152 @@
+{
+ "round": 29,
+ "source": "conti18seq by dbLook; per-story lookIds from conti3 (corrected); teal -> NZcc for DAILY, US075 for love-07; empty dbLook -> no reference",
+ "panels": {
+  "twist-08-panel-8": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "NZccb0kPIeTBNdaawDdga",
+     "storyName": "채희"
+    }
+   ],
+   "withLookId": 1
+  },
+  "twist-08-panel-8-b": {
+   "inScene": [
+    {
+     "speaker": "C",
+     "lookId": "CN9d5nO78jJ_H23YzePBn",
+     "storyName": "도담"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-12-panel-6": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "5gzzlvKrrU81JPesnH1uz",
+     "storyName": "하늘"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-12-panel-6-b": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  },
+  "love-07-panel-3": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "mxXOQdRxZQz5KqH3YR7mW",
+     "storyName": "새봄"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-07-panel-3-b": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "US075HrDL41gNGwZyhv6j",
+     "storyName": "이랑"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-07-panel-8": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "US075HrDL41gNGwZyhv6j",
+     "storyName": "이랑"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-07-panel-8-b": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "mxXOQdRxZQz5KqH3YR7mW",
+     "storyName": "새봄"
+    }
+   ],
+   "withLookId": 1
+  },
+  "family-09-panel-1": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  },
+  "family-09-panel-1-b": {
+   "inScene": [
+    {
+     "speaker": "B"
+    }
+   ],
+   "withLookId": 0
+  },
+  "family-09-panel-8": {
+   "inScene": [
+    {
+     "speaker": "B"
+    }
+   ],
+   "withLookId": 0
+  },
+  "family-09-panel-8-b": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  },
+  "love-06-panel-8": {
+   "inScene": [
+    {
+     "speaker": "C",
+     "lookId": "vUESqz66fLB4jqmP__cyB",
+     "storyName": "보람"
+    }
+   ],
+   "withLookId": 1
+  },
+  "love-06-panel-8-b": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "w8qPz79rbTZt3Dqb17BVj",
+     "storyName": "나래"
+    }
+   ],
+   "withLookId": 1
+  },
+  "mystery-08-panel-3": {
+   "inScene": [
+    {
+     "speaker": "B"
+    }
+   ],
+   "withLookId": 0
+  },
+  "mystery-08-panel-3-b": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  }
+ }
+}

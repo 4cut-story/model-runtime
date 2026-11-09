@@ -1,0 +1,163 @@
+{
+ "settings": {
+  "IMAGE_MODEL": "klein",
+  "DIFFUSION_GUIDANCE": "1.0",
+  "DIFFUSION_STEPS": "4",
+  "MODEL_KEEP_IN_RAM": "false"
+ },
+ "reference": true,
+ "loadSeconds": 30.2,
+ "backend": "DiffusionBackend",
+ "panelSeconds": {
+  "twist-08-panel-8": 5.99,
+  "twist-08-panel-8-b": 8.66,
+  "funny-12-panel-6": 5.25,
+  "funny-12-panel-6-b": 6.92,
+  "love-07-panel-3": 5.17,
+  "love-07-panel-3-b": 8.4,
+  "love-07-panel-8": 5.27,
+  "love-07-panel-8-b": 8.48,
+  "family-09-panel-1": 3.98,
+  "family-09-panel-1-b": 6.98,
+  "family-09-panel-8": 3.99,
+  "family-09-panel-8-b": 7.05,
+  "love-06-panel-8": 7.01,
+  "love-06-panel-8-b": 10.6,
+  "mystery-08-panel-3": 4.02,
+  "mystery-08-panel-3-b": 7.0
+ },
+ "referencesUsed": {
+  "twist-08-panel-8": [
+   {
+    "character": "채희",
+    "region": "center"
+   }
+  ],
+  "twist-08-panel-8-b": [
+   {
+    "character": "__base__:twist-08-panel-8",
+    "region": "full"
+   },
+   {
+    "character": "도담",
+    "region": "center"
+   }
+  ],
+  "funny-12-panel-6": [
+   {
+    "character": "하늘",
+    "region": "center"
+   }
+  ],
+  "funny-12-panel-6-b": [
+   {
+    "character": "__base__:funny-12-panel-6",
+    "region": "full"
+   }
+  ],
+  "love-07-panel-3": [
+   {
+    "character": "새봄",
+    "region": "center"
+   }
+  ],
+  "love-07-panel-3-b": [
+   {
+    "character": "__base__:love-07-panel-3",
+    "region": "full"
+   },
+   {
+    "character": "이랑",
+    "region": "center"
+   }
+  ],
+  "love-07-panel-8": [
+   {
+    "character": "이랑",
+    "region": "center"
+   }
+  ],
+  "love-07-panel-8-b": [
+   {
+    "character": "__base__:love-07-panel-8",
+    "region": "full"
+   },
+   {
+    "character": "새봄",
+    "region": "center"
+   }
+  ],
+  "family-09-panel-1": [],
+  "family-09-panel-1-b": [
+   {
+    "character": "__base__:family-09-panel-1",
+    "region": "full"
+   }
+  ],
+  "family-09-panel-8": [],
+  "family-09-panel-8-b": [
+   {
+    "character": "__base__:family-09-panel-8",
+    "region": "full"
+   }
+  ],
+  "love-06-panel-8": [
+   {
+    "character": "보람",
+    "region": "center"
+   }
+  ],
+  "love-06-panel-8-b": [
+   {
+    "character": "__base__:love-06-panel-8",
+    "region": "full"
+   },
+   {
+    "character": "나래",
+    "region": "center"
+   }
+  ],
+  "mystery-08-panel-3": [],
+  "mystery-08-panel-3-b": [
+   {
+    "character": "__base__:mystery-08-panel-3",
+    "region": "full"
+   }
+  ]
+ },
+ "stageSeconds": {
+  "1": {
+   "twist-08-panel-8": 5.99,
+   "funny-12-panel-6": 5.25,
+   "love-07-panel-3": 5.17,
+   "love-07-panel-8": 5.27,
+   "family-09-panel-1": 3.98,
+   "family-09-panel-8": 3.99,
+   "love-06-panel-8": 7.01,
+   "mystery-08-panel-3": 4.02
+  },
+  "2": {
+   "twist-08-panel-8-b": 8.66,
+   "funny-12-panel-6-b": 6.92,
+   "love-07-panel-3-b": 8.4,
+   "love-07-panel-8-b": 8.48,
+   "family-09-panel-1-b": 6.98,
+   "family-09-panel-8-b": 7.05,
+   "love-06-panel-8-b": 10.6,
+   "mystery-08-panel-3-b": 7.0
+  }
+ },
+ "failed": {},
+ "peakRamGiB": 8.1,
+ "modelInfo": {
+  "klein": "black-forest-labs/FLUX.2-klein-4B",
+  "quantization": "nf4",
+  "steps": 4,
+  "guidance": 1.0,
+  "cpuOffload": true,
+  "ipAdapter": null,
+  "references": "image"
+ },
+ "peakVramGiB": 3.68,
+ "secondsPerPanel": 6.55
+}
