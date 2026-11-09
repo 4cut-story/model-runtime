@@ -1,0 +1,31 @@
+[
+ {
+  "name": "mystery-08-panel-5",
+  "comic": "mystery-08",
+  "stage": 1,
+  "prompt": "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting, night, deep navy starry sky, dark night lighting, small child, little boy, blue robe, straight-leg white trousers, black cloth shoes, high quality illustration, crisp clean lineart, well-drawn faces, one single scene, one full-frame illustration of a single moment, exactly one character, alone in the frame, drawn only once, same outfit and same props in every panel, full-body shot, the character large in the frame, tall pine trees, small child stands on tiptoe peering, hands empty, hilltop clearing, awestruck, mouth open, looking ahead, rocky ground, wide open sky, ringed planet Saturn",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 778199924,
+  "width": 768,
+  "height": 768,
+  "characters": [
+   {
+    "speaker": "A",
+    "dbLook": "",
+    "side": "CENTER"
+   }
+  ]
+ },
+ {
+  "name": "mystery-08-panel-5-b",
+  "comic": "mystery-08",
+  "stage": 2,
+  "baseFrom": "mystery-08-panel-5",
+  "prompt": "wuxia martial arts comic, dynamic ink brush lines, flowing robes, misty mountains, dramatic lighting, edit this picture: keep the character, the face, the pose, the clothes, the background and the drawing style exactly the same, and add exactly one brass telescope with one eyepiece on tripod in front of the character, the character peering into its eyepiece, only one telescope in the whole picture",
+  "negativePrompt": "text, letters, watermark, signature, logo, speech bubble, comic panels, multiple panels, grid, collage, split screen, picture frame, border, photo, realistic, 3d, cluttered background, photorealistic, semi-realistic, detailed skin texture, monochrome, grayscale, nsfw, extra fingers, deformed, clones, duplicate person",
+  "seed": 778199924,
+  "width": 768,
+  "height": 768,
+  "characters": []
+ }
+]
