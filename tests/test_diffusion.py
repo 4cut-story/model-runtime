@@ -124,3 +124,23 @@ def test_klein은_필요_VRAM을_5GB로_정하고_다른_모델은_정하지_않
 
     assert DiffusionBackend("klein").required_vram == 5 * 1024**3
     assert DiffusionBackend("sd35").required_vram is None
+
+
+def test_REQ018_klein_참조_그림은_아래_소품을_잘라_위쪽만_넘긴다() -> None:
+    """REQ-018: 캐릭터 그림 아래 가장자리에 든 책이 빈손 컷에 그려지지 않게 위쪽 78%만 넘긴다."""
+    import io
+
+    from PIL import Image
+
+    from model_runtime.backends.diffusion import DiffusionBackend
+
+    source = Image.new("RGB", (512, 512), "white")
+    source.paste((200, 30, 30), (130, 415, 230, 505))  # 아래 가장자리의 빨간 책
+    buf = io.BytesIO()
+    source.save(buf, format="PNG")
+    cropped = DiffusionBackend("klein").encode_reference(buf.getvalue())
+    assert cropped is not None
+    with Image.open(io.BytesIO(cropped)) as im:
+        assert im.size == (512, 399)
+        red = im.convert("RGB").crop((130, 300, 230, 399)).getcolors()
+    assert red == [(100 * 99, (255, 255, 255))]

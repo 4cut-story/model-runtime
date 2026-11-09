@@ -46,6 +46,10 @@ IMAGE_REFERENCE_KINDS = ("klein",)
 REQUIRED_VRAM_GIB = {"klein": 5}
 # 참조 그림은 이만큼까지만 넘긴다(컷 하나에 나오는 캐릭터 수)
 MAX_REFERENCES = 4
+# 캐릭터 참조 그림은 위쪽 이만큼(얼굴·머리·윗옷)만 넘긴다. 일부 캐릭터 그림은 아래 가장자리에
+# 빨간 책 같은 소품을 들고 있어, 빈손 컷에도 그 책이 그려졌다
+# (시험 31회 motion-01 3컷, family-09 6컷).
+REFERENCE_KEEP = 0.78
 QUANTS = ("nf4", "nunchaku", "none")
 
 
@@ -207,8 +211,13 @@ class DiffusionBackend:
         return "image" if self.kind in IMAGE_REFERENCE_KINDS else "none"
 
     def encode_reference(self, image: bytes) -> bytes | None:
-        """klein은 그림 바이트를 그대로 쓴다. 나머지는 참조를 쓰지 않는다."""
-        return image if self.reference_kind() == "image" else None
+        """klein은 캐릭터 그림의 아래 가장자리(손에 든 소품)를 잘라 PNG로 쓴다.
+
+        나머지 모델은 참조를 쓰지 않는다. 읽을 수 없는 그림이면 그대로 넘긴다.
+        """
+        if self.reference_kind() != "image":
+            return None
+        return crop_reference(image)
 
     def reference_images(self, references: list[Reference] | None) -> list[bytes]:
         """파이프라인에 넘길 참조 그림. 같은 캐릭터는 한 번만, 최대 MAX_REFERENCES장."""
@@ -258,3 +267,18 @@ class DiffusionBackend:
             "ipAdapter": None,
             "references": self.reference_kind(),
         }
+
+
+def crop_reference(image: bytes, keep: float = REFERENCE_KEEP) -> bytes:
+    """캐릭터 참조 그림의 위쪽 keep만 남긴 PNG. 읽지 못하면 원본 그대로."""
+    from PIL import Image, UnidentifiedImageError
+
+    try:
+        with Image.open(io.BytesIO(image)) as im:
+            width, height = im.size
+            top = im.crop((0, 0, width, max(1, round(height * keep))))
+            out = io.BytesIO()
+            top.save(out, format="PNG")
+            return out.getvalue()
+    except (UnidentifiedImageError, OSError):
+        return image
