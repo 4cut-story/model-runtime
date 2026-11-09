@@ -90,9 +90,15 @@ def _nvidia_smi_free(index: int) -> int | None:
 
 class RealBackends:
     def __init__(
-        self, whisper: Any, sdxl: Any, ollama: OllamaClient, vram: Any = free_vram
+        self,
+        whisper: Any,
+        sdxl: Any,
+        ollama: OllamaClient,
+        vram: Any = free_vram,
+        depth: Any = None,
     ) -> None:
         self.whisper = whisper
+        self._depth = depth
         self.sdxl = sdxl
         self.ollama = ollama
         self._vram = vram
@@ -120,6 +126,15 @@ class RealBackends:
 
     def draw(self, image: dict[str, Any], references: list[Reference] | None = None) -> bytes:
         data: bytes = self.sdxl.draw(image, references)
+        return data
+
+    def depth(self, png: bytes) -> bytes:
+        """라이브 넓은 그림의 깊이 지도(같은 크기 흑백 PNG, 밝을수록 가깝다)."""
+        if self._depth is None:
+            from .depth import DepthEstimator
+
+            self._depth = DepthEstimator()
+        data: bytes = self._depth.estimate(png)
         return data
 
     def encode_reference(self, image: bytes) -> bytes | None:

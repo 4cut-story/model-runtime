@@ -36,6 +36,7 @@ class FakeBackends:
         self.drawn: list[tuple[str, list[Reference]]] = []
         self.prompts: list[str] = []
         self.encoded = 0
+        self.depths = 0
         # 테스트에서 "image"로 바꿔 klein처럼 참조 그림을 그대로 받는 경우를 본다
         self.reference_mode = "embed"
 
@@ -114,6 +115,11 @@ class FakeBackends:
     def draw(self, image: dict[str, Any], references: list[Reference] | None = None) -> bytes:
         self.drawn.append((str(image.get("name")), list(references or [])))
         self.prompts.append(str(image.get("prompt")))
+        return tiny_png()
+
+    def depth(self, png: bytes) -> bytes:
+        """가짜 깊이 지도: 아주 작은 PNG."""
+        self.depths += 1
         return tiny_png()
 
     def encode_reference(self, image: bytes) -> bytes | None:

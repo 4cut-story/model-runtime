@@ -203,6 +203,7 @@ class Worker:
         panels: list[dict[str, Any]] = []
         motions: list[str] = []
         lives: list[str] = []
+        depths: list[str] = []
         self._stats["panels"] = panels
         for image in images:
             refs = self.references(image.get("references") or [], embeds, computed)
@@ -233,6 +234,8 @@ class Worker:
             wide = self._live(image, live, png, stats) if isinstance(live, dict) else None
             if wide is not None:
                 lives.append(image["name"])
+                if isinstance(live, dict) and self._depth(image, live, wide, stats):
+                    depths.append(image["name"])
             motion = image.get("motion")
             if isinstance(motion, dict):
                 # 넓은 그림이 있으면 두 번째 그림도 넓은 그림을 바탕으로 같은 크기로 그린다 (FR-034)
@@ -250,6 +253,8 @@ class Worker:
             result["motions"] = motions
         if lives:
             result["lives"] = lives
+        if depths:
+            result["depths"] = depths
         return result
 
     def _live(
@@ -274,6 +279,29 @@ class Worker:
         except Exception as e:  # 넓은 그림 때문에 만화를 실패시키지 않는다
             log.warning("넓은 그림을 만들지 못해 컷 그림을 쓴다: %s (%s)", image.get("name"), e)
             return None
+
+    def _depth(
+        self, image: dict[str, Any], live: dict[str, Any], wide: bytes, stats: dict[str, Any]
+    ) -> bool:
+        """넓은 그림의 깊이 지도 (docs specs/003-live-mode FR-048).
+
+        live.depthUploadUrl이 있으면 넓은 그림에서 깊이 지도를 만들어 올린다. 실패해도 작업은
+        성공이다(그 컷은 평면으로 움직인다).
+        """
+        url = live.get("depthUploadUrl")
+        estimate = getattr(self.backends, "depth", None)
+        if not url or not callable(estimate):
+            return False
+        try:
+            started = self.clock()
+            png = estimate(wide)
+            stats["depthMs"] = int((self.clock() - started) * 1000)
+            response = self.uploader.put(url, content=png, headers={"Content-Type": "image/png"})
+            response.raise_for_status()
+            return True
+        except Exception as e:  # 깊이 지도 때문에 만화를 실패시키지 않는다
+            log.warning("깊이 지도를 만들지 못해 평면으로 둔다: %s (%s)", image.get("name"), e)
+            return False
 
     def _motion(
         self,
