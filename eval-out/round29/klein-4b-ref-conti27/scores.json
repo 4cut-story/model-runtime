@@ -1,0 +1,39 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 21판, 20판 그리기(768px 4 step)에 얼굴 컷 배경 물건 빼기·인물 크게·3/4 얼굴",
+ "status": "후보",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  97.1,
+  97.8
+ ],
+ "average": 97.4,
+ "criticalComics": 3,
+ "perComic": {
+  "solo-01": 95.3,
+  "funny-03": 99.8,
+  "twist-08": 98.3,
+  "funny-12": 94.0,
+  "funny-15": 94.2,
+  "love-07": 96.6,
+  "family-09": 98.7,
+  "mystery-02": 89.0,
+  "love-06": 98.7,
+  "mystery-08": 89.0
+ },
+ "strict": {
+  "average": 84.3,
+  "items": {
+   "X1": 86.2,
+   "X2": 89.9,
+   "X3": 86.2,
+   "X4": 76.1
+  },
+  "baseline": {
+   "variant": "klein-4b-ref-fixlookS",
+   "average": 61.5
+  }
+ },
+ "appeal": 6.7,
+ "note": "21판: 20판 콘티와 768px·4 step 그대로, 20b·20c 프롬프트 변경은 되돌림. 더한 것: 얼굴 컷에 장면과 상관없는 배경 물건 빼기, 한 사람 wide 컷은 인물을 크게, close-up·medium은 3/4 얼굴. 컷당 5.5초, VRAM 최대 3.68GiB. 심각 3편(mystery-02 1컷 은솔 둘, mystery-08 5컷 망원경 둘: 둘 다 시선 말에 물건 이름이 다시 들어감. funny-12 엄마와 아들 같은 얼굴은 콘티 문제, 채점자 한 명). 점수 97.4, 실패 115건으로 가장 적음, strict 84.3으로 가장 높음."
+}
