@@ -9,6 +9,7 @@ import argparse
 import json
 import subprocess
 import tempfile
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -62,18 +63,34 @@ def main() -> None:
     a = ap.parse_args()
     a.out.mkdir(parents=True, exist_ok=True)
     cands = [json.loads(x) for x in a.candidates.read_text(encoding="utf-8").splitlines()]
-    zips = {
-        "eval": RemoteZip(FSD_PARTS["eval"]),
-        "dev": RemoteZip(FSD_PARTS["dev"]),
-        "fma": RemoteZip([FMA_ZIP]),
-    }
-    if any(c.get("fma_full") for c in cands):
+    zipped = [c for c in cands if not c.get("preview_url")]
+    zips = (
+        {
+            "eval": RemoteZip(FSD_PARTS["eval"]),
+            "dev": RemoteZip(FSD_PARTS["dev"]),
+            "fma": RemoteZip([FMA_ZIP]),
+        }
+        if zipped
+        else {}
+    )
+    if any(c.get("fma_full") for c in zipped):
         zips["fma_full"] = RemoteZip([FMA_FULL_ZIP])
 
     def one(c: dict) -> str:
         out = a.out / f"{key(c)}.mp3"
         if out.exists() and out.stat().st_size > 0:
             return "skip"
+        if c.get("preview_url"):  # Freesound 미리 듣기 MP3 (4차부터)
+            try:
+                req = urllib.request.Request(
+                    c["preview_url"], headers={"User-Agent": "4cut-sound-library"}
+                )
+                with urllib.request.urlopen(req, timeout=60) as r:
+                    convert(r.read(), ".mp3", out)
+            except Exception as e:
+                out.unlink(missing_ok=True)
+                return f"fail {key(c)} {e}"
+            return "ok"
         if c["source"] == "FMA":
             z = zips["fma_full" if c.get("fma_full") else "fma"]
         else:
