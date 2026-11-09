@@ -91,6 +91,42 @@ def test_FR030_live가_있으면_완성_그림을_바탕으로_넓은_그림을_
     assert "liveMs" in w._stats["panels"][0]
 
 
+def test_FR044_넓은_그림_컷은_같은_바탕에서_세_번째_그림도_올린다() -> None:
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+    job = live_image(1, motion=True)
+    job["motion"]["next"] = {
+        "prompt": "make other stars sparkle",
+        "uploadUrl": "http://minio/put/motion-c-1",
+    }
+    with respx.mock:
+        put = respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        w.draw_all([job])
+    assert backends.prompts == [
+        "p",
+        "wide 16:9 shot",
+        "make the stars sparkle",
+        "make other stars sparkle",
+    ]
+    # 세 번째 그림도 두 번째 그림이 아니라 넓은 그림을 바탕으로 그린다
+    assert backends.drawn[3][1] == backends.drawn[2][1]
+    assert any(c.request.url.path == "/put/motion-c-1" for c in put.calls)
+    assert "motionNextMs" in w._stats["panels"][0]
+
+
+def test_FR044_넓은_그림이_없으면_세_번째_그림은_그리지_않는다() -> None:
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+    job = motion_image(1)
+    job["motion"]["next"] = {"prompt": "other", "uploadUrl": "http://minio/put/motion-c-1"}
+    with respx.mock:
+        respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        w.draw_all([job])
+    assert backends.prompts == ["p", "make the stars sparkle"]
+
+
 def test_FR033_넓은_그림을_올리지_못하면_컷_그림_크기로_움직임을_그린다() -> None:
     backends = FakeBackends()
     backends.reference_mode = "image"
