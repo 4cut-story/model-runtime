@@ -17,6 +17,7 @@ import numpy as np
 import torch
 from categories import ALL, MOODS
 from fetch_clips import key
+from gpu_gate import wait_until_free
 from transformers import ClapModel, ClapProcessor
 
 # CLAP이 소리에서 직접 고르는 낱말. 설명을 쓸 때 "실제로 들린 것"의 근거가 된다
@@ -129,6 +130,11 @@ def main() -> None:
     ap.add_argument("--candidates", type=Path, required=True)
     ap.add_argument("--audio", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument(
+        "--gate",
+        action="store_true",
+        help="라이브 GPU 워커가 작업 중이면 비는 동안만 처리한다(GPU PC 공용 시). 워커 로그 없으면 무효",
+    )
     a = ap.parse_args()
     torch.set_num_threads(max(1, torch.get_num_threads()))
     model = ClapModel.from_pretrained(MODEL).eval()
@@ -151,6 +157,8 @@ def main() -> None:
             path = a.audio / f"{k}.mp3"
             if k in done or not path.exists():
                 continue
+            if a.gate:
+                wait_until_free()
             y, _ = librosa.load(path, sr=SR, mono=True)
             with torch.no_grad():
                 inp = proc(audio=windows(y), sampling_rate=SR, return_tensors="pt")

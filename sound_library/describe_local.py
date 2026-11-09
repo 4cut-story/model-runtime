@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import gzip
 import json
 import os
@@ -24,6 +25,7 @@ from threading import Lock
 
 from categories import ALL, MOODS
 from fetch_clips import key
+from gpu_gate import wait_until_free
 from select_clips import jsonline
 
 CATS = {c.code: c for c in ALL}
@@ -125,7 +127,8 @@ def evidence(c: dict, clap: dict | None) -> dict[str, object]:
     }
 
 
-def ask(url: str, model: str, prompt: str) -> dict:
+def ask(url: str, model: str, prompt: str, keep_alive: object = 0) -> dict:
+    # keep_alive=0: 생성이 끝나면 바로 모델을 내려 운영 그림 작업에 VRAM을 돌려준다.
     body = json.dumps(
         {
             "model": model,
@@ -133,6 +136,7 @@ def ask(url: str, model: str, prompt: str) -> dict:
             "format": "json",
             "stream": False,
             "think": False,
+            "keep_alive": keep_alive,
             "options": {"temperature": 0.2, "num_ctx": 4096},
         }
     ).encode()
@@ -141,6 +145,16 @@ def ask(url: str, model: str, prompt: str) -> dict:
     )
     with urllib.request.urlopen(req, timeout=300) as r:
         return json.loads(json.loads(r.read())["response"])
+
+
+def unload(url: str, model: str) -> None:
+    """Ollama에서 모델을 즉시 내린다(프롬프트 없이 keep_alive=0). VRAM을 운영 작업에 양보."""
+    body = json.dumps({"model": model, "keep_alive": 0}).encode()
+    req = urllib.request.Request(
+        url.rstrip("/") + "/api/generate", body, {"Content-Type": "application/json"}
+    )
+    with contextlib.suppress(Exception), urllib.request.urlopen(req, timeout=30):
+        pass
 
 
 def describe(c: dict, x: dict, model: str) -> dict:
@@ -188,9 +202,20 @@ def main() -> None:
         "--only", type=Path, help="이 설명 파일에서 빼지 않은 key만 다시 쓴다(기존 소리 다시 쓰기)"
     )
     ap.add_argument("--model", default="qwen3:8b")
-    ap.add_argument("--workers", type=int, default=2)
+    ap.add_argument("--workers", type=int, default=1)
+    ap.add_argument(
+        "--keep-alive",
+        default="0",
+        help="Ollama keep_alive. 0이면 생성 후 바로 모델을 내려 VRAM을 비운다(기본)",
+    )
+    ap.add_argument(
+        "--gate",
+        action="store_true",
+        help="라이브 GPU 워커가 작업 중이면 비는 동안만 생성한다(GPU PC 공용 시). 워커 로그가 없으면 무효",
+    )
     a = ap.parse_args()
     url = os.environ.get("OLLAMA_URL", "http://localhost:11434")
+    keep_alive: object = 0 if str(a.keep_alive) in ("0", "0s") else a.keep_alive
 
     cands = read_jsonl(a.candidates)
     if a.only:
@@ -204,9 +229,12 @@ def main() -> None:
     count = {"ok": 0, "fail": 0}
 
     def one(c: dict) -> None:
+        if a.gate:
+            # 운영 그림 작업이 돌면 비는 동안만. 기다리기 시작할 때 모델을 내려 VRAM을 양보한다
+            wait_until_free(on_wait=lambda: unload(url, a.model))
         prompt = PROMPT.format(**evidence(c, claps.get(key(c))))
         try:
-            d = describe(c, ask(url, a.model, prompt), a.model)
+            d = describe(c, ask(url, a.model, prompt, keep_alive), a.model)
         except Exception as e:  # 한 개 실패로 멈추지 않는다. 다시 돌리면 이어 쓴다
             with lock:
                 count["fail"] += 1
