@@ -16,6 +16,9 @@ from .backends import REGIONS, Backends, JobInputError, Reference, VramBusyError
 from .backends.depth import keep_near
 from .backends.ollama import OllamaUnavailableError
 
+# 움직임 컷 두 번째 그림 뒤에 더 그릴 수 있는 장 수(세 번째·네 번째).
+MAX_MOTION_NEXT = 2
+
 log = logging.getLogger(__name__)
 
 TYPES = ["TRANSCRIBE", "LLM", "IMAGE"]
@@ -247,10 +250,16 @@ class Worker:
                 base = png if wide is None else wide
                 if self._motion(target, motion, base, stats, keep=depth):
                     motions.append(image["name"])
+                    # 세 번째부터(FR-044·049)는 넓은 그림 컷만 쓴다. 같은 바탕에서 다르게
+                    # 바꿔 그리고, next를 따라(네 번째는 next.next) 그린다. 못 그리면 멈춘다
                     nxt = motion.get("next")
-                    # 세 번째 그림(FR-044)은 넓은 그림 컷만 쓴다. 같은 바탕에서 다르게 바꿔 그린다
-                    if wide is not None and isinstance(nxt, dict):
-                        self._motion(target, nxt, wide, stats, "motionNextMs", keep=depth)
+                    step = 0
+                    while wide is not None and isinstance(nxt, dict) and step < MAX_MOTION_NEXT:
+                        stat = "motionNextMs" if step == 0 else f"motionNext{step + 1}Ms"
+                        if not self._motion(target, nxt, wide, stats, stat, keep=depth):
+                            break
+                        nxt = nxt.get("next")
+                        step += 1
         result: dict[str, Any] = {"uploaded": uploaded}
         if computed:
             result["embeds"] = computed

@@ -223,3 +223,46 @@ def test_FR049_인물을_고정하지_못하면_새_그림을_그대로_올린�
     assert result["motions"] == ["panel-1"]
     motion = next(c for c in put.calls if c.request.url.path == "/put/motion-1")
     assert motion.request.content == tiny_png()
+
+
+def test_FR049_넓은_그림_컷은_next를_따라_네_번째_그림까지_올린다() -> None:
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+    job = live_image(1, motion=True)
+    job["motion"]["next"] = {
+        "prompt": "c",
+        "uploadUrl": "http://minio/put/motion-c-1",
+        "next": {
+            "prompt": "d",
+            "uploadUrl": "http://minio/put/motion-d-1",
+            "next": {"prompt": "e", "uploadUrl": "http://minio/put/motion-e-1"},
+        },
+    }
+    with respx.mock:
+        put = respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        w.draw_all([job])
+    # 네 장(첫 그림 + 셋)까지만 그린다
+    assert backends.prompts == ["p", "wide 16:9 shot", "make the stars sparkle", "c", "d"]
+    assert backends.drawn[4][1] == backends.drawn[2][1]
+    paths = [c.request.url.path for c in put.calls]
+    assert "/put/motion-d-1" in paths
+    assert "/put/motion-e-1" not in paths
+    assert "motionNext2Ms" in w._stats["panels"][0]
+
+
+def test_FR049_세_번째_그림을_못_올리면_네_번째는_그리지_않는다() -> None:
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+    job = live_image(1, motion=True)
+    job["motion"]["next"] = {
+        "prompt": "c",
+        "uploadUrl": "http://minio/put/motion-c-1",
+        "next": {"prompt": "d", "uploadUrl": "http://minio/put/motion-d-1"},
+    }
+    with respx.mock:
+        respx.put("http://minio/put/motion-c-1").mock(return_value=httpx.Response(500))
+        respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        w.draw_all([job])
+    assert "d" not in backends.prompts
