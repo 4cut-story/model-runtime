@@ -13,7 +13,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from remote_zip import RemoteZip
-from select_clips import FMA_ZIP, FSD_PARTS
+from select_clips import FMA_FULL_ZIP, FMA_ZIP, FSD_PARTS
 
 
 def key(c: dict) -> str:
@@ -67,12 +67,17 @@ def main() -> None:
         "dev": RemoteZip(FSD_PARTS["dev"]),
         "fma": RemoteZip([FMA_ZIP]),
     }
+    if any(c.get("fma_full") for c in cands):
+        zips["fma_full"] = RemoteZip([FMA_FULL_ZIP])
 
     def one(c: dict) -> str:
         out = a.out / f"{key(c)}.mp3"
         if out.exists() and out.stat().st_size > 0:
             return "skip"
-        z = zips["fma"] if c["source"] == "FMA" else zips[c["split"]]
+        if c["source"] == "FMA":
+            z = zips["fma_full" if c.get("fma_full") else "fma"]
+        else:
+            z = zips[c["split"]]
         try:
             convert(z.read(c["zip_name"]), Path(c["zip_name"]).suffix, out)
         except Exception as e:

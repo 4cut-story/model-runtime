@@ -188,7 +188,8 @@ def main() -> None:
                 audio_key = f"sounds/{pid}/audio.mp3"
                 path = a.audio / f"{k}.mp3"
                 s3.fput_object(bucket, audio_key, str(path), content_type="audio/mpeg")
-                duration_ms = round(float(d.get("duration") or c["duration"]) * 1000)
+                # 미리 듣기 MP3는 30초로 자른다 (fetch_clips -t 30)
+                duration_ms = round(min(float(d.get("duration") or c["duration"]), 30.0) * 1000)
                 cur.execute(
                     "insert into background_sounds (public_id, kind, category, title, description,"
                     " moods, places, duration_ms, audio_key, source, source_id, source_url,"
