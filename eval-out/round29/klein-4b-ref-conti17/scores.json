@@ -1,0 +1,38 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 15판 (4 step)",
+ "status": "후보",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  97.4,
+  97.1
+ ],
+ "average": 97.2,
+ "criticalComics": 5,
+ "perComic": {
+  "solo-01": 89.0,
+  "funny-03": 97.9,
+  "twist-08": 99.0,
+  "funny-12": 89.0,
+  "funny-15": 89.0,
+  "love-07": 89.0,
+  "family-09": 98.9,
+  "mystery-02": 96.8,
+  "love-06": 89.0,
+  "mystery-08": 98.7
+ },
+ "strict": {
+  "average": 82.8,
+  "items": {
+   "X1": 78.9,
+   "X2": 93.7,
+   "X3": 82.4,
+   "X4": 78.2
+  },
+  "baseline": {
+   "variant": "klein-4b-ref-fixlookS",
+   "average": 61.5
+  }
+ },
+ "note": "콘티 틀 15판(대명사 대신 the, close-up은 얼굴만, action에 신발·옷 낱말 빼기, 딴 열매만 쓰기, 소품 draw는 쉼표 없이)과 코드 수정(콘티 외모의 성별 마디를 캐릭터 외모에 붙이지 않기, 시선의 \"the a single\" 고침, 외모에 든 물건은 쥔 모습 붙이기)으로 다시 그렸어요. 72컷, 모두 한 사람 컷. 평균 97.2, 엄격 점수 82.8로 지금까지 가장 높아요. 복제 아이와 성별 뒤바뀜은 사라졌고 twist-08 99.0, family-09 98.9, mystery-08 98.7이에요. 심각 오류는 5편: 소품 뒤에 붙은 \"wearing 모자\"가 찜기 위에 모자를 하나 더 그림, 소품 뒤 \"holding 양말\"이 토끼를 하나 더 그림, 양말 한 짝이 한 켤레로, 우산 손잡이가 하나 더 떠 있음, 어른이 아이 체형으로 그려짐(2편)."
+}
