@@ -182,3 +182,87 @@ def test_FR048_깊이_지도를_만들지_못해도_작업은_성공이다() -> 
         result = w.draw_all([img])
     assert result["lives"] == ["panel-1"]
     assert "depths" not in result
+
+
+def test_FR049_깊이_지도가_있으면_움직임_그림의_앞쪽_인물은_첫_그림으로_덮는다(monkeypatch) -> None:
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+    calls: list[tuple[bytes, bytes, bytes]] = []
+
+    def fake_keep(base: bytes, frame: bytes, depth: bytes) -> bytes:
+        calls.append((base, frame, depth))
+        return b"kept"
+
+    monkeypatch.setattr("model_runtime.worker.keep_near", fake_keep)
+    img = live_image(1, motion=True)
+    img["live"]["depthUploadUrl"] = "http://minio/put/depth-1"
+    with respx.mock:
+        put = respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        result = w.draw_all([img])
+    assert result["motions"] == ["panel-1"]
+    assert len(calls) == 1
+    motion = next(c for c in put.calls if c.request.url.path == "/put/motion-1")
+    assert motion.request.content == b"kept"
+
+
+def test_FR049_인물을_고정하지_못하면_새_그림을_그대로_올린다(monkeypatch) -> None:
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+
+    def broken(base: bytes, frame: bytes, depth: bytes) -> bytes:
+        raise ValueError("bad png")
+
+    monkeypatch.setattr("model_runtime.worker.keep_near", broken)
+    img = live_image(1, motion=True)
+    img["live"]["depthUploadUrl"] = "http://minio/put/depth-1"
+    with respx.mock:
+        put = respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        result = w.draw_all([img])
+    assert result["motions"] == ["panel-1"]
+    motion = next(c for c in put.calls if c.request.url.path == "/put/motion-1")
+    assert motion.request.content == tiny_png()
+
+
+def test_FR049_넓은_그림_컷은_next를_따라_네_번째_그림까지_올린다() -> None:
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+    job = live_image(1, motion=True)
+    job["motion"]["next"] = {
+        "prompt": "c",
+        "uploadUrl": "http://minio/put/motion-c-1",
+        "next": {
+            "prompt": "d",
+            "uploadUrl": "http://minio/put/motion-d-1",
+            "next": {"prompt": "e", "uploadUrl": "http://minio/put/motion-e-1"},
+        },
+    }
+    with respx.mock:
+        put = respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        w.draw_all([job])
+    # 네 장(첫 그림 + 셋)까지만 그린다
+    assert backends.prompts == ["p", "wide 16:9 shot", "make the stars sparkle", "c", "d"]
+    assert backends.drawn[4][1] == backends.drawn[2][1]
+    paths = [c.request.url.path for c in put.calls]
+    assert "/put/motion-d-1" in paths
+    assert "/put/motion-e-1" not in paths
+    assert "motionNext2Ms" in w._stats["panels"][0]
+
+
+def test_FR049_세_번째_그림을_못_올리면_네_번째는_그리지_않는다() -> None:
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+    job = live_image(1, motion=True)
+    job["motion"]["next"] = {
+        "prompt": "c",
+        "uploadUrl": "http://minio/put/motion-c-1",
+        "next": {"prompt": "d", "uploadUrl": "http://minio/put/motion-d-1"},
+    }
+    with respx.mock:
+        respx.put("http://minio/put/motion-c-1").mock(return_value=httpx.Response(500))
+        respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        w.draw_all([job])
+    assert "d" not in backends.prompts

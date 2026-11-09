@@ -13,7 +13,11 @@ import httpx
 from . import __version__
 from .api import Job, LeaseLostError, WorkerApi
 from .backends import REGIONS, Backends, JobInputError, Reference, VramBusyError
+from .backends.depth import keep_near
 from .backends.ollama import OllamaUnavailableError
+
+# 움직임 컷 두 번째 그림 뒤에 더 그릴 수 있는 장 수(세 번째·네 번째).
+MAX_MOTION_NEXT = 2
 
 log = logging.getLogger(__name__)
 
@@ -234,18 +238,28 @@ class Worker:
             wide = self._live(image, live, png, stats) if isinstance(live, dict) else None
             if wide is not None:
                 lives.append(image["name"])
-                if isinstance(live, dict) and self._depth(image, live, wide, stats):
+                depth = self._depth(image, live, wide, stats) if isinstance(live, dict) else None
+                if depth is not None:
                     depths.append(image["name"])
+            else:
+                depth = None
             motion = image.get("motion")
             if isinstance(motion, dict):
                 # 넓은 그림이 있으면 두 번째 그림도 넓은 그림을 바탕으로 같은 크기로 그린다 (FR-034)
                 target = image if wide is None else _sized(image, live)
-                if self._motion(target, motion, png if wide is None else wide, stats):
+                base = png if wide is None else wide
+                if self._motion(target, motion, base, stats, keep=depth):
                     motions.append(image["name"])
+                    # 세 번째부터(FR-044·049)는 넓은 그림 컷만 쓴다. 같은 바탕에서 다르게
+                    # 바꿔 그리고, next를 따라(네 번째는 next.next) 그린다. 못 그리면 멈춘다
                     nxt = motion.get("next")
-                    # 세 번째 그림(FR-044)은 넓은 그림 컷만 쓴다. 같은 바탕에서 다르게 바꿔 그린다
-                    if wide is not None and isinstance(nxt, dict):
-                        self._motion(target, nxt, wide, stats, "motionNextMs")
+                    step = 0
+                    while wide is not None and isinstance(nxt, dict) and step < MAX_MOTION_NEXT:
+                        stat = "motionNextMs" if step == 0 else f"motionNext{step + 1}Ms"
+                        if not self._motion(target, nxt, wide, stats, stat, keep=depth):
+                            break
+                        nxt = nxt.get("next")
+                        step += 1
         result: dict[str, Any] = {"uploaded": uploaded}
         if computed:
             result["embeds"] = computed
@@ -282,26 +296,26 @@ class Worker:
 
     def _depth(
         self, image: dict[str, Any], live: dict[str, Any], wide: bytes, stats: dict[str, Any]
-    ) -> bool:
+    ) -> bytes | None:
         """넓은 그림의 깊이 지도 (docs specs/003-live-mode FR-048).
 
-        live.depthUploadUrl이 있으면 넓은 그림에서 깊이 지도를 만들어 올린다. 실패해도 작업은
-        성공이다(그 컷은 평면으로 움직인다).
+        live.depthUploadUrl이 있으면 넓은 그림에서 깊이 지도를 만들어 올리고 돌려준다. 실패하면
+        None이다(작업은 성공, 움직임 그림이 인물을 가리지 않는다).
         """
         url = live.get("depthUploadUrl")
         estimate = getattr(self.backends, "depth", None)
         if not url or not callable(estimate):
-            return False
+            return None
         try:
             started = self.clock()
             png = estimate(wide)
             stats["depthMs"] = int((self.clock() - started) * 1000)
             response = self.uploader.put(url, content=png, headers={"Content-Type": "image/png"})
             response.raise_for_status()
-            return True
+            return bytes(png)
         except Exception as e:  # 깊이 지도 때문에 만화를 실패시키지 않는다
             log.warning("깊이 지도를 만들지 못해 평면으로 둔다: %s (%s)", image.get("name"), e)
-            return False
+            return None
 
     def _motion(
         self,
@@ -310,11 +324,13 @@ class Worker:
         base: bytes,
         stats: dict[str, Any],
         stat: str = "motionMs",
+        keep: bytes | None = None,
     ) -> bool:
         """라이브 모드 두 번째 그림 (docs specs/003-live-mode).
 
         완성된 컷 그림을 첫 입력 그림으로 넣고 motion.prompt로 배경만 바꿔 한 장 더 그려
         motion.uploadUrl에 올린다. 시드·크기는 컷과 같다. 실패해도 작업은 성공이다(그 컷은 한 장).
+        keep(깊이 지도)이 있으면 앞쪽 인물은 첫 그림 그대로 둔다(FR-049).
         """
         try:
             second = {**image, "prompt": str(motion["prompt"])}
@@ -322,6 +338,8 @@ class Worker:
             started = self.clock()
             png = self.backends.draw(second, [Reference("__base__", base, 1.0, "full")])
             stats[stat] = int((self.clock() - started) * 1000)
+            if keep is not None:
+                png = self._keep_near(image, base, png, keep)
             response = self.uploader.put(
                 motion["uploadUrl"], content=png, headers={"Content-Type": "image/png"}
             )
@@ -330,6 +348,13 @@ class Worker:
         except Exception as e:  # 두 번째 그림 때문에 만화를 실패시키지 않는다
             log.warning("움직임 그림을 만들지 못해 한 장으로 둔다: %s (%s)", image.get("name"), e)
             return False
+
+    def _keep_near(self, image: dict[str, Any], base: bytes, frame: bytes, depth: bytes) -> bytes:
+        try:
+            return keep_near(base, frame, depth)
+        except Exception as e:  # 가리지 못하면 새 그림을 그대로 쓴다
+            log.warning("움직임 그림의 인물을 고정하지 못했다: %s (%s)", image.get("name"), e)
+            return frame
 
     def _edit(
         self,

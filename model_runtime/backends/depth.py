@@ -49,3 +49,35 @@ def normalized_png(depth: Any) -> bytes:
     out = io.BytesIO()
     depth.save(out, format="PNG")
     return out.getvalue()
+
+
+# 깊이 지도에서 이만큼(0~255) 밝으면 앞쪽(인물)으로 보고 원래 그림을 그대로 둔다.
+# 사이 값은 부드럽게 섞는다.
+NEAR_FROM = 150
+NEAR_TO = 190
+FEATHER = 4
+
+
+def keep_near(base: bytes, frame: bytes, depth: bytes) -> bytes:
+    """움직임 그림에서 앞쪽(인물)은 첫 그림 그대로 두고 뒤쪽(배경)만 새 그림을 쓴다.
+
+    배경만 바꿔 다시 그려도 얼굴·옷이 조금씩 달라져 번갈아 보면 인물이 흔들린다. 깊이 지도(밝을수록
+    가깝다)로 가까운 곳을 가려 첫 그림을 덮는다 (docs specs/003-live-mode FR-049).
+    """
+    from PIL import Image, ImageFilter
+
+    first = Image.open(io.BytesIO(base)).convert("RGB")
+    moved = Image.open(io.BytesIO(frame)).convert("RGB")
+    if moved.size != first.size:
+        moved = moved.resize(first.size)
+    span = max(1, NEAR_TO - NEAR_FROM)
+    mask = (
+        Image.open(io.BytesIO(depth))
+        .convert("L")
+        .resize(first.size)
+        .point(lambda v: max(0, min(255, round((v - NEAR_FROM) * 255 / span))))
+        .filter(ImageFilter.GaussianBlur(FEATHER))
+    )
+    out = io.BytesIO()
+    Image.composite(first, moved, mask).save(out, format="PNG")
+    return out.getvalue()
