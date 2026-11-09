@@ -1,0 +1,38 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 5판 (4 step)",
+ "status": "후보",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  96.2,
+  96.0
+ ],
+ "average": 96.1,
+ "criticalComics": 3,
+ "perComic": {
+  "solo-01": 97.8,
+  "funny-03": 98.2,
+  "twist-08": 99.2,
+  "funny-12": 97.3,
+  "funny-15": 89.0,
+  "love-07": 96.8,
+  "family-09": 94.8,
+  "mystery-02": 92.2,
+  "love-06": 89.0,
+  "mystery-08": 94.3
+ },
+ "strict": {
+  "average": 79.3,
+  "items": {
+   "X1": 84.0,
+   "X2": 92.0,
+   "X3": 72.8,
+   "X4": 72.8
+  },
+  "baseline": {
+   "variant": "klein-4b-ref-fixlookS",
+   "average": 61.5
+  }
+ },
+ "note": "콘티 틀 5판(동물 인물은 종·털색이 한눈에 다르게, 길쭉한 소품은 한 인물만, 그림 모델이 글자로 쓰는 낱말 금지, 실내 컷에 비 낱말 금지)과 콘티 머리 모양이 참조 외모 뒤에 붙던 문제 수정으로 Claude가 다시 썼어요. 62컷. 콘티 틀 중 가장 높고 운영과 같은 판(95.7)보다 높아요. 심각 오류 3편: love-06 바둑판 양쪽에 같은 사람 둘, funny-15 팔 셋·강아지가 곰 옷을 입음, mystery-02 팔 셋. 옷·신발 유지는 40명 중 9명만 same으로 신발이 가장 자주 바뀌어요. 컷당 5.9초."
+}
