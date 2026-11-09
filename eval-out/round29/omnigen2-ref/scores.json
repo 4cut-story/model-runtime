@@ -1,6 +1,6 @@
 {
  "label": "OmniGen2 + 캐릭터 참조 + 프롬프트 개선 2 (50 step)",
- "status": "비교용",
+ "status": "비교",
  "license": "Apache 2.0",
  "reference": true,
  "scores": [

@@ -1,6 +1,6 @@
 {
  "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 20c판, 1024px 6 step, 프롬프트 순서 구도→인물→동작→장소→빛→그림체",
- "status": "후보",
+ "status": "비교",
  "license": "Apache 2.0",
  "reference": true,
  "scores": [

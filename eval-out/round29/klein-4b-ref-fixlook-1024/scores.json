@@ -1,6 +1,6 @@
 {
  "label": "FLUX.2 klein 4B + 캐릭터 참조 + 프롬프트 개선 + DB 외모 글 (4 step, 1024px)",
- "status": "비교용",
+ "status": "비교",
  "license": "Apache 2.0",
  "reference": true,
  "scores": [
