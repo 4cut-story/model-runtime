@@ -29,4 +29,4 @@ conversation-service의 `background_sounds` 표와 MinIO에 넣는 스크립트�
 
 `data/`에 1차 후보(`candidates-1.jsonl`), 직접 쓴 설명 원문(`desc-claude-1.raw`), 합친 설명(`descriptions-1.jsonl`)을 둔다.
 2차는 `select_clips.py --exclude data/candidates-1.jsonl`로 1차와 겹치지 않게 뽑는다.
-CLAP 임베딩 파일(약 6MB)과 MP3는 레포에 넣지 않는다.
+CLAP 임베딩은 `clap-1.jsonl.gz`(풀면 약 6MB)로 둔다. MP3(약 400MB)는 레포에 넣지 않고 `fetch_clips.py`로 다시 받는다.
