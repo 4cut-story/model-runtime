@@ -1,0 +1,128 @@
+{
+ "round": 29,
+ "source": "conti19obj by dbLook; per-story lookIds from conti3 (corrected); teal -> NZcc for DAILY, US075 for love-07; empty dbLook -> no reference",
+ "panels": {
+  "twist-08-panel-4": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "un2pc1jifrGENcbe2__Li",
+     "storyName": "윤슬"
+    }
+   ],
+   "withLookId": 1
+  },
+  "twist-08-panel-4-b": {
+   "inScene": [],
+   "withLookId": 0
+  },
+  "twist-08-panel-6": {
+   "inScene": [
+    {
+     "speaker": "C",
+     "lookId": "CN9d5nO78jJ_H23YzePBn",
+     "storyName": "도담"
+    }
+   ],
+   "withLookId": 1
+  },
+  "twist-08-panel-6-b": {
+   "inScene": [],
+   "withLookId": 0
+  },
+  "funny-15-panel-2": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "-e3xDDD_MZlZrG85dWbix",
+     "storyName": "해솔"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-15-panel-2-b": {
+   "inScene": [],
+   "withLookId": 0
+  },
+  "funny-15-panel-5": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  },
+  "funny-15-panel-5-b": {
+   "inScene": [],
+   "withLookId": 0
+  },
+  "solo-01-panel-2": {
+   "inScene": [
+    {
+     "speaker": "A",
+     "lookId": "PSk5gY4wvimLF-KEu5M04",
+     "storyName": "나래"
+    }
+   ],
+   "withLookId": 1
+  },
+  "solo-01-panel-2-b": {
+   "inScene": [],
+   "withLookId": 0
+  },
+  "funny-03-panel-4": {
+   "inScene": [
+    {
+     "speaker": "C",
+     "lookId": "5Fw-Y1QYfZv7Q4lCFNoWc",
+     "storyName": "지우"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-03-panel-4-b": {
+   "inScene": [],
+   "withLookId": 0
+  },
+  "funny-03-panel-6": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "gChXfzcb-TvrEcrTQrNqW",
+     "storyName": "하늘"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-03-panel-6-b": {
+   "inScene": [],
+   "withLookId": 0
+  },
+  "funny-12-panel-5": {
+   "inScene": [
+    {
+     "speaker": "A"
+    }
+   ],
+   "withLookId": 0
+  },
+  "funny-12-panel-5-b": {
+   "inScene": [],
+   "withLookId": 0
+  },
+  "funny-12-panel-6": {
+   "inScene": [
+    {
+     "speaker": "B",
+     "lookId": "5gzzlvKrrU81JPesnH1uz",
+     "storyName": "하늘"
+    }
+   ],
+   "withLookId": 1
+  },
+  "funny-12-panel-6-b": {
+   "inScene": [],
+   "withLookId": 0
+  }
+ }
+}
