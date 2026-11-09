@@ -149,3 +149,36 @@ def test_FR030_참조_그림을_받지_않는_모델은_넓은_그림을_건너�
         result = w.draw_all([live_image(1)])
     assert "lives" not in result
     assert [n for n, _ in backends.drawn] == ["panel-1"]
+
+
+def test_FR048_넓은_그림이_있고_depthUploadUrl이_있으면_깊이_지도를_올린다() -> None:
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+    img = live_image(1)
+    img["live"]["depthUploadUrl"] = "http://minio/put/depth-1"
+    with respx.mock:
+        put = respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        result = w.draw_all([img, live_image(2)])
+    assert result["depths"] == ["panel-1"]
+    assert backends.depths == 1
+    assert any(c.request.url.path == "/put/depth-1" for c in put.calls)
+    assert "depthMs" in w._stats["panels"][0]
+
+
+def test_FR048_깊이_지도를_만들지_못해도_작업은_성공이다() -> None:
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+
+    def broken(png: bytes) -> bytes:
+        raise RuntimeError("no model")
+
+    backends.depth = broken  # type: ignore[method-assign]
+    w, _ = make(backends)
+    img = live_image(1)
+    img["live"]["depthUploadUrl"] = "http://minio/put/depth-1"
+    with respx.mock:
+        respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        result = w.draw_all([img])
+    assert result["lives"] == ["panel-1"]
+    assert "depths" not in result
