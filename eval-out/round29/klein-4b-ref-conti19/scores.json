@@ -1,0 +1,38 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 16판 (4 step)",
+ "status": "후보",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  97.7,
+  97.2
+ ],
+ "average": 97.5,
+ "criticalComics": 4,
+ "perComic": {
+  "solo-01": 99.0,
+  "funny-03": 97.8,
+  "twist-08": 89.0,
+  "funny-12": 94.0,
+  "funny-15": 89.0,
+  "love-07": 98.6,
+  "family-09": 98.1,
+  "mystery-02": 95.7,
+  "love-06": 89.0,
+  "mystery-08": 99.2
+ },
+ "strict": {
+  "average": 80.8,
+  "items": {
+   "X1": 78.1,
+   "X2": 91.2,
+   "X3": 84.7,
+   "X4": 71.5
+  },
+  "baseline": {
+   "variant": "klein-4b-ref-fixlookS",
+   "average": 61.5
+  }
+ },
+ "note": "콘티 틀 16판(모자 같은 쓰는 것은 외모에, 짝 물건 하나는 one lone, action에 소품 자리표 하나·물건에 동사 없음, young 어른은 young adult). 점수 97.5, 심각 4편, 실패 111건(15판 136건). 남은 심각: 휴대폰·양말·프라이팬 중복, 토끼 복제, 한복 딸이 아이 체형."
+}
