@@ -1,0 +1,38 @@
+{
+ "label": "FLUX.2 klein 4B + 캐릭터 참조 + 구조화 콘티 틀 8판 (4 step)",
+ "status": "후보",
+ "license": "Apache 2.0",
+ "reference": true,
+ "scores": [
+  97.1,
+  97.0
+ ],
+ "average": 97.0,
+ "criticalComics": 1,
+ "perComic": {
+  "solo-01": 99.7,
+  "funny-03": 96.9,
+  "twist-08": 97.4,
+  "funny-12": 98.3,
+  "funny-15": 89.0,
+  "love-07": 99.1,
+  "family-09": 97.8,
+  "mystery-02": 95.8,
+  "love-06": 99.0,
+  "mystery-08": 94.8
+ },
+ "strict": {
+  "average": 75.4,
+  "items": {
+   "X1": 78.7,
+   "X2": 85.3,
+   "X3": 63.2,
+   "X4": 77.9
+  },
+  "baseline": {
+   "variant": "klein-4b-ref-fixlookS",
+   "average": 61.5
+  }
+ },
+ "note": "콘티 틀 8판(외모에 윗옷 꼭 쓰기, 배경에는 손에 들 수 없는 큰 물건만, 무협 아이는 small child, 조선 방은 한옥 특징)과 캐릭터 모습에 윗옷이 없으면 콘티 윗옷을, 참조 그림이 없으면 콘티 신발을 붙이는 수정으로 Claude가 다시 썼어요. 68컷, 두 사람 컷 13개. 콘티 틀 중 가장 높고 심각 오류는 1편(funny-15 5컷 토끼가 둘)뿐이에요. 실패 항목 158개로 가장 적고, 옷·신발 유지는 40명 중 22명 same. 컷당 5.6초."
+}
