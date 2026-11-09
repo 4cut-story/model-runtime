@@ -102,3 +102,13 @@ def test_VRAM_부족은_작업을_돌려보내고_거듭되면_SDXL로_되돌린
             image.draw({"prompt": "p"})
     assert made == []
     assert image.draw({"prompt": "p"}) == b"sdxl"
+
+
+def test_필요_VRAM은_지금_그리는_모델을_따르고_SDXL로_되돌리면_SDXL_기준(tmp_path: Path) -> None:
+    """FR-008: klein이 정한 필요 VRAM을 넘기고, SDXL로 되돌린 뒤에는 SDXL 기준(None)을 쓴다."""
+    flux = Model("flux", load_fail=True)
+    flux.required_vram = 5  # type: ignore[attr-defined]
+    image, _ = make(tmp_path, flux)
+    assert image.required_vram == 5
+    image.draw({"prompt": "p"})
+    assert image.required_vram is None
