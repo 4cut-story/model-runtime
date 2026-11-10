@@ -157,7 +157,7 @@ def read_jsonl(path: Path | None) -> list[dict]:
 
 
 def known(v: object) -> str:
-    s = str(v or "").strip()
+    s = str(v or "").strip().rstrip(".").strip()  # 항목을 ". "로 잇기 때문에 끝 마침표는 뗀다
     return "" if s.lower() in UNKNOWN else s
 
 
