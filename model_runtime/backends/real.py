@@ -9,6 +9,7 @@ from typing import Any
 
 from . import Reference, VramBusyError, reference_kind
 from .ollama import OllamaClient
+from .speech import SpeechUnavailableError
 
 GIB = 1024**3
 
@@ -96,7 +97,9 @@ class RealBackends:
         ollama: OllamaClient,
         vram: Any = free_vram,
         depth: Any = None,
+        speaker: Any = None,
     ) -> None:
+        self.speaker = speaker
         self.whisper = whisper
         self._depth = depth
         self.sdxl = sdxl
@@ -137,6 +140,14 @@ class RealBackends:
         data: bytes = self._depth.estimate(png)
         return data
 
+    def speak(
+        self, voice_id: str, emotion: str, text: str, speed: float = 1.0
+    ) -> tuple[bytes, int]:
+        if self.speaker is None:
+            raise SpeechUnavailableError("대사 읽기가 꺼져 있다 (SPEECH_ENABLED)")
+        mp3, ms = self.speaker.speak(voice_id, emotion, text, speed)
+        return bytes(mp3), int(ms)
+
     def encode_reference(self, image: bytes) -> bytes | None:
         data: bytes | None = self.sdxl.encode_reference(image)
         return data
@@ -169,5 +180,8 @@ class RealBackends:
             return info
         if model == "SDXL":
             info = self.sdxl.model_info()
+            return info
+        if model == "SPEECH" and self.speaker is not None:
+            info = self.speaker.model_info()
             return info
         return {"ollama": self.ollama.last_model}

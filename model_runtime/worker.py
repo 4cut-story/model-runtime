@@ -15,6 +15,7 @@ from .api import Job, LeaseLostError, WorkerApi
 from .backends import REGIONS, Backends, JobInputError, Reference, VramBusyError
 from .backends.depth import keep_near, match_tone
 from .backends.ollama import OllamaUnavailableError
+from .backends.speech import SpeechUnavailableError
 
 # 움직임 컷 두 번째 그림 뒤에 더 그릴 수 있는 장 수(세 번째·네 번째).
 MAX_MOTION_NEXT = 2
@@ -22,7 +23,8 @@ MAX_MOTION_NEXT = 2
 log = logging.getLogger(__name__)
 
 TYPES = ["TRANSCRIBE", "LLM", "IMAGE"]
-MODEL_FOR = {"TRANSCRIBE": "WHISPER", "LLM": "LLM", "IMAGE": "SDXL"}
+# 대사 읽기(SPEECH)는 GPT-SoVITS 서버가 따로 VRAM을 잡고 있어 그림 모델 묶음을 내리지 않는다
+MODEL_FOR = {"TRANSCRIBE": "WHISPER", "LLM": "LLM", "IMAGE": "SDXL", "SPEECH": "SDXL"}
 
 
 class Heartbeat(threading.Thread):
@@ -70,8 +72,11 @@ class Worker:
         sleep: Callable[[float], None] = time.sleep,
         device: Callable[[], str | None] = lambda: None,
         clock: Callable[[], float] = time.monotonic,
+        types: list[str] | None = None,
     ) -> None:
         self.api = api
+        # 서버가 모르는 종류를 보내면 가져가기가 거절되므로 SPEECH는 켤 때만 더한다
+        self.types = list(types or TYPES)
         self.backends = backends
         self.uploader = uploader
         self.heartbeat_interval = heartbeat_interval
@@ -106,7 +111,7 @@ class Worker:
             delay = min(delay * 2, self.poll_max)
 
     def run_once(self) -> bool:
-        job = self.api.claim(TYPES, self.loaded)
+        job = self.api.claim(self.types, self.loaded)
         if job is None:
             return False
         log.info("작업 시작: job=%s type=%s", job.job_id, job.type)
@@ -121,6 +126,9 @@ class Worker:
             return True
         except OllamaUnavailableError as e:
             self._report_fail(job, heartbeat, "OLLAMA_UNAVAILABLE", str(e), retryable=True)
+            return True
+        except SpeechUnavailableError as e:
+            self._report_fail(job, heartbeat, "TTS_UNAVAILABLE", str(e), retryable=True)
             return True
         except (JobInputError, KeyError, ValueError) as e:
             self._report_fail(job, heartbeat, "BAD_INPUT", str(e), retryable=False)
@@ -157,7 +165,47 @@ class Worker:
             return self.transcribe(data), model
         if job.type == "LLM":
             return self.backends.chat(data), model
+        if job.type == "SPEECH":
+            return self.speak_all(data), "SPEECH"
         return self.draw_all(data["images"]), model
+
+    def speak_all(self, data: dict[str, Any]) -> dict[str, Any]:
+        """대사마다 목소리·감정으로 읽어 MP3를 uploadUrl에 올린다 (라이브 모드 대사 음성).
+
+        읽지 못한 줄은 결과에서 빼고 이어 간다(그 줄만 소리 없이 자막). 한 줄도 못 읽으면 작업
+        실패다. 대사 글은 로그에 남기지 않는다.
+        """
+        lines = data["lines"]
+        speed = min(max(float(data.get("speed") or 1.0), 0.5), 2.0)
+        done: list[dict[str, Any]] = []
+        times: list[dict[str, Any]] = []
+        self._stats["lines"] = times
+        last: Exception | None = None
+        for line in lines:
+            key = str(line["key"])
+            started = self.clock()
+            try:
+                mp3, ms = self.backends.speak(
+                    str(line["voiceId"]),
+                    str(line.get("emotion") or "neutral"),
+                    str(line["text"]),
+                    speed,
+                )
+                response = self.uploader.put(
+                    line["uploadUrl"], content=mp3, headers={"Content-Type": "audio/mpeg"}
+                )
+                response.raise_for_status()
+            except SpeechUnavailableError:
+                raise
+            except Exception as e:  # 한 줄 때문에 다른 줄을 버리지 않는다
+                log.warning("대사를 읽지 못해 소리 없이 둔다: %s (%s)", key, e)
+                last = e
+                continue
+            done.append({"key": key, "durationMs": ms})
+            times.append({"key": key, "ms": int((self.clock() - started) * 1000)})
+        if lines and not done:
+            raise last if last is not None else JobInputError("읽은 대사가 없다")
+        return {"lines": done}
 
     def transcribe(self, data: dict[str, Any]) -> dict[str, Any]:
         """mode=part면 녹음 중 구간 전사(FR-015).

@@ -74,6 +74,13 @@ class Backends(Protocol):
         입력으로 받는다(저장한 embedding을 받지도 올리지도 않는다). "none": 참조를 쓰지 않는다."""
         ...
 
+    def speak(
+        self, voice_id: str, emotion: str, text: str, speed: float = 1.0
+    ) -> tuple[bytes, int]:
+        """대사 하나를 그 목소리·감정으로 읽은 MP3 바이트와 길이(ms). 읽기 서버가 없으면
+        SpeechUnavailableError."""
+        ...
+
     def prepare(self, model: str) -> None:
         """모델 묶음(WHISPER, LLM, SDXL)을 쓸 수 있게 한다. VRAM이 모자라면 VramBusyError."""
         ...

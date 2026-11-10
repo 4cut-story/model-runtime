@@ -37,6 +37,7 @@ class FakeBackends:
         self.prompts: list[str] = []
         self.encoded = 0
         self.depths = 0
+        self.spoken: list[tuple[str, str, str]] = []
         # 테스트에서 "image"로 바꿔 klein처럼 참조 그림을 그대로 받는 경우를 본다
         self.reference_mode = "embed"
 
@@ -116,6 +117,13 @@ class FakeBackends:
         self.drawn.append((str(image.get("name")), list(references or [])))
         self.prompts.append(str(image.get("prompt")))
         return tiny_png()
+
+    def speak(
+        self, voice_id: str, emotion: str, text: str, speed: float = 1.0
+    ) -> tuple[bytes, int]:
+        """가짜 MP3: 글자마다 100ms."""
+        self.spoken.append((voice_id, emotion, text))
+        return b"ID3fake-mp3", int(len(text) * 100 / speed)
 
     def depth(self, png: bytes) -> bytes:
         """가짜 깊이 지도: 아주 작은 PNG."""

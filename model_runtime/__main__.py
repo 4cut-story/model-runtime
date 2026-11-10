@@ -16,7 +16,7 @@ from .backends import Backends
 from .backends.diffusion import KINDS
 from .backends.fake import FakeBackends
 from .config import Settings, load_env_file
-from .worker import Worker
+from .worker import TYPES, Worker
 
 
 def build_backends(settings: Settings) -> Backends:
@@ -40,7 +40,22 @@ def build_backends(settings: Settings) -> Backends:
         ),
         build_image_backend(settings),
         ollama,
+        speaker=build_speaker(settings),
     )
+
+
+def build_speaker(settings: Settings) -> Any:
+    """SPEECH_ENABLED면 GPT-SoVITS 대사 읽기. 아니면 None."""
+    if not settings.speech_enabled:
+        return None
+    from .backends.speech import SovitsSpeaker
+
+    return SovitsSpeaker(settings.tts_url, settings.voices_dir)
+
+
+def job_types(settings: Settings) -> list[str]:
+    """가져갈 작업 종류. 대사 읽기는 켤 때만 (서버가 모르는 종류면 가져가기가 거절된다)."""
+    return [*TYPES, "SPEECH"] if settings.speech_enabled else list(TYPES)
 
 
 def build_image_backend(settings: Settings) -> Any:
@@ -132,6 +147,7 @@ def main(argv: list[str] | None = None) -> int:
         poll_min=settings.poll_min,
         poll_max=settings.poll_max,
         device=_gpu_name if settings.backend == "real" else (lambda: None),
+        types=job_types(settings),
     )
 
     def shutdown(signum: int, frame: FrameType | None) -> None:
