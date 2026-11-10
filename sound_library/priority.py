@@ -22,6 +22,7 @@ import time
 from pathlib import Path
 
 from fetch_clips import key
+from select_clips import jsonline
 
 # 만화 장면에 자주 나오는 장소·소리 순서. 여기 없는 카테고리는 마지막 묶음이다
 TIERS: list[tuple[str, set[str]]] = [
@@ -65,7 +66,7 @@ def read(path: Path) -> list[dict]:
 
 def write(path: Path, rows: list[dict]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), "utf-8")
+    path.write_text("".join(jsonline(r) + "\n" for r in rows), "utf-8")
 
 
 def note(log: Path, text: str) -> None:
