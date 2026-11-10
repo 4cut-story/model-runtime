@@ -13,7 +13,7 @@ import httpx
 from . import __version__
 from .api import Job, LeaseLostError, WorkerApi
 from .backends import REGIONS, Backends, JobInputError, Reference, VramBusyError
-from .backends.depth import keep_near
+from .backends.depth import keep_near, match_tone
 from .backends.ollama import OllamaUnavailableError
 
 # 움직임 컷 두 번째 그림 뒤에 더 그릴 수 있는 장 수(세 번째·네 번째).
@@ -338,6 +338,7 @@ class Worker:
             started = self.clock()
             png = self.backends.draw(second, [Reference("__base__", base, 1.0, "full")])
             stats[stat] = int((self.clock() - started) * 1000)
+            png = self._match_tone(image, base, png)
             if keep is not None:
                 png = self._keep_near(image, base, png, keep)
             response = self.uploader.put(
@@ -348,6 +349,13 @@ class Worker:
         except Exception as e:  # 두 번째 그림 때문에 만화를 실패시키지 않는다
             log.warning("움직임 그림을 만들지 못해 한 장으로 둔다: %s (%s)", image.get("name"), e)
             return False
+
+    def _match_tone(self, image: dict[str, Any], base: bytes, frame: bytes) -> bytes:
+        try:
+            return match_tone(base, frame)
+        except Exception as e:  # 톤을 맞추지 못하면 새 그림을 그대로 쓴다
+            log.warning("움직임 그림의 밝기를 맞추지 못했다: %s (%s)", image.get("name"), e)
+            return frame
 
     def _keep_near(self, image: dict[str, Any], base: bytes, frame: bytes, depth: bytes) -> bytes:
         try:
