@@ -43,6 +43,10 @@ class Heartbeat(threading.Thread):
             try:
                 self.api.heartbeat(self.job)
             except LeaseLostError:
+                if self._stopped.is_set():
+                    # 결과를 보고한 직후 엇갈려 나간 heartbeat다. 작업은 이미 끝났다
+                    log.debug("보고 뒤 heartbeat가 거절됨: job=%s", self.job.job_id)
+                    return
                 log.warning("임대를 잃었다: job=%s", self.job.job_id)
                 self.lost.set()
                 return
