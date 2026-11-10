@@ -133,6 +133,8 @@ def test_GPT_SoVITS에_감정_참조_음성과_그_글을_넘기고_MP3로_바�
     assert mp3.startswith(b"ID3")
     assert ms == 1500
     assert "libmp3lame" in calls[0]
+    # 목소리마다 다른 크기를 -16 LUFS로 맞춘다
+    assert calls[0][calls[0].index("-af") + 1].startswith("loudnorm=I=-16")
     assert speaker.model_info() == {"tts": "GPT-SoVITS v4"}
 
 

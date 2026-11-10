@@ -40,6 +40,12 @@ def wav_ms(data: bytes) -> int:
 
 Runner = Callable[[list[str], bytes], bytes]
 
+# 대사 음성 크기를 -16 LUFS(최대 -1.5 dBTP)로 맞춘다.
+# 목소리마다 -20~-25 LUFS로 달라 배경음에 묻혔다.
+# loudnorm은 출력을 192kHz로 올리므로 44.1kHz로 되돌린다.
+LOUDNORM = "loudnorm=I=-16:TP=-1.5:LRA=11"
+SAMPLE_RATE = "44100"
+
 
 def _ffmpeg(args: list[str], data: bytes) -> bytes:
     out = subprocess.run(  # noqa: S603 - 고정된 인자만 넘긴다
@@ -115,6 +121,10 @@ class SovitsSpeaker:
                 "wav",
                 "-i",
                 "pipe:0",
+                "-af",
+                LOUDNORM,
+                "-ar",
+                SAMPLE_RATE,
                 "-codec:a",
                 "libmp3lame",
                 "-b:a",
