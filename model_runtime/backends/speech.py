@@ -12,6 +12,7 @@ import io
 import re
 import shutil
 import subprocess
+import time
 import wave
 from collections.abc import Callable
 from pathlib import Path
@@ -55,6 +56,9 @@ class SovitsSpeaker:
         ffmpeg: str | None = None,
         run: Runner = _ffmpeg,
         bitrate: str = "64k",
+        wait_s: float = 90.0,
+        sleep: Callable[[float], None] = time.sleep,
+        clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self.url = url.rstrip("/")
         self.voices = Path(voices_dir)
@@ -62,6 +66,9 @@ class SovitsSpeaker:
         self.ffmpeg = ffmpeg or shutil.which("ffmpeg") or "ffmpeg"
         self.run = run
         self.bitrate = bitrate
+        self.wait_s = wait_s
+        self.sleep = sleep
+        self.clock = clock
 
     def reference(self, voice_id: str, emotion: str) -> tuple[Path, str]:
         """감정 참조 음성과 그 글. 감정 참조가 없으면 기본 목소리."""
@@ -93,10 +100,7 @@ class SovitsSpeaker:
             "media_type": "wav",
             "streaming_mode": False,
         }
-        try:
-            response = self.client.post(self.url + "/tts", json=body)
-        except httpx.TransportError as e:
-            raise SpeechUnavailableError(f"대사 읽기 서버에 닿지 않는다: {e}") from e
+        response = self._post(body)
         response.raise_for_status()
         wav = response.content
         mp3 = self.run(
@@ -120,6 +124,21 @@ class SovitsSpeaker:
             wav,
         )
         return mp3, wav_ms(wav)
+
+    def _post(self, body: dict[str, Any]) -> httpx.Response:
+        """서버가 잠깐 내려가 있으면(재시작 중) wait_s까지 기다리며 다시 부른다.
+
+        서버는 실패한 작업을 곧바로 다시 주므로, 몇 초짜리 재시작에도
+        작업이 실패로 끝나지 않게 여기서 기다린다.
+        """
+        until = self.clock() + self.wait_s
+        while True:
+            try:
+                return self.client.post(self.url + "/tts", json=body)
+            except httpx.TransportError as e:
+                if self.clock() >= until:
+                    raise SpeechUnavailableError(f"대사 읽기 서버에 닿지 않는다: {e}") from e
+                self.sleep(3.0)
 
     def model_info(self) -> dict[str, Any]:
         return {"tts": MODEL}
