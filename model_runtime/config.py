@@ -87,6 +87,8 @@ class Settings:
     # nf4 | nunchaku(qwen만, DIFFUSION_FILE 필요) | none
     diffusion_quant: str = "nf4"
     diffusion_file: str = ""
+    # auto(klein만 GPU에 계속 올려 둔다) | true(그림마다 CPU↔GPU 이동) | false(GPU 상주)
+    diffusion_cpu_offload: str = "auto"
     # FLUX를 올리는 동안 두는 표시 파일. 워커가 시작할 때 남아 있으면 SDXL로 그린다
     flux_marker: str = ".flux-loading"
     # 대사 읽기(SPEECH 작업). 켜면 같은 PC의 GPT-SoVITS api_v2 서버(v4)를 부른다
@@ -144,6 +146,7 @@ class Settings:
             diffusion_guidance=float(env.get("DIFFUSION_GUIDANCE", "-1")),
             diffusion_quant=env.get("DIFFUSION_QUANT", "nf4").strip().lower(),
             diffusion_file=env.get("DIFFUSION_FILE", "").strip(),
+            diffusion_cpu_offload=env.get("DIFFUSION_CPU_OFFLOAD", "auto").strip().lower(),
             flux_marker=env.get("FLUX_MARKER", ".flux-loading").strip(),
             speech_enabled=env.get("SPEECH_ENABLED", "false").lower() == "true",
             tts_url=env.get("TTS_URL", "http://127.0.0.1:9880").strip().rstrip("/"),
