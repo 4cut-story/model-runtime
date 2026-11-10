@@ -18,6 +18,7 @@ import contextlib
 import gzip
 import json
 import os
+import re
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -33,6 +34,45 @@ KIND = {
     "AMBIENCE": "장소·환경음(계속 깔리는 소리)",
     "EFFECT": "효과음(한 번 나는 소리)",
     "MUSIC": "배경음악(곡). 소리를 내는 것에는 악기를 쓴다",
+}
+# 원본 태그·FSD50K 라벨에 이게 있으면 사람 목소리가 섞인 소리로 본다
+VOICE_TAGS = {
+    "speech",
+    "voice",
+    "voices",
+    "talking",
+    "talk",
+    "conversation",
+    "chatter",
+    "chat",
+    "crowd",
+    "people",
+    "walla",
+    "babble",
+    "murmur",
+    "laughter",
+    "laughing",
+    "laugh",
+    "shout",
+    "shouting",
+    "yelling",
+    "scream",
+    "screaming",
+    "singing",
+    "vocal",
+    "vocals",
+    "narration",
+    "spoken",
+    "words",
+    "child",
+    "children",
+    "kids",
+    "baby",
+    "male_speech_and_man_speaking",
+    "female_speech_and_woman_speaking",
+    "child_speech_and_kid_speaking",
+    "male_singing",
+    "female_singing",
 }
 UNKNOWN = {"", "모름", "알 수 없음", "없음", "unknown", "none"}
 
@@ -62,6 +102,7 @@ PROMPT = """너는 만화 서비스의 배경음 사서다. 아래 근거로 이
  "mood": "분위기 한 구절 (예: 바쁘고 분주한)",
  "others": "함께 섞여 들리는 다른 소리, 없으면 없음",
  "speech": 사람 말소리가 또렷하게 중심이면 true,
+ "voice": 사람 목소리(말소리, 웅성거림, 웃음, 비명, 외침, 아기 울음, 노래)가 배경에서라도 조금이라도 들리면 true,
  "moods": [아래 분위기 코드 중 맞는 것 1~3개],
  "places": ["어울리는 장소 한국어 낱말 0~3개"],
  "quality": 녹음 상태와 배경음으로 쓰기 좋은 정도 1~5
@@ -171,7 +212,13 @@ def describe(c: dict, x: dict, model: str) -> dict:
     one_shot = c["kind"] == "AMBIENCE" and x.get("continuous") is False
     # 음악의 노랫소리는 말소리로 보지 않는다(노래가 든 곡은 앞 차수에서 이미 뺐다)
     speech = bool(x.get("speech")) and c["kind"] != "MUSIC"
-    exclude = (not x.get("matches", True)) or speech or quality <= 2 or one_shot
+    # 배경음·효과음은 뒤에서 사람 목소리가 조금만 들려도 뺀다(만화 대사와 겹친다). 음악은 앞 차수 기준(노래 든 곡 제외)을 따른다
+    tags = {str(t).lower() for t in c.get("tags", [])} | {
+        str(t).lower() for t in c.get("labels", [])
+    }
+    tags |= set(re.findall(r"[a-z_]+", str(c.get("title_original", "")).lower()))
+    voice = c["kind"] != "MUSIC" and (bool(x.get("voice")) or bool(VOICE_TAGS & tags))
+    exclude = (not x.get("matches", True)) or speech or voice or quality <= 2 or one_shot
     return {
         "key": key(c),
         "model": model,
@@ -193,6 +240,7 @@ def describe(c: dict, x: dict, model: str) -> dict:
                 "weather",
                 "mood",
                 "others",
+                "voice",
                 "quality",
             )
         },
