@@ -21,6 +21,7 @@ from typing import Any
 import httpx
 
 from . import JobInputError
+from .ko_numbers import normalize
 
 EMOTIONS = ("neutral", "happy", "angry", "sad", "surprised")
 VOICE_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,39}$")
@@ -89,7 +90,8 @@ class SovitsSpeaker:
         """MP3 바이트와 길이(ms)."""
         ref, prompt = self.reference(voice_id, emotion)
         body: dict[str, Any] = {
-            "text": text,
+            # 읽기 모델은 아라비아 숫자를 제대로 읽지 못해 한글 읽기로 바꿔 넘긴다
+            "text": normalize(text),
             "text_lang": "ko",
             "ref_audio_path": str(ref.resolve()),
             "prompt_text": prompt,
