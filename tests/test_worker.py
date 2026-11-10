@@ -132,6 +132,19 @@ def test_heartbeat는_임대를_잃으면_멈춘다() -> None:
     assert hb.lost.is_set()
 
 
+def test_heartbeat_결과_보고_뒤에_엇갈린_거절은_임대를_잃은_것으로_보지_않는다() -> None:
+    class Late(FakeApi):
+        def heartbeat(self, job: Job, progress: int | None = None) -> None:
+            hb.stop()  # 결과 보고가 끝나 멈춘 뒤에 거절 응답이 온 경우
+            raise LeaseLostError("409")
+
+    api = Late([])
+    hb = Heartbeat(api, Job("j", "LLM", "lt", {}), 0.01)  # type: ignore[arg-type]
+    hb.start()
+    hb.join(timeout=2)
+    assert not hb.lost.is_set()
+
+
 def test_heartbeat_통신_오류는_다음에_다시_한다() -> None:
     class Flaky(FakeApi):
         def heartbeat(self, job: Job, progress: int | None = None) -> None:
