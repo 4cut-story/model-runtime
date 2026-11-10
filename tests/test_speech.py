@@ -149,12 +149,49 @@ def test_감정_참조가_없으면_기본_목소리를_쓰고_틀린_ID는_거�
         speaker.reference("m-none", "neutral")
 
 
-def test_읽기_서버에_닿지_않으면_SpeechUnavailable(tmp_path: Path) -> None:
-    speaker = SovitsSpeaker("http://tts", str(voices(tmp_path)))
+def test_읽기_서버에_기다려도_닿지_않으면_SpeechUnavailable(tmp_path: Path) -> None:
+    now = [0.0]
+    naps: list[float] = []
+
+    def sleep(s: float) -> None:
+        naps.append(s)
+        now[0] += s
+
+    speaker = SovitsSpeaker(
+        "http://tts", str(voices(tmp_path)), wait_s=10, sleep=sleep, clock=lambda: now[0]
+    )
     with respx.mock:
         respx.post("http://tts/tts").mock(side_effect=httpx.ConnectError("refused"))
         with pytest.raises(SpeechUnavailableError):
             speaker.speak("f-child-bright", "neutral", "안녕")
+    assert sum(naps) >= 10
+
+
+def test_읽기_서버가_재시작_중이면_다시_뜰_때까지_기다렸다_읽는다(tmp_path: Path) -> None:
+    now = [0.0]
+
+    def sleep(s: float) -> None:
+        now[0] += s
+
+    speaker = SovitsSpeaker(
+        "http://tts",
+        str(voices(tmp_path)),
+        run=lambda args, data: b"ID3",
+        sleep=sleep,
+        clock=lambda: now[0],
+    )
+    with respx.mock:
+        respx.post("http://tts/tts").mock(
+            side_effect=[
+                httpx.ConnectError("refused"),
+                httpx.ConnectError("refused"),
+                httpx.Response(200, content=wav_bytes(800)),
+            ]
+        )
+        mp3, ms = speaker.speak("f-child-bright", "neutral", "안녕")
+    assert mp3 == b"ID3"
+    assert ms == 800
+    assert now[0] == 6.0
 
 
 def test_실제_백엔드는_읽기와_모델_정보를_읽기_백엔드에_넘긴다() -> None:
