@@ -89,6 +89,11 @@ class Settings:
     diffusion_file: str = ""
     # FLUX를 올리는 동안 두는 표시 파일. 워커가 시작할 때 남아 있으면 SDXL로 그린다
     flux_marker: str = ".flux-loading"
+    # 대사 읽기(SPEECH 작업). 켜면 같은 PC의 GPT-SoVITS api_v2 서버(v4)를 부른다
+    speech_enabled: bool = False
+    tts_url: str = "http://127.0.0.1:9880"
+    # 목소리 참조 음성 폴더: <목소리 ID>/<감정>.wav와 같은 이름의 .txt(녹음의 글)
+    voices_dir: str = "voices"
     poll_min: float = 2.0
     poll_max: float = 10.0
     heartbeat_interval: float = 30.0
@@ -140,4 +145,7 @@ class Settings:
             diffusion_quant=env.get("DIFFUSION_QUANT", "nf4").strip().lower(),
             diffusion_file=env.get("DIFFUSION_FILE", "").strip(),
             flux_marker=env.get("FLUX_MARKER", ".flux-loading").strip(),
+            speech_enabled=env.get("SPEECH_ENABLED", "false").lower() == "true",
+            tts_url=env.get("TTS_URL", "http://127.0.0.1:9880").strip().rstrip("/"),
+            voices_dir=env.get("VOICES_DIR", "voices").strip(),
         )
