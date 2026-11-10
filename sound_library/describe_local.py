@@ -127,6 +127,12 @@ def evidence(c: dict, clap: dict | None) -> dict[str, object]:
     }
 
 
+# macOS 13 Metal에서 llama-server가 GGML_ASSERT(buf_dst)로 죽는다. 그때는 OLLAMA_NUM_GPU=0으로 CPU에서 돌린다
+OPTIONS: dict[str, object] = {"temperature": 0.2, "num_ctx": 4096}
+if os.environ.get("OLLAMA_NUM_GPU"):
+    OPTIONS["num_gpu"] = int(os.environ["OLLAMA_NUM_GPU"])
+
+
 def ask(url: str, model: str, prompt: str, keep_alive: object = 0) -> dict:
     # keep_alive=0: 생성이 끝나면 바로 모델을 내려 운영 그림 작업에 VRAM을 돌려준다.
     body = json.dumps(
@@ -137,7 +143,7 @@ def ask(url: str, model: str, prompt: str, keep_alive: object = 0) -> dict:
             "stream": False,
             "think": False,
             "keep_alive": keep_alive,
-            "options": {"temperature": 0.2, "num_ctx": 4096},
+            "options": OPTIONS,
         }
     ).encode()
     req = urllib.request.Request(
