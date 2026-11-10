@@ -215,6 +215,7 @@ def test_FR049_인물을_고정하지_못하면_새_그림을_그대로_올린�
         raise ValueError("bad png")
 
     monkeypatch.setattr("model_runtime.worker.keep_near", broken)
+    monkeypatch.setattr("model_runtime.worker.match_tone", lambda base, frame: frame)
     img = live_image(1, motion=True)
     img["live"]["depthUploadUrl"] = "http://minio/put/depth-1"
     with respx.mock:
@@ -266,3 +267,20 @@ def test_FR049_세_번째_그림을_못_올리면_네_번째는_그리지_않는
         respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
         w.draw_all([job])
     assert "d" not in backends.prompts
+
+
+def test_FR049_밝기를_맞추지_못하면_새_그림을_그대로_올린다(monkeypatch) -> None:
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+
+    def broken(base: bytes, frame: bytes) -> bytes:
+        raise ValueError("bad png")
+
+    monkeypatch.setattr("model_runtime.worker.match_tone", broken)
+    with respx.mock:
+        put = respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        result = w.draw_all([live_image(1, motion=True)])
+    assert result["motions"] == ["panel-1"]
+    motion = next(c for c in put.calls if c.request.url.path == "/put/motion-1")
+    assert motion.request.content == tiny_png()

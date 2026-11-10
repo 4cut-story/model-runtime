@@ -46,3 +46,24 @@ def test_FR049_크기가_다른_새_그림은_첫_그림_크기로_맞춘다() -
     out = Image.open(io.BytesIO(keep_near(_png(base), _png(frame), _png(depth))))
     assert out.size == (8, 4)
     assert out.getpixel((4, 2)) == (0, 0, 255)
+
+
+def test_FR049_움직임_그림이_전체적으로_밝아지면_첫_그림_밝기로_되돌린다() -> None:
+    from model_runtime.backends.depth import match_tone
+
+    base = Image.new("RGB", (8, 8), (60, 50, 40))
+    base.putpixel((0, 0), (120, 100, 80))
+    frame = Image.new("RGB", (8, 8), (180, 170, 160))
+    frame.putpixel((0, 0), (240, 220, 200))
+    out = Image.open(io.BytesIO(match_tone(_png(base), _png(frame))))
+    assert abs(out.getpixel((3, 3))[0] - 60) <= 2
+    assert out.getpixel((0, 0))[0] > out.getpixel((3, 3))[0]
+
+
+def test_FR049_밝기가_같은_움직임_그림은_그대로_둔다() -> None:
+    from model_runtime.backends.depth import match_tone
+
+    base = Image.new("RGB", (4, 4), (10, 200, 90))
+    base.putpixel((1, 1), (30, 180, 110))
+    out = Image.open(io.BytesIO(match_tone(_png(base), _png(base))))
+    assert out.getpixel((1, 1)) == (30, 180, 110)

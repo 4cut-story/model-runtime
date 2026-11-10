@@ -81,3 +81,32 @@ def keep_near(base: bytes, frame: bytes, depth: bytes) -> bytes:
     out = io.BytesIO()
     Image.composite(first, moved, mask).save(out, format="PNG")
     return out.getvalue()
+
+
+def match_tone(base: bytes, frame: bytes) -> bytes:
+    """움직임 그림의 밝기·대비를 첫 그림에 맞춘다 (FR-049).
+
+    광원이 있는 장면(벽난로·등불)에서 edit가 화면 전체를 밝히거나 색을 바래게 그리면, 번갈아 볼 때
+    그림이 깜빡이고 어긋남 검사에서 빠진다. 채널마다 평균·표준편차를 첫 그림에 맞춰 전체 톤만
+    되돌리고, 빗줄기·불꽃 같은 국소 변화는 남긴다.
+    """
+    from PIL import Image, ImageStat
+
+    first = Image.open(io.BytesIO(base)).convert("RGB")
+    moved = Image.open(io.BytesIO(frame)).convert("RGB")
+    if moved.size != first.size:
+        moved = moved.resize(first.size)
+    a, b = ImageStat.Stat(first), ImageStat.Stat(moved)
+    bands = []
+    for band, mean_a, std_a, mean_b, std_b in zip(
+        moved.split(), a.mean, a.stddev, b.mean, b.stddev, strict=True
+    ):
+        scale = min(2.0, max(0.5, std_a / std_b)) if std_b > 0 else 1.0
+        bands.append(
+            band.point(
+                lambda v, s=scale, ma=mean_a, mb=mean_b: max(0, min(255, round((v - mb) * s + ma)))
+            )
+        )
+    out = io.BytesIO()
+    Image.merge("RGB", bands).save(out, format="PNG")
+    return out.getvalue()
