@@ -74,6 +74,42 @@ VOICE_TAGS = {
     "male_singing",
     "female_singing",
 }
+# 사람 소리가 바로 그 소리인 카테고리(환호성, 웃음, 학교 아이들, 붐비는 가게 등)는 목소리로 빼지 않는다
+VOICE_OK = {
+    "SCHOOL_KIDS",
+    "CHEERING",
+    "PARTY_CROWD",
+    "LAUGHTER",
+    "SCREAM",
+    "CRYING",
+    "GASP_SIGH",
+    "COUGH",
+    "SNEEZE",
+    "WHISPER",
+    "BABY",
+    "SNORE",
+    "YAWN",
+    "BREATH",
+    "BURP",
+    "VOICE",
+    "MAN_TALKING",
+    "WOMAN_TALKING",
+    "ROBOT_VOICE",
+    "FIGHT",
+    "BATTLE",
+    "STADIUM",
+    "SPORTS",
+    "CONCERT",
+    "PARADE",
+    "PLAYGROUND",
+    "SWIMMING_POOL",
+    "CAFE",
+    "RESTAURANT",
+    "FASTFOOD",
+    "BAR",
+    "MARKET",
+    "SHOPPING",
+}
 UNKNOWN = {"", "모름", "알 수 없음", "없음", "unknown", "none"}
 
 PROMPT = """너는 만화 서비스의 배경음 사서다. 아래 근거로 이 소리가 실제로 어떻게 들리는지 한국어로 자세히 정리해라.
@@ -217,7 +253,11 @@ def describe(c: dict, x: dict, model: str) -> dict:
         str(t).lower() for t in c.get("labels", [])
     }
     tags |= set(re.findall(r"[a-z_]+", str(c.get("title_original", "")).lower()))
-    voice = c["kind"] != "MUSIC" and (bool(x.get("voice")) or bool(VOICE_TAGS & tags))
+    voice = (
+        c["kind"] != "MUSIC"
+        and c["category"] not in VOICE_OK
+        and (bool(x.get("voice")) or bool(VOICE_TAGS & tags))
+    )
     exclude = (not x.get("matches", True)) or speech or voice or quality <= 2 or one_shot
     return {
         "key": key(c),
