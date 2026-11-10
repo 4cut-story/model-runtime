@@ -9,6 +9,8 @@ import argparse
 import json
 import subprocess
 import tempfile
+import time
+import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -136,8 +138,17 @@ def main() -> None:
                 req = urllib.request.Request(
                     c["preview_url"], headers={"User-Agent": "4cut-sound-library"}
                 )
-                with urllib.request.urlopen(req, timeout=60) as r:
-                    convert(r.read(), ".mp3", out)
+                raw = b""
+                for wait in (0, 5, 30, 120):  # 밤새 돌리다 와이파이·DNS가 잠깐 끊겨도 다시 받는다
+                    time.sleep(wait)
+                    try:
+                        with urllib.request.urlopen(req, timeout=60) as r:
+                            raw = r.read()
+                        break
+                    except (urllib.error.URLError, TimeoutError, ConnectionError):
+                        if wait == 120:
+                            raise
+                convert(raw, ".mp3", out)
             except Exception as e:
                 out.unlink(missing_ok=True)
                 return f"fail {key(c)} {e}"

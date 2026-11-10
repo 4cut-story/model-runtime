@@ -8,6 +8,7 @@
 - FSD50K 클립 번호는 Freesound 번호와 같아서, 앞 차수 후보와 겹치는 소리는 뺀다.
 - 말소리가 중심인 클립, 너무 짧은 배경음은 뺀다. 미리 듣기 MP3(HQ) 주소를 같이 적어 fetch_clips.py가 받는다.
 - 검색은 카테고리마다 몇 번만 부른다(하루 2,000번 제한 안). 키는 출력하지 않는다.
+- 카테고리마다 바로 --out에 덧붙인다. 중간에 끊기면 다시 돌려 이미 고른 카테고리는 건너뛴다.
 """
 
 from __future__ import annotations
@@ -22,7 +23,7 @@ import urllib.request
 from pathlib import Path
 
 from categories import ALL, Category
-from select_clips import write
+from select_clips import jsonline
 
 API = "https://freesound.org/apiv2/search/text/"
 FIELDS = "id,name,tags,description,username,license,duration,previews,url,num_downloads"
@@ -127,7 +128,18 @@ def main() -> None:
     filt = 'license:"Creative Commons 0" duration:[1 TO 300]'
 
     chosen: list[dict] = []
+    done: set[str] = set()
+    if a.out.exists():
+        for line in a.out.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                x = json.loads(line)
+                chosen.append(x)
+                seen.add(str(x["source_id"]))
+                done.add(x["category"])
+        print(f"이어서 고른다: 이미 {len(chosen)}개, 카테고리 {len(done)}개", flush=True)
     for cat in codes.values():
+        if cat.code in done:
+            continue
         got: list[dict] = []
         authors: dict[str, int] = {}
         for q in queries(cat):
@@ -147,8 +159,11 @@ def main() -> None:
             if len(got) >= per:
                 break
         chosen += got[:per]
+        with open(a.out, "a", encoding="utf-8") as f:
+            for c in got[:per]:
+                f.write(jsonline(c) + "\n")
         print(f"{cat.code}: {len(got[:per])}개 (누적 {len(chosen)})", flush=True)
-    write(a.out, chosen)
+    print(f"{len(chosen)}개, 카테고리 {len({c['category'] for c in chosen})}개를 골랐다 → {a.out}")
 
 
 if __name__ == "__main__":
