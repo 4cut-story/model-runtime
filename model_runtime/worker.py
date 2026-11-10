@@ -333,6 +333,14 @@ class Worker:
         keep(깊이 지도)이 있으면 앞쪽 인물은 첫 그림 그대로 둔다(FR-049).
         """
         try:
+            # 움직임 그림이 어긋날 때 GPU PC에서 원인을 찾게 컷마다 종류와 지시를 남긴다
+            log.info(
+                "움직임 %s %s 종류: %s | 프롬프트: %s",
+                image.get("name"),
+                stat,
+                motion.get("type"),
+                str(motion.get("prompt", "")).replace(chr(10), " / "),
+            )
             second = {**image, "prompt": str(motion["prompt"])}
             second.pop("regions", None)
             started = self.clock()
