@@ -90,6 +90,7 @@ def build_image_backend(settings: Settings) -> Any:
             quant=settings.diffusion_quant,
             single_file=settings.diffusion_file,
             keep_in_ram=settings.keep_in_ram,
+            cpu_offload=settings.diffusion_cpu_offload,
         )
         return FallbackImage(other, lambda: build_sdxl(settings), Path(settings.flux_marker))
     if settings.image_model != "sdxl":

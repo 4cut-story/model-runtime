@@ -51,6 +51,10 @@ MAX_REFERENCES = 4
 # (시험 31회 motion-01 3컷, family-09 6컷).
 REFERENCE_KEEP = 0.78
 QUANTS = ("nf4", "nunchaku", "none")
+# GPU에 계속 올려 둘 모델(cpu_offload=auto). klein nf4는 약 6.3GB라 16GB에 대사 서버와
+# 함께 들어가고, 그림마다 CPU↔GPU로 옮기지 않아 장당 약 1.1초(7.0→5.9초) 빨라진다.
+# 768px 움직임 그림 시험에서 그림은 픽셀까지 같았다
+RESIDENT_KINDS = ("klein",)
 
 
 class DiffusionBackend:
@@ -63,6 +67,7 @@ class DiffusionBackend:
         quant: str = "nf4",
         single_file: str = "",
         keep_in_ram: bool = True,
+        cpu_offload: str = "auto",
     ) -> None:
         if kind not in KINDS:
             raise ValueError(f"IMAGE_MODEL은 {', '.join(KINDS)} 중 하나여야 한다: {kind}")
@@ -78,12 +83,21 @@ class DiffusionBackend:
         self.quant = quant
         self.single_file = single_file
         self.keep_in_ram = keep_in_ram
+        if cpu_offload not in ("auto", "true", "false"):
+            raise ValueError(f"DIFFUSION_CPU_OFFLOAD는 auto, true, false 중 하나다: {cpu_offload}")
+        self.cpu_offload = (
+            kind not in RESIDENT_KINDS if cpu_offload == "auto" else cpu_offload == "true"
+        )
         gib = REQUIRED_VRAM_GIB.get(kind)
         self.required_vram: int | None = gib * 1024**3 if gib is not None else None
         self._pipe: Any = None
+        self._on_gpu = False
 
     def load(self) -> None:  # pragma: no cover - GPU 전용
         if self._pipe is not None:
+            if not self.cpu_offload and not self._on_gpu:
+                self._pipe.to("cuda")
+                self._on_gpu = True
             return
         import torch
 
@@ -95,8 +109,17 @@ class DiffusionBackend:
             self._pipe = self._generic(torch)
         # SD3·Qwen 파이프라인에는 enable_vae_tiling()이 없어 VAE에 바로 켠다.
         self._pipe.vae.enable_tiling()
-        self._pipe.enable_model_cpu_offload()
-        log.info("%s 준비 완료 (%s)", self.kind, self.quant)
+        if self.cpu_offload:
+            self._pipe.enable_model_cpu_offload()
+        else:
+            self._pipe.to("cuda")
+            self._on_gpu = True
+        log.info(
+            "%s 준비 완료 (%s, %s)",
+            self.kind,
+            self.quant,
+            "CPU offload" if self.cpu_offload else "GPU 상주",
+        )
 
     def _nf4(self, torch: Any, transformers: bool) -> Any:  # pragma: no cover - GPU 전용
         if self.quant != "nf4":
@@ -232,10 +255,19 @@ class DiffusionBackend:
         import torch
 
         if self._pipe is not None:
-            if self.keep_in_ram:
+            if not self.keep_in_ram:
+                self._pipe = None
+            elif self.cpu_offload:
                 self._pipe.maybe_free_model_hooks()
             else:
-                self._pipe = None
+                # GPU 상주 모델은 다른 작업(받아쓰기·LLM)에 자리를 내준다.
+                # 옮기지 못하면 버리고 다시 읽는다
+                try:
+                    self._on_gpu = False
+                    self._pipe.to("cpu")
+                except Exception as e:
+                    log.warning("그림 모델을 CPU로 옮기지 못해 내려놓는다: %s", e)
+                    self._pipe = None
         gc.collect()
         torch.cuda.empty_cache()
 
@@ -263,7 +295,7 @@ class DiffusionBackend:
             "quantization": self.quant,
             "steps": self.steps,
             "guidance": self.guidance,
-            "cpuOffload": True,
+            "cpuOffload": self.cpu_offload,
             "ipAdapter": None,
             "references": self.reference_kind(),
         }

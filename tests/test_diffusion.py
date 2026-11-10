@@ -144,3 +144,13 @@ def test_REQ018_klein_참조_그림은_아래_소품을_잘라_위쪽만_넘긴�
         assert im.size == (512, 399)
         red = im.convert("RGB").crop((130, 300, 230, 399)).getcolors()
     assert red == [(100 * 99, (255, 255, 255))]
+
+
+def test_klein만_GPU에_계속_올려_두고_설정으로_바꿀_수_있다() -> None:
+    assert DiffusionBackend("klein").cpu_offload is False
+    assert DiffusionBackend("qwen").cpu_offload is True
+    assert DiffusionBackend("klein", cpu_offload="true").cpu_offload is True
+    assert DiffusionBackend("sd35", cpu_offload="false").cpu_offload is False
+    assert DiffusionBackend("klein").model_info()["cpuOffload"] is False
+    with pytest.raises(ValueError):
+        DiffusionBackend("klein", cpu_offload="maybe")
