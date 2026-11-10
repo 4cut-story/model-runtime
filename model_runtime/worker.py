@@ -262,6 +262,11 @@ class Worker:
         depths: list[str] = []
         self._stats["panels"] = panels
         for image in images:
+            if image.get("baseUrl"):
+                # 그려 둔 넓은 그림에 움직임 그림만 그린다 (FR-051)
+                if self._motion_only(image, panels):
+                    motions.append(image["name"])
+                continue
             refs = self.references(image.get("references") or [], embeds, computed)
             edit = image.get("edit")
             # 그림 문제(같은 인물 둘, 이상한 발)를 GPU PC에서 짚게 컷마다 프롬프트를 남긴다.
@@ -322,6 +327,50 @@ class Worker:
         if depths:
             result["depths"] = depths
         return result
+
+    def _motion_only(self, image: dict[str, Any], panels: list[dict[str, Any]]) -> bool:
+        """그려 둔 넓은 그림을 바탕으로 움직임 그림만 그린다 (docs specs/003-live-mode FR-051).
+
+        서버가 넓은 그림을 보고 컷마다 움직일 것과 세 장면을 정한 뒤 넣는 작업이다. baseUrl(넓은
+        그림)과 depthUrl(깊이 지도, 없을 수 있다)을 받아 motion과 그 next를 차례로 그린다.
+        받지 못하거나 그리지 못해도 작업은 성공이다(그 컷은 넓은 그림 한 장).
+        """
+        stats: dict[str, Any] = {"name": image.get("name"), "motionOnly": True}
+        panels.append(stats)
+        motion = image.get("motion")
+        if not isinstance(motion, dict) or self.backends.reference_kind() != "image":
+            return False
+        try:
+            base = self._download(str(image["baseUrl"]))
+        except httpx.HTTPError as e:
+            log.warning(
+                "넓은 그림을 받지 못해 움직임 그림을 건너뛴다: %s (%s)", image.get("name"), e
+            )
+            return False
+        depth: bytes | None = None
+        if image.get("depthUrl"):
+            try:
+                depth = self._download(str(image["depthUrl"]))
+            except httpx.HTTPError as e:
+                log.warning(
+                    "깊이 지도를 받지 못해 인물 고정 없이 그린다: %s (%s)", image.get("name"), e
+                )
+        if not self._motion(image, motion, base, stats, keep=depth):
+            return False
+        nxt = motion.get("next")
+        step = 0
+        while isinstance(nxt, dict) and step < MAX_MOTION_NEXT:
+            stat = "motionNextMs" if step == 0 else f"motionNext{step + 1}Ms"
+            if not self._motion(image, nxt, base, stats, stat, keep=depth):
+                break
+            nxt = nxt.get("next")
+            step += 1
+        return True
+
+    def _download(self, url: str) -> bytes:
+        response = self.uploader.get(url)
+        response.raise_for_status()
+        return bytes(response.content)
 
     def _live(
         self, image: dict[str, Any], live: dict[str, Any], base: bytes, stats: dict[str, Any]

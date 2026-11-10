@@ -284,3 +284,59 @@ def test_FR049_밝기를_맞추지_못하면_새_그림을_그대로_올린다(m
     assert result["motions"] == ["panel-1"]
     motion = next(c for c in put.calls if c.request.url.path == "/put/motion-1")
     assert motion.request.content == tiny_png()
+
+
+def motion_only_image(i: int, depth: bool = True) -> dict:
+    out: dict = {
+        "name": f"panel-{i}",
+        "prompt": "wide 16:9 shot",
+        "seed": 1,
+        "width": 1024,
+        "height": 576,
+        "baseUrl": f"http://minio/get/wide-{i}",
+        "motion": {
+            "type": "breeze",
+            "target": "the wall clock",
+            "prompt": "clock at twelve",
+            "uploadUrl": f"http://minio/put/motion-{i}",
+            "next": {
+                "prompt": "clock at one",
+                "uploadUrl": f"http://minio/put/motion-c-{i}",
+                "next": {"prompt": "clock at two", "uploadUrl": f"http://minio/put/motion-d-{i}"},
+            },
+        },
+    }
+    if depth:
+        out["depthUrl"] = f"http://minio/get/depth-{i}"
+    return out
+
+
+def test_FR051_그려_둔_넓은_그림을_받아_움직임_그림_세_장만_그린다() -> None:
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+    wide = b"wide-png"
+    with respx.mock:
+        respx.get("http://minio/get/wide-1").mock(return_value=httpx.Response(200, content=wide))
+        respx.get("http://minio/get/depth-1").mock(return_value=httpx.Response(404))
+        put = respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        result = w.draw_all([motion_only_image(1)])
+    assert result["uploaded"] == []
+    assert result["motions"] == ["panel-1"]
+    assert backends.prompts == ["clock at twelve", "clock at one", "clock at two"]
+    # 세 장 모두 받은 넓은 그림을 바탕으로 넓은 크기로 그린다
+    assert all(refs == [Reference("__base__", wide, 1.0, "full")] for _, refs in backends.drawn)
+    paths = [c.request.url.path for c in put.calls]
+    assert paths == ["/put/motion-1", "/put/motion-c-1", "/put/motion-d-1"]
+    assert w._stats["panels"][0]["motionOnly"] is True
+
+
+def test_FR051_넓은_그림을_받지_못하면_건너뛰고_작업은_성공이다() -> None:
+    backends = FakeBackends()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+    with respx.mock:
+        respx.get("http://minio/get/wide-1").mock(return_value=httpx.Response(500))
+        result = w.draw_all([motion_only_image(1, depth=False)])
+    assert "motions" not in result
+    assert backends.drawn == []
