@@ -110,3 +110,46 @@ def match_tone(base: bytes, frame: bytes) -> bytes:
     out = io.BytesIO()
     Image.merge("RGB", bands).save(out, format="PNG")
     return out.getvalue()
+
+
+#: 넓은 그림이 컷 그림보다 이만큼 어두우면 밝힌다(평균 밝기 비).
+LIFT_BELOW = 0.8
+
+#: 밝힐 때 쓰는 감마의 하한. 더 내리면 색이 바래 밤 분위기가 사라진다.
+LIFT_MIN_GAMMA = 0.55
+
+
+def lift_dark(base: bytes, wide: bytes) -> bytes:
+    """넓은 그림이 컷 그림보다 많이 어두우면 감마로 밝힌다 (docs specs/003-live-mode FR-030).
+
+    밤 실내 컷에서 넓은 그림이 컷 그림(평균 밝기 약 150)과 달리 거의 검푸른 방(약 35)으로
+    그려져 라이브 모드가 너무 어두웠다. 평균 밝기가 컷 그림의 LIFT_BELOW배보다 낮으면
+    그 밝기에 닿도록 감마를 낮추되 LIFT_MIN_GAMMA 아래로는 내리지 않는다(밤 분위기는 남긴다).
+    밝기만 올리고 색 비율과 그림 크기는 그대로다. 어둡지 않으면 받은 그림을 그대로 돌려준다.
+    """
+    from PIL import Image, ImageStat
+
+    first = Image.open(io.BytesIO(base)).convert("L")
+    image = Image.open(io.BytesIO(wide)).convert("RGB")
+    target = ImageStat.Stat(first).mean[0] * LIFT_BELOW
+    gray = image.convert("L")
+    if ImageStat.Stat(gray).mean[0] >= target:
+        return wide
+
+    def lut(gamma: float) -> list[int]:
+        return [round(255 * ((v / 255) ** gamma)) for v in range(256)]
+
+    lo, hi = LIFT_MIN_GAMMA, 1.0
+    if ImageStat.Stat(gray.point(lut(lo))).mean[0] <= target:
+        gamma = lo
+    else:
+        for _ in range(16):
+            mid = (lo + hi) / 2
+            if ImageStat.Stat(gray.point(lut(mid))).mean[0] < target:
+                hi = mid
+            else:
+                lo = mid
+        gamma = lo
+    out = io.BytesIO()
+    image.point(lut(gamma) * 3).save(out, format="PNG")
+    return out.getvalue()
