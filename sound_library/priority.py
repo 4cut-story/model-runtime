@@ -110,6 +110,9 @@ def main() -> None:
     ap.add_argument("--register", action="store_true")
     ap.add_argument("--wait", type=int, default=600, help="4차 CLAP을 기다릴 때 쉬는 초")
     ap.add_argument(
+        "--model", default="qwen3:8b", help="설명 모델 (낮에 서버 Ollama를 쓸 때 qwen3.5:9b)"
+    )
+    ap.add_argument(
         "--gate",
         action="store_true",
         help="GPU PC 공용: 운영 워커가 GPU를 쓰는 동안 기다리고, 한 개 쓸 때마다 모델을 내린다",
@@ -156,6 +159,7 @@ def main() -> None:
                     args = ["describe_local.py", "--candidates", str(part), "--out", str(b["desc"])]
                     args += ["--clap", str(b["clap"])]
                     args += ["--gate", "--keep-alive", "0"] if a.gate else ["--keep-alive", "5m"]
+                    args += ["--model", a.model]
                     run(args, log)
                 if len(ready) < len(cands):  # CLAP이 아직 덜 끝났다
                     pending = True
