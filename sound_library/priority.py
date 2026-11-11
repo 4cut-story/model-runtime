@@ -197,7 +197,7 @@ def main() -> None:
                 run(args, log)
                 mark.touch()
                 note(log, f"[{name}] {n}차 등록 끝")
-        if not pending:
+        if not pending or a.no_describe:  # 등록만 할 때는 한 바퀴 돌고 끝낸다(바깥에서 다시 부른다)
             break
         time.sleep(a.wait)
     note(log, "전부 끝")
