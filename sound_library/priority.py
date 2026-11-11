@@ -153,7 +153,15 @@ def main() -> None:
                 if n != 4:
                     for _ in range(2):  # 원격 zip 읽기가 가끔 끊긴다(IncompleteRead)
                         run(
-                            ["fetch_clips.py", "--candidates", str(part), "--out", str(b["audio"])],
+                            [
+                                "fetch_clips.py",
+                                "--candidates",
+                                str(part),
+                                "--out",
+                                str(b["audio"]),
+                                "--workers",
+                                "1",
+                            ],  # 맥 사용 중 네트워크를 덜 잡게
                             log,
                         )
                 # 끝내 못 받은 MP3는 이번 등록에서 뺀다(기존 소리는 MinIO의 예전 MP3가 그대로 남는다)
