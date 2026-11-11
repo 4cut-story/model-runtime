@@ -32,10 +32,17 @@ TIERS: list[tuple[str, set[str]]] = [
     ("바다·파도", {"OCEAN_WAVES", "BEACH", "HARBOR"}),
     ("도심 거리·차도", {"CITY_TRAFFIC", "STREET", "CAR_PASS", "CAR_HORN", "HIGHWAY"}),
     ("카페·식당", {"CAFE", "RESTAURANT", "FASTFOOD", "BAR", "KITCHEN", "COFFEE"}),
+    # 집·거실·식당 장면에 장소 소리가 없어 음악으로 대체되던 일이 많아 앞으로 당긴다
+    (
+        "실내 방·집",
+        {
+            "HOUSE_NOISES", "CLOCK", "FAN", "FRIDGE", "BLACKOUT", "OFFICE", "KETTLE",
+            "MICROWAVE", "SINK", "VACUUM", "LAUNDRY", "BATHROOM", "TOILET", "RADIO",
+        },
+    ),
     ("공원·밤 풀벌레", {"PARK", "NIGHT_INSECTS", "NIGHT", "INSECTS", "FROGS"}),
     ("숲·새소리", {"FOREST_BIRDS", "JUNGLE", "OWL", "CROW"}),
     ("바람", {"WIND", "WIND_CHIME"}),
-    ("실내 방·집", {"HOUSE_NOISES", "CLOCK", "FAN", "FRIDGE", "BLACKOUT", "OFFICE"}),
     ("학교·교실", {"SCHOOL_KIDS", "PLAYGROUND", "LIBRARY", "WRITING"}),
     ("지하철·버스", {"SUBWAY_TRAIN", "STATION", "BUS", "TRAM"}),
     (
