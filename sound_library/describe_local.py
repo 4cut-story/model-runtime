@@ -208,6 +208,9 @@ def evidence(c: dict, clap: dict | None) -> dict[str, object]:
 OPTIONS: dict[str, object] = {"temperature": 0.2, "num_ctx": 4096}
 if os.environ.get("OLLAMA_NUM_GPU"):
     OPTIONS["num_gpu"] = int(os.environ["OLLAMA_NUM_GPU"])
+# 맥을 같이 쓰는 동안은 CPU 스레드 수를 줄여 다른 앱이 느려지지 않게 한다
+if os.environ.get("OLLAMA_NUM_THREAD"):
+    OPTIONS["num_thread"] = int(os.environ["OLLAMA_NUM_THREAD"])
 
 
 def ask(url: str, model: str, prompt: str, keep_alive: object = 0) -> dict:
