@@ -1,6 +1,8 @@
 """자주 쓰는 소리부터 설명·등록한다 (4차부터, 기존 소리 다시 쓰기에도).
 
-  python priority.py --env local.env [--register]
+  python priority.py --env local.env [--register]       # 한 PC에서 설명·등록
+  python priority.py --env local.env --gate              # GPU PC: 설명만 (운영 작업 양보)
+  python priority.py --env local.env --register --no-describe   # 맥: 받은 설명으로 등록만
 
 카테고리를 아래 묶음 순서로 나눠, 묶음마다 4차 신규 → 1~3차 다시 쓰기 순으로 describe_local.py를 돌리고
 그 묶음이 다 써지면 바로 register_sounds.py로 MinIO·DB에 넣는다. 다시 돌리면 끝난 묶음은 건너뛴다.
@@ -107,6 +109,16 @@ def main() -> None:
     ap.add_argument("--env", type=Path, required=True)
     ap.add_argument("--register", action="store_true")
     ap.add_argument("--wait", type=int, default=600, help="4차 CLAP을 기다릴 때 쉬는 초")
+    ap.add_argument(
+        "--gate",
+        action="store_true",
+        help="GPU PC 공용: 운영 워커가 GPU를 쓰는 동안 기다리고, 한 개 쓸 때마다 모델을 내린다",
+    )
+    ap.add_argument(
+        "--no-describe",
+        action="store_true",
+        help="설명은 쓰지 않고(다른 PC가 쓴다) 설명이 다 된 묶음만 등록한다",
+    )
     a = ap.parse_args()
     work = HERE / "work/prio"
     work.mkdir(parents=True, exist_ok=True)
@@ -130,6 +142,8 @@ def main() -> None:
                 if "only" in b:
                     keep = {d["key"] for d in read(b["only"]) if not d.get("exclude")}
                     cands = [c for c in cands if key(c) in keep]
+                if not b["clap"].exists() and b["clap"].with_suffix(".jsonl.gz").exists():
+                    b["clap"] = b["clap"].with_suffix(".jsonl.gz")
                 clap = {x["key"] for x in read(b["clap"])}
                 ready = [c for c in cands if key(c) in clap]
                 if not cands:
@@ -138,11 +152,17 @@ def main() -> None:
                 part = work / f"cand-{n}-{t}.jsonl"
                 write(part, ready)
                 note(log, f"[{name}] {n}차 {len(ready)}/{len(cands)}개 설명")
-                if ready:
+                if ready and not a.no_describe:
                     args = ["describe_local.py", "--candidates", str(part), "--out", str(b["desc"])]
-                    args += ["--clap", str(b["clap"]), "--keep-alive", "5m"]
+                    args += ["--clap", str(b["clap"])]
+                    args += ["--gate", "--keep-alive", "0"] if a.gate else ["--keep-alive", "5m"]
                     run(args, log)
                 if len(ready) < len(cands):  # CLAP이 아직 덜 끝났다
+                    pending = True
+                    continue
+                if a.no_describe and not {key(c) for c in ready} <= {
+                    d["key"] for d in read(b["desc"])
+                }:  # 다른 PC가 아직 쓰는 중
                     pending = True
                     continue
                 if not a.register:
