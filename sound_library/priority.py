@@ -151,9 +151,17 @@ def main() -> None:
                 sub = work / f"desc-{n}-{t}.jsonl"
                 write(sub, [desc[key(c)] for c in cands if key(c) in desc])
                 if n != 4:
-                    run(
-                        ["fetch_clips.py", "--candidates", str(part), "--out", str(b["audio"])], log
-                    )
+                    for _ in range(2):  # 원격 zip 읽기가 가끔 끊긴다(IncompleteRead)
+                        run(
+                            ["fetch_clips.py", "--candidates", str(part), "--out", str(b["audio"])],
+                            log,
+                        )
+                # 끝내 못 받은 MP3는 이번 등록에서 뺀다(기존 소리는 MinIO의 예전 MP3가 그대로 남는다)
+                have = [c for c in ready if (b["audio"] / f"{key(c)}.mp3").exists()]
+                if len(have) < len(ready):
+                    note(log, f"[{name}] {n}차 MP3 없는 {len(ready) - len(have)}개는 건너뜀")
+                part = work / f"cand-{n}-{t}.reg.jsonl"
+                write(part, have)
                 args = ["register_sounds.py", "--candidates", str(part), "--audio", str(b["audio"])]
                 args += ["--clap", str(b["clap"]), "--descriptions", str(sub), "--env", str(a.env)]
                 if n != 4:
