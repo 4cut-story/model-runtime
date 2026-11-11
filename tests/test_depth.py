@@ -67,3 +67,30 @@ def test_FR049_밝기가_같은_움직임_그림은_그대로_둔다() -> None:
     base.putpixel((1, 1), (30, 180, 110))
     out = Image.open(io.BytesIO(match_tone(_png(base), _png(base))))
     assert out.getpixel((1, 1)) == (30, 180, 110)
+
+
+def test_FR030_넓은_그림이_컷보다_많이_어두우면_밝히되_밤_분위기는_남긴다() -> None:
+    from PIL import ImageStat
+
+    from model_runtime.backends.depth import lift_dark
+
+    base = Image.new("RGB", (8, 8), (150, 150, 150))
+    dark = Image.new("RGB", (16, 9))
+    dark.putdata([(15 + i // 8, 25 + i // 8, 60 + i // 8) for i in range(16 * 9)])
+    out = Image.open(io.BytesIO(lift_dark(_png(base), _png(dark))))
+    assert out.size == (16, 9)
+    before = ImageStat.Stat(dark.convert("L")).mean[0]
+    after = ImageStat.Stat(out.convert("L")).mean[0]
+    assert after > before * 1.5
+    # 감마 하한 때문에 컷 그림 밝기까지는 올리지 않는다
+    assert after < 150
+    r, _g, b = out.getpixel((0, 0))
+    assert b > r
+
+
+def test_FR030_넓은_그림이_어둡지_않으면_그대로_둔다() -> None:
+    from model_runtime.backends.depth import lift_dark
+
+    base = Image.new("RGB", (8, 8), (150, 150, 150))
+    wide = _png(Image.new("RGB", (16, 9), (140, 140, 140)))
+    assert lift_dark(_png(base), wide) == wide

@@ -13,7 +13,7 @@ import httpx
 from . import __version__
 from .api import Job, LeaseLostError, WorkerApi
 from .backends import REGIONS, Backends, JobInputError, Reference, VramBusyError
-from .backends.depth import keep_near, match_tone
+from .backends.depth import keep_near, lift_dark, match_tone
 from .backends.ollama import OllamaUnavailableError
 from .backends.speech import SpeechUnavailableError
 
@@ -386,6 +386,7 @@ class Worker:
             started = self.clock()
             png = self.backends.draw(wide, [Reference("__base__", base, 1.0, "full")])
             stats["liveMs"] = int((self.clock() - started) * 1000)
+            png = self._lift(image, base, png)
             response = self.uploader.put(
                 live["uploadUrl"], content=png, headers={"Content-Type": "image/png"}
             )
@@ -458,6 +459,13 @@ class Worker:
         except Exception as e:  # 두 번째 그림 때문에 만화를 실패시키지 않는다
             log.warning("움직임 그림을 만들지 못해 한 장으로 둔다: %s (%s)", image.get("name"), e)
             return False
+
+    def _lift(self, image: dict[str, Any], base: bytes, wide: bytes) -> bytes:
+        try:
+            return lift_dark(base, wide)
+        except Exception as e:  # 밝히지 못하면 넓은 그림을 그대로 쓴다
+            log.warning("넓은 그림의 밝기를 맞추지 못했다: %s (%s)", image.get("name"), e)
+            return wide
 
     def _match_tone(self, image: dict[str, Any], base: bytes, frame: bytes) -> bytes:
         try:
