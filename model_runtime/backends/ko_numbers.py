@@ -1,7 +1,10 @@
-"""대사의 숫자를 한글 읽기로 바꾼다. GPT-SoVITS는 아라비아 숫자를 제대로 읽지 못한다.
+"""대사의 숫자를 한글 읽기로 바꾼다. 읽기 모델은 아라비아 숫자를 제대로 읽지 못한다.
 
 "260조"는 "이백육십조", "3명"은 "세 명", "2.5%"는 "이 점 오 퍼센트"처럼 읽는다.
 세는 말(명·개·살 등) 앞의 1~99는 고유어로, 나머지는 한자어로 읽는다.
+시각 "10:30"은 "열 시 삼십 분", 점수 "3:2"는 "삼 대 이",
+범위 "3~4명"은 "서너 명", "10~20%"는 "십에서 이십 퍼센트",
+분수 "1/2"은 "이분의 일", 전화번호 "010-1234-5678"은 "공일공 일이삼사 오육칠팔"로 읽는다.
 """
 
 from __future__ import annotations
@@ -44,6 +47,7 @@ UNITS = {
     "kg": " 킬로그램",
     "cm": " 센티미터",
     "mm": " 밀리미터",
+    "ml": " 밀리리터",
     "m": " 미터",
     "g": " 그램",
     "℃": " 도",
@@ -53,9 +57,19 @@ UNITS = {
 
 NUMBER = re.compile(
     r"(?P<dollar>\$)?(?P<int>\d{1,3}(?:,\d{3})+|\d+)(?:\.(?P<frac>\d+))?"
-    r"(?P<unit>%|km|kg|cm|mm|°C|℃|m(?![a-zA-Z])|g(?![a-zA-Z]))?"
+    r"(?P<unit>%|km|kg|cm|mm|ml|°C|℃|m(?![a-zA-Z])|g(?![a-zA-Z]))?"
     r"(?P<space>\s?)(?P<counter>" + "|".join(COUNTERS) + r")?"
 )
+COUNTER = "(?:" + "|".join(COUNTERS) + ")"
+TIME = re.compile(r"(?<![\d:.])([01]?\d|2[0-3]):([0-5]\d)(?![\d:])")
+PHONE = re.compile(r"(?<![\d-])\d{2,4}(?:-\d{3,4}){1,2}(?![\d-])")
+FRACTION = re.compile(r"(?<![\d/.])(\d)/(\d{1,2})(?![\d/])")
+COUNT_RANGE = re.compile(r"(?<![\d.,])(\d{1,2})\s?~\s?(\d{1,2})(\s?)(" + COUNTER + ")")
+# 시각이 아닌 "3:2"는 점수로 읽는다
+SCORE = re.compile(r"(?<=\d):(?=\d)")
+RANGE = re.compile(r"(?<=\d)\s?~\s?(?=\$?\d)")
+# 이웃한 두 수를 세는 말 앞에서 줄여 읽는다: "3~4명"은 "서너 명"
+PAIRS = {(1, 2): "한두", (2, 3): "두세", (3, 4): "서너", (4, 5): "네다섯", (5, 6): "대여섯"}
 MONTHS = ((re.compile(r"(?<![\d.,])6월"), "유월"), (re.compile(r"(?<![\d.,])10월"), "시월"))
 
 
@@ -102,7 +116,9 @@ def _read(m: re.Match[str]) -> str:
     value = int(digits)
     if len(digits) > 1 and digits.startswith("0"):
         # 전화번호·코드처럼 0으로 시작하면 한 자리씩 읽는다
-        text = "".join(DIGITS[int(d)] if d != "0" else "공" for d in digits)
+        text = _digits(digits)
+    elif counter == "번째" and value == 1 and not frac:
+        text = "첫"
     elif counter and not frac and not unit and 0 < value < 100:
         text = native(value)
     else:
@@ -120,8 +136,41 @@ def _read(m: re.Match[str]) -> str:
     return text
 
 
+def _digits(s: str) -> str:
+    return "".join(DIGITS[int(d)] if d != "0" else "공" for d in s)
+
+
+def _time(m: re.Match[str]) -> str:
+    hour, minute = int(m.group(1)), int(m.group(2))
+    text = (native(hour) if hour else "영") + " 시"
+    return text + (" " + sino(minute) + " 분" if minute else "")
+
+
+def _fraction(m: re.Match[str]) -> str:
+    top, bottom = int(m.group(1)), int(m.group(2))
+    if not 0 < top < bottom:
+        return m.group(0)
+    return sino(bottom) + "분의 " + sino(top)
+
+
+def _count_range(m: re.Match[str]) -> str:
+    low, high = int(m.group(1)), int(m.group(2))
+    counter = m.group(4)
+    if not 0 < low < high:
+        return m.group(0)
+    pair = PAIRS.get((low, high))
+    spoken = pair if pair else native(low) + "에서 " + native(high)
+    return spoken + " " + counter
+
+
 def normalize(text: str) -> str:
     """대사 속 숫자를 한글 읽기로 바꾼다. 숫자가 없으면 그대로."""
+    text = PHONE.sub(lambda m: " ".join(_digits(g) for g in m.group(0).split("-")), text)
+    text = TIME.sub(_time, text)
+    text = SCORE.sub(" 대 ", text)
+    text = FRACTION.sub(_fraction, text)
+    text = COUNT_RANGE.sub(_count_range, text)
+    text = RANGE.sub("에서 ", text)
     for pattern, word in MONTHS:
         text = pattern.sub(word, text)
     return NUMBER.sub(_read, text)
