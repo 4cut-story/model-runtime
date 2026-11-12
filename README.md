@@ -11,7 +11,7 @@
 | TRANSCRIBE | 녹음을 글로 받아 적고 화자를 나눠요 | WhisperX large-v3, pyannote |
 | LLM | 클라우드 LLM이 안 될 때 콘티를 써요 | Ollama의 Qwen3 8B |
 | IMAGE | 컷 그림을 그려요 (캐릭터 참조 그림 최대 4장) | FLUX.2 klein 4B, 실패하면 DreamShaper XL Lightning |
-| SPEECH | 라이브 모드 대사를 가상 인물 목소리로 읽어요 | GPT-SoVITS v4 |
+| SPEECH | 라이브 모드 대사를 가상 인물 목소리로 읽어요 | CosyVoice3 (`TTS_ENGINE=sovits`면 GPT-SoVITS v4) |
 
 - 들어오는 포트를 열지 않아요. 워커가 HTTPS로 conversation-service에 일을 가져가러 가고(pull), 결과는 미리 서명된 주소로 올린 뒤 보고해요.
 - 한 번에 작업 하나씩 처리하고, 남은 VRAM이 모자라면 `VRAM_BUSY`로 돌려보내 나중에 다시 받아요.
@@ -24,12 +24,12 @@
 GPU PC (RTX 5060 Ti 16GB)                          클러스터
 model-runtime ──HTTPS로 일 가져가기(pull)──> api-gateway ──> conversation-service
    ├── Ollama (Qwen3 8B)
-   └── GPT-SoVITS (대사 읽기)
+   └── CosyVoice3 (대사 읽기)
 ```
 
 ## 기술
 
-Python 3.11+ · PyTorch (CUDA 12.8) · diffusers · WhisperX · Ollama · GPT-SoVITS
+Python 3.11+ · PyTorch (CUDA 12.8) · diffusers · WhisperX · Ollama · CosyVoice3
 
 ## 실행
 
