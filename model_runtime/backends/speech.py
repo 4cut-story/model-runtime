@@ -25,6 +25,7 @@ import httpx
 from . import JobInputError
 from .ko_letters import spell
 from .ko_numbers import normalize
+from .ko_text import tidy
 
 EMOTIONS = ("neutral", "happy", "angry", "sad", "surprised")
 VOICE_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,39}$")
@@ -111,7 +112,7 @@ class Speaker:
         ref, prompt = self.reference(voice_id, emotion)
         body: dict[str, Any] = {
             # 읽기 모델은 아라비아 숫자와 영어 약어를 제대로 읽지 못해 한글 읽기로 바꿔 넘긴다
-            "text": normalize(spell(text)),
+            "text": normalize(spell(tidy(text))),
             "text_lang": "ko",
             "ref_audio_path": str(ref.resolve()),
             "prompt_text": prompt,
