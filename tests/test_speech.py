@@ -130,6 +130,10 @@ def test_GPT_SoVITS에_감정_참조_음성과_그_글을_넘기고_MP3로_바�
     assert body["ref_audio_path"].endswith("happy.wav")
     assert body["speed_factor"] == 1.1
     assert body["text_lang"] == "ko"
+    # 비교해 고른 읽기 설정
+    assert body["text_split_method"] == "cut1"
+    assert body["sample_steps"] == 16
+    assert body["temperature"] == 0.7
     assert mp3.startswith(b"ID3")
     assert ms == 1500
     assert "libmp3lame" in calls[0]
