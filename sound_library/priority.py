@@ -129,6 +129,11 @@ def main() -> None:
         action="store_true",
         help="설명은 쓰지 않고(다른 PC가 쓴다) 설명이 다 된 묶음만 등록한다",
     )
+    ap.add_argument(
+        "--no-fetch",
+        action="store_true",
+        help="1~3차 MP3 다시 받기·재업로드를 미룬다(낮에 맥을 쓰는 동안). 설명은 쓴다",
+    )
     a = ap.parse_args()
     work = HERE / "work/prio"
     work.mkdir(parents=True, exist_ok=True)
@@ -177,6 +182,8 @@ def main() -> None:
                     pending = True
                     continue
                 if not a.register:
+                    continue
+                if a.no_fetch and n != 4:  # 밤에 받는다
                     continue
                 desc = {d["key"]: d for d in read(b["desc"])}
                 sub = work / f"desc-{n}-{t}.jsonl"
