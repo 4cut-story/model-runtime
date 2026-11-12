@@ -15,7 +15,7 @@ from model_runtime.api import Job
 from model_runtime.backends import JobInputError
 from model_runtime.backends.fake import FakeBackends
 from model_runtime.backends.real import RealBackends
-from model_runtime.backends.speech import SovitsSpeaker, SpeechUnavailableError, wav_ms
+from model_runtime.backends.speech import Speaker, SpeechUnavailableError, wav_ms
 from model_runtime.config import Settings
 from tests.test_worker import FakeApi, worker
 
@@ -102,8 +102,20 @@ def test_대사_읽기는_켤_때만_가져간다() -> None:
     assert job_types(on)[-1] == "SPEECH"
     assert build_speaker(off) is None
     speaker = build_speaker(on)
-    assert isinstance(speaker, SovitsSpeaker)
+    assert isinstance(speaker, Speaker)
     assert speaker.url == "http://127.0.0.1:9880"
+    cosy = build_speaker(
+        Settings.from_env({**env, "SPEECH_ENABLED": "true", "TTS_ENGINE": "CosyVoice"})
+    )
+    assert cosy.url == "http://127.0.0.1:9881"
+    assert cosy.model_info() == {"tts": "CosyVoice3"}
+    custom = {
+        **env,
+        "SPEECH_ENABLED": "true",
+        "TTS_ENGINE": "cosyvoice",
+        "TTS_URL": "http://gpu:9000/",
+    }
+    assert build_speaker(Settings.from_env(custom)).url == "http://gpu:9000"
     api = FakeApi([])
     w = worker(api)
     w.types = job_types(on)
@@ -118,7 +130,7 @@ def test_GPT_SoVITS에_감정_참조_음성과_그_글을_넘기고_MP3로_바�
         calls.append(args)
         return b"ID3" + data[:4]
 
-    speaker = SovitsSpeaker("http://tts:9880/", str(voices(tmp_path)), ffmpeg="ffmpeg", run=run)
+    speaker = Speaker("http://tts:9880/", str(voices(tmp_path)), ffmpeg="ffmpeg", run=run)
     with respx.mock:
         tts = respx.post("http://tts:9880/tts").mock(
             return_value=httpx.Response(200, content=wav_bytes(1500))
@@ -138,8 +150,29 @@ def test_GPT_SoVITS에_감정_참조_음성과_그_글을_넘기고_MP3로_바�
     assert speaker.model_info() == {"tts": "GPT-SoVITS v4"}
 
 
+def test_CosyVoice3에는_GPT_SoVITS_전용_값을_넘기지_않는다(tmp_path: Path) -> None:
+    speaker = Speaker(
+        "http://tts:9881", str(voices(tmp_path)), run=lambda a, d: b"ID3", engine="cosyvoice"
+    )
+    with respx.mock:
+        tts = respx.post("http://tts:9881/tts").mock(
+            return_value=httpx.Response(200, content=wav_bytes(700))
+        )
+        assert speaker.speak("f-child-bright", "happy", "안녕", 0.9) == (b"ID3", 700)
+    body = json.loads(tts.calls.last.request.content)
+    assert body["prompt_text"] == "happy 참조 글"
+    assert body["speed_factor"] == 0.9
+    assert "text_split_method" not in body
+    assert speaker.model_info() == {"tts": "CosyVoice3"}
+
+
+def test_모르는_읽기_엔진은_시작할_때_거절한다(tmp_path: Path) -> None:
+    with pytest.raises(ValueError):
+        Speaker("http://tts", str(tmp_path), engine="openvoice")
+
+
 def test_감정_참조가_없으면_기본_목소리를_쓰고_틀린_ID는_거절한다(tmp_path: Path) -> None:
-    speaker = SovitsSpeaker("http://tts", str(voices(tmp_path)))
+    speaker = Speaker("http://tts", str(voices(tmp_path)))
     ref, text = speaker.reference("f-child-bright", "sad")
     assert ref.name == "neutral.wav"
     assert text == "neutral 참조 글"
@@ -159,7 +192,7 @@ def test_읽기_서버에_기다려도_닿지_않으면_SpeechUnavailable(tmp_pa
         naps.append(s)
         now[0] += s
 
-    speaker = SovitsSpeaker(
+    speaker = Speaker(
         "http://tts", str(voices(tmp_path)), wait_s=10, sleep=sleep, clock=lambda: now[0]
     )
     with respx.mock:
@@ -175,7 +208,7 @@ def test_읽기_서버가_재시작_중이면_다시_뜰_때까지_기다렸다_
     def sleep(s: float) -> None:
         now[0] += s
 
-    speaker = SovitsSpeaker(
+    speaker = Speaker(
         "http://tts",
         str(voices(tmp_path)),
         run=lambda args, data: b"ID3",
@@ -197,14 +230,14 @@ def test_읽기_서버가_재시작_중이면_다시_뜰_때까지_기다렸다_
 
 
 def test_실제_백엔드는_읽기와_모델_정보를_읽기_백엔드에_넘긴다() -> None:
-    class Speaker:
+    class FakeSpeaker:
         def speak(self, v: str, e: str, t: str, s: float) -> tuple[bytes, int]:
             return b"mp3", 1234
 
         def model_info(self) -> dict[str, Any]:
             return {"tts": "x"}
 
-    real = RealBackends(None, None, None, vram=lambda: None, speaker=Speaker())  # type: ignore[arg-type]
+    real = RealBackends(None, None, None, vram=lambda: None, speaker=FakeSpeaker())  # type: ignore[arg-type]
     assert real.speak("v", "neutral", "t") == (b"mp3", 1234)
     assert real.model_info("SPEECH") == {"tts": "x"}
 

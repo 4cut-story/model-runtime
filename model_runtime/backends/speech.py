@@ -1,7 +1,9 @@
-"""대사 읽기 (GPT-SoVITS v4). 가상 인물 목소리의 감정별 참조 음성을 흉내 내 대사를 MP3로 만든다.
+"""대사 읽기. 가상 인물 목소리의 감정별 참조 음성을 흉내 내 대사를 MP3로 만든다.
 
-GPT-SoVITS는 저장소와 Python 환경이 따로라 같은 GPU PC에서 도는 api_v2 서버(기본
-http://127.0.0.1:9880, v4 설정, CUDAGraph 끔)를 부른다. 참조 음성은 VOICES_DIR 아래
+읽기 모델은 저장소와 Python 환경이 따로라 같은 GPU PC에서 도는 HTTP 서버를 부른다.
+TTS_ENGINE으로 고른다. ``cosyvoice``는 CosyVoice3 제로샷 서버(기본 http://127.0.0.1:9881),
+``sovits``는 GPT-SoVITS api_v2 서버(http://127.0.0.1:9880, v4 설정, CUDAGraph 끔)다.
+두 서버는 같은 ``POST /tts`` 본문을 받고 WAV를 돌려준다. 참조 음성은 VOICES_DIR 아래
 ``<목소리 ID>/<감정>.wav``와 그 녹음의 글 ``<목소리 ID>/<감정>.txt``다.
 감정 참조가 없으면 기본(neutral)을 쓴다.
 """
@@ -26,7 +28,14 @@ from .ko_numbers import normalize
 
 EMOTIONS = ("neutral", "happy", "angry", "sad", "surprised")
 VOICE_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,39}$")
-MODEL = "GPT-SoVITS v4"
+ENGINES = {"cosyvoice": "CosyVoice3", "sovits": "GPT-SoVITS v4"}
+DEFAULT_URLS = {"cosyvoice": "http://127.0.0.1:9881", "sovits": "http://127.0.0.1:9880"}
+# GPT-SoVITS만 쓰는 값. CosyVoice3 서버는 모르는 키를 무시한다
+SOVITS_ONLY: dict[str, Any] = {
+    "text_split_method": "cut5",
+    "batch_size": 1,
+    "streaming_mode": False,
+}
 
 
 class SpeechUnavailableError(Exception):
@@ -55,7 +64,7 @@ def _ffmpeg(args: list[str], data: bytes) -> bytes:
     return out.stdout
 
 
-class SovitsSpeaker:
+class Speaker:
     def __init__(
         self,
         url: str,
@@ -67,7 +76,11 @@ class SovitsSpeaker:
         wait_s: float = 90.0,
         sleep: Callable[[float], None] = time.sleep,
         clock: Callable[[], float] = time.monotonic,
+        engine: str = "sovits",
     ) -> None:
+        if engine not in ENGINES:
+            raise ValueError(f"TTS_ENGINE은 {', '.join(ENGINES)} 중 하나다: {engine}")
+        self.engine = engine
         self.url = url.rstrip("/")
         self.voices = Path(voices_dir)
         self.client = client or httpx.Client(timeout=120.0)
@@ -103,12 +116,11 @@ class SovitsSpeaker:
             "ref_audio_path": str(ref.resolve()),
             "prompt_text": prompt,
             "prompt_lang": "ko",
-            "text_split_method": "cut5",
-            "batch_size": 1,
             "speed_factor": speed,
             "media_type": "wav",
-            "streaming_mode": False,
         }
+        if self.engine == "sovits":
+            body.update(SOVITS_ONLY)
         response = self._post(body)
         response.raise_for_status()
         wav = response.content
@@ -154,4 +166,4 @@ class SovitsSpeaker:
                 self.sleep(3.0)
 
     def model_info(self) -> dict[str, Any]:
-        return {"tts": MODEL}
+        return {"tts": ENGINES[self.engine]}

@@ -45,12 +45,13 @@ def build_backends(settings: Settings) -> Backends:
 
 
 def build_speaker(settings: Settings) -> Any:
-    """SPEECH_ENABLED면 GPT-SoVITS 대사 읽기. 아니면 None."""
+    """SPEECH_ENABLED면 TTS_ENGINE의 대사 읽기. 아니면 None."""
     if not settings.speech_enabled:
         return None
-    from .backends.speech import SovitsSpeaker
+    from .backends.speech import DEFAULT_URLS, Speaker
 
-    return SovitsSpeaker(settings.tts_url, settings.voices_dir)
+    url = settings.tts_url or DEFAULT_URLS.get(settings.tts_engine, "")
+    return Speaker(url, settings.voices_dir, engine=settings.tts_engine)
 
 
 def job_types(settings: Settings) -> list[str]:
