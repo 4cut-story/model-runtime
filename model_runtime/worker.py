@@ -23,7 +23,7 @@ MAX_MOTION_NEXT = 2
 log = logging.getLogger(__name__)
 
 TYPES = ["TRANSCRIBE", "LLM", "IMAGE"]
-# 대사 읽기(SPEECH)는 GPT-SoVITS 서버가 따로 VRAM을 잡고 있어 그림 모델 묶음을 내리지 않는다
+# 대사 읽기(SPEECH)는 읽기 서버가 따로 VRAM을 잡고 있어 그림 모델 묶음을 내리지 않는다
 MODEL_FOR = {"TRANSCRIBE": "WHISPER", "LLM": "LLM", "IMAGE": "SDXL", "SPEECH": "SDXL"}
 
 
