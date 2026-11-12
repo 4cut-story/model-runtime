@@ -64,6 +64,29 @@ def tier(category: str) -> int:
     return len(TIERS)
 
 
+def rest_groups(size: int = 400) -> list[tuple[str, set[str]]]:
+    """나머지 카테고리를 4차 후보 수 기준 약 size개씩 묶는다. 묶음마다 바로 등록하려고 나눈다."""
+    from collections import Counter
+
+    counts = Counter(
+        c["category"]
+        for c in read(HERE / "data/candidates-4.jsonl")
+        if tier(c["category"]) == len(TIERS)
+    )
+    groups: list[tuple[str, set[str]]] = []
+    cur: set[str] = set()
+    total = 0
+    for code, k in sorted(counts.items()):
+        cur.add(code)
+        total += k
+        if total >= size:
+            groups.append((f"{REST} {len(groups) + 1}", cur))
+            cur, total = set(), 0
+    if cur:
+        groups.append((f"{REST} {len(groups) + 1}", cur))
+    return groups
+
+
 def read(path: Path) -> list[dict]:
     if not path.exists():
         return []
@@ -141,10 +164,12 @@ def main() -> None:
 
     while True:
         pending = False
-        for t in range(len(TIERS) + 1):
-            name = TIERS[t][0] if t < len(TIERS) else REST
+        tiers = TIERS + rest_groups()
+        where = {code: i for i, (_, codes) in enumerate(tiers) for code in codes}
+        for t in range(len(tiers) + 1):
+            name = tiers[t][0] if t < len(tiers) else REST
             # 앞 묶음의 4차 CLAP을 기다리는 동안 나머지로 넘어가지 않는다
-            if t == len(TIERS) and pending:
+            if t >= len(TIERS) and pending:
                 break
             for b in batches():
                 n = b["n"]
@@ -152,11 +177,15 @@ def main() -> None:
                 if mark.exists():
                     continue
                 cands = [
-                    c for c in read(HERE / f"data/candidates-{n}.jsonl") if tier(c["category"]) == t
+                    c
+                    for c in read(HERE / f"data/candidates-{n}.jsonl")
+                    if where.get(c["category"], len(tiers)) == t
                 ]
                 if "only" in b:
                     keep = {d["key"] for d in read(b["only"]) if not d.get("exclude")}
                     cands = [c for c in cands if key(c) in keep]
+                else:  # 4차: 끝내 못 받은 MP3(CLAP도 없다)는 기다리지 않는다
+                    cands = [c for c in cands if (b["audio"] / f"{key(c)}.mp3").exists()]
                 if not b["clap"].exists() and b["clap"].with_suffix(".jsonl.gz").exists():
                     b["clap"] = b["clap"].with_suffix(".jsonl.gz")
                 clap = {x["key"] for x in read(b["clap"])}
