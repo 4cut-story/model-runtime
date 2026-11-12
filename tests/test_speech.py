@@ -123,9 +123,9 @@ def test_GPT_SoVITS에_감정_참조_음성과_그_글을_넘기고_MP3로_바�
         tts = respx.post("http://tts:9880/tts").mock(
             return_value=httpx.Response(200, content=wav_bytes(1500))
         )
-        mp3, ms = speaker.speak("f-child-bright", "happy", "260조래", 1.1)
+        mp3, ms = speaker.speak("f-child-bright", "happy", "AI가 260조래", 1.1)
     body = json.loads(tts.calls.last.request.content)
-    assert body["text"] == "이백육십조래"
+    assert body["text"] == "에이아이가 이백육십조래"
     assert body["prompt_text"] == "happy 참조 글"
     assert body["ref_audio_path"].endswith("happy.wav")
     assert body["speed_factor"] == 1.1
