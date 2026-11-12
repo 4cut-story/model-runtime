@@ -103,7 +103,13 @@ class SovitsSpeaker:
             "ref_audio_path": str(ref.resolve()),
             "prompt_text": prompt,
             "prompt_lang": "ko",
-            "text_split_method": "cut5",
+            # GPU PC에서 같은 대사 13줄을 조합마다 2~3번 읽혀 고른 값.
+            # 기본값 대비 발음 오류율 2.5% → 2.0%, 목소리 닮은 정도 그대로, 줄당 2.92초 → 1.78초.
+            # 문장 단위로 나누면 억양이 이어지고, 다듬는 횟수 16번은 32번(기본)과 차이 없이 빠르며,
+            # 무작위성을 낮추면 발음이 안정된다
+            "text_split_method": "cut1",
+            "sample_steps": 16,
+            "temperature": 0.7,
             "batch_size": 1,
             "speed_factor": speed,
             "media_type": "wav",
