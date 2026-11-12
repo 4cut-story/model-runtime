@@ -9,6 +9,9 @@ import argparse
 import json
 import subprocess
 import tempfile
+import time
+import urllib.error
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -20,11 +23,62 @@ def key(c: dict) -> str:
     return f"{c['source'].lower()}-{c['source_id']}"
 
 
+# 라이브 모드가 배경음 60%/효과음 100%로 섞으므로 모든 파일 음량 기준이 같아야 한다.
+# EBU R128 방송 기준: -23 LUFS, 최대 피크 -2 dBTP. 2패스(측정→선형 정규화)로 정확히 맞춘다.
+LOUDNORM = "I=-23:TP=-2:LRA=11"
+
+
+def _measure(src: Path) -> dict | None:
+    """1패스: loudnorm이 stderr에 찍는 측정 JSON을 읽는다. 30초 구간 기준."""
+    # loudnorm 측정 JSON은 info 레벨로 stderr에 찍히므로 -v error로 숨기면 안 된다
+    p = subprocess.run(
+        [
+            "ffmpeg",
+            "-hide_banner",
+            "-nostats",
+            "-i",
+            str(src),
+            "-t",
+            "30",
+            "-af",
+            f"loudnorm={LOUDNORM}:print_format=json",
+            "-f",
+            "null",
+            "-",
+        ],
+        capture_output=True,
+        text=True,
+    )
+    s, e = p.stderr.rfind("{"), p.stderr.rfind("}")
+    if s == -1 or e <= s:
+        return None
+    try:
+        m = json.loads(p.stderr[s : e + 1])
+    except ValueError:
+        return None
+    # 무음 등으로 측정값이 inf면 선형 모드가 깨지니 2패스를 포기한다
+    if any(
+        str(m.get(k, "")).lstrip("-").startswith("inf")
+        for k in ("input_i", "input_tp", "input_lra", "input_thresh")
+    ):
+        return None
+    return m
+
+
 def convert(raw: bytes, suffix: str, out: Path) -> float:
     # Windows는 열려 있는 임시 파일을 다른 프로세스가 못 연다. 폴더째 만들고 닫은 뒤 ffmpeg에 넘긴다
     with tempfile.TemporaryDirectory() as tmp:
         src = Path(tmp) / f"in{suffix}"
         src.write_bytes(raw)
+        m = _measure(src)
+        if m:
+            af = (
+                f"loudnorm={LOUDNORM}:measured_I={m['input_i']}:measured_TP={m['input_tp']}"
+                f":measured_LRA={m['input_lra']}:measured_thresh={m['input_thresh']}"
+                f":offset={m['target_offset']}:linear=true,afade=t=in:d=0.05"
+            )
+        else:  # 측정 실패 시 1패스 동적 정규화로 대체
+            af = f"loudnorm={LOUDNORM},afade=t=in:d=0.05"
         subprocess.run(
             [
                 "ffmpeg",
@@ -36,7 +90,7 @@ def convert(raw: bytes, suffix: str, out: Path) -> float:
                 "-t",
                 "30",
                 "-af",
-                "loudnorm=I=-18:TP=-1.5:LRA=11,afade=t=in:d=0.05",
+                af,
                 "-ar",
                 "44100",
                 "-b:a",
@@ -62,18 +116,43 @@ def main() -> None:
     a = ap.parse_args()
     a.out.mkdir(parents=True, exist_ok=True)
     cands = [json.loads(x) for x in a.candidates.read_text(encoding="utf-8").splitlines()]
-    zips = {
-        "eval": RemoteZip(FSD_PARTS["eval"]),
-        "dev": RemoteZip(FSD_PARTS["dev"]),
-        "fma": RemoteZip([FMA_ZIP]),
-    }
-    if any(c.get("fma_full") for c in cands):
+    zipped = [c for c in cands if not c.get("preview_url")]
+    zips = (
+        {
+            "eval": RemoteZip(FSD_PARTS["eval"]),
+            "dev": RemoteZip(FSD_PARTS["dev"]),
+            "fma": RemoteZip([FMA_ZIP]),
+        }
+        if zipped
+        else {}
+    )
+    if any(c.get("fma_full") for c in zipped):
         zips["fma_full"] = RemoteZip([FMA_FULL_ZIP])
 
     def one(c: dict) -> str:
         out = a.out / f"{key(c)}.mp3"
         if out.exists() and out.stat().st_size > 0:
             return "skip"
+        if c.get("preview_url"):  # Freesound 미리 듣기 MP3 (4차부터)
+            try:
+                req = urllib.request.Request(
+                    c["preview_url"], headers={"User-Agent": "4cut-sound-library"}
+                )
+                raw = b""
+                for wait in (0, 5, 30, 120):  # 밤새 돌리다 와이파이·DNS가 잠깐 끊겨도 다시 받는다
+                    time.sleep(wait)
+                    try:
+                        with urllib.request.urlopen(req, timeout=60) as r:
+                            raw = r.read()
+                        break
+                    except (urllib.error.URLError, TimeoutError, ConnectionError):
+                        if wait == 120:
+                            raise
+                convert(raw, ".mp3", out)
+            except Exception as e:
+                out.unlink(missing_ok=True)
+                return f"fail {key(c)} {e}"
+            return "ok"
         if c["source"] == "FMA":
             z = zips["fma_full" if c.get("fma_full") else "fma"]
         else:

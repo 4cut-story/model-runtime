@@ -13,6 +13,23 @@ conversation-service의 `background_sounds` 표와 MinIO에 넣는 스크립트�
 | 6 | `register_sounds.py` | 설명을 BGE-M3로 임베딩하고 MP3를 MinIO에, 행을 DB에 넣는다 (다시 돌려도 된다) |
 | 6a | `embed_texts.py` | 임베딩 서버에 닿지 않는 PC용. 설명 임베딩을 미리 만들어 두고 `register_sounds.py --text-embeddings`로 넘긴다 (1차: `data/text-1.jsonl.gz`) |
 
+### 4차부터 (Freesound CC0, 항목별 설명)
+
+| 순서 | 스크립트 | 하는 일 |
+| --- | --- | --- |
+| 1 | `freesound_select.py` | Freesound API로 CC0 클립만 카테고리별로 고른다 (`FREESOUND_API_KEY`, 키는 출력하지 않는다) |
+| 2 | `fetch_clips.py` | 후보의 미리 듣기 MP3(HQ)를 받아 30초 이하 128k MP3로 만든다 |
+| 3 | `embed_clips.py` | CLAP 소리 임베딩과 들린 소리·실내/바깥·밤/낮 점수 |
+| 4 | `describe_local.py` | GPU PC의 Ollama가 근거를 보고 항목별 설명을 쓴다: 들리는 소리, 소리 결, 이어짐(배경음/효과음), 장소, 시간대, 날씨, 분위기, 함께 들리는 소리. "어울리는 장면"은 쓰지 않는다 |
+| 5 | `register_sounds.py` | 설명을 BGE-M3로 임베딩하고 MP3·행을 넣는다 |
+
+4차에는 만화에 나왔는데 맞는 소리가 없던 장소를 카테고리로 더했다: 눈 내리는 날, 키오스크·무인 단말기, 패스트푸드점, 정전된 실내.
+`freesound_select.py`는 카테고리마다 바로 저장해서 끊겨도 이어서 고르고, `fetch_clips.py`는 네트워크가 잠깐 끊기면 기다렸다 다시 받는다.
+
+장면 추천 한 줄("마트 계산대 장면에 어울려요")이 들어간 설명은 실제 소리와 다른 장면으로 검색을 끌고 갔다
+(마트 장면에 와인병 부딪히는 소리). 그래서 4차부터는 들리는 소리만 항목별로 쓰고, 기존 소리도
+`describe_local.py --only data/descriptions-N.jsonl`로 같은 틀로 다시 쓴다. 배경음으로 분류됐는데 한 번 나는 소리는 뺀다.
+
 `describe_clips.py`는 Gemini 무료 등급으로 설명을 쓰던 스크립트다. 하루 20번 제한이 있어 1차 43개만 이걸로 썼고,
 나머지는 Claude(유료 API가 아닌 대화)가 근거를 보고 직접 썼다.
 

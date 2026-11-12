@@ -114,6 +114,7 @@ def main() -> None:
     ap.add_argument("--embedding-url", default="https://emb.java21.net")
     ap.add_argument("--text-embeddings", type=Path, help="embed_texts.py가 만든 설명 임베딩 파일")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--reupload", action="store_true", help="이미 등록된 소리의 MP3도 다시 올린다")
     a = ap.parse_args()
 
     import psycopg
@@ -187,7 +188,9 @@ def main() -> None:
                 pid = known.get(f"{c['source']}:{c['source_id']}") or public_id()
                 audio_key = f"sounds/{pid}/audio.mp3"
                 path = a.audio / f"{k}.mp3"
-                s3.fput_object(bucket, audio_key, str(path), content_type="audio/mpeg")
+                # 이미 등록된 소리는 MP3가 MinIO에 있으니 설명만 바꿀 때는 다시 올리지 않는다
+                if a.reupload or f"{c['source']}:{c['source_id']}" not in known:
+                    s3.fput_object(bucket, audio_key, str(path), content_type="audio/mpeg")
                 # 미리 듣기 MP3는 30초로 자른다 (fetch_clips -t 30)
                 duration_ms = round(min(float(d.get("duration") or c["duration"]), 30.0) * 1000)
                 cur.execute(
@@ -233,7 +236,24 @@ def main() -> None:
         conn.commit()
         done += len(batch)
         print(f"{done}/{len(rows)}")
-    print("끝")
+
+    # 다시 쓴 설명에서 빠진 소리(배경음인데 한 번 나는 소리 등)는 검색에 안 나오게 끈다
+    dropped = [
+        (c["source"], c["source_id"])
+        for c in cands
+        if key(c) in desc
+        and desc[key(c)].get("exclude")
+        and f"{c['source']}:{c['source_id']}" in known
+    ]
+    with conn.cursor() as cur:
+        for src, sid in dropped:
+            cur.execute(
+                "update background_sounds set active = false, updated_at = current_timestamp"
+                " where source = %s and source_id = %s",
+                (src, sid),
+            )
+    conn.commit()
+    print(f"끝 (설명에서 빠져 끈 소리 {len(dropped)}개)")
 
 
 if __name__ == "__main__":
