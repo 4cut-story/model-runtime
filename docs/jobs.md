@@ -14,7 +14,7 @@ GPU PC에서 도는 **작업 워커**. 들어오는 포트 없이 conversation-s
 | SPEECH | SDXL (내리지 않음) | 라이브 모드 대사 음성. `SPEECH_ENABLED=true`일 때만 가져간다(서버가 SPEECH를 모르면 가져가기가 거절된다). 같은 PC의 읽기 서버에(`TTS_ENGINE=cosyvoice`: CosyVoice3 제로샷 서버, 기본 `http://127.0.0.1:9881`, VRAM 약 3.7GB / `TTS_ENGINE=sovits`(기본값): GPT-SoVITS v4 api_v2 서버, 기본 `http://127.0.0.1:9880`, CUDAGraph 끔, VRAM 약 2.2GB. `TTS_URL`로 바꿀 수 있다. 두 서버를 같이 켜면 PC 메모리가 모자라 그림 모델이 멈추므로 하나만 켠다) 대사마다 목소리의 감정 참조 음성(`VOICES_DIR/<목소리 ID>/<감정>.wav`와 그 녹음의 글 `.txt`, 없으면 `neutral`)을 넘겨 읽고, ffmpeg로 MP3(64kbps)로 바꿔 줄마다 `uploadUrl`에 올린다. 결과는 `{lines: [{key, durationMs}]}`이고 못 읽은 줄은 뺀다. 서버에 닿지 않으면 `TTS_UNAVAILABLE`(재시도 가능) |
 
 - 한 번에 작업 하나, 모델 묶음 하나만 VRAM에 둔다. 다른 종류 작업을 받으면 들고 있던 묶음을 먼저 내린다 (Ollama는 `keep_alive: 0`).
-- 모델을 올리기 전에 남은 VRAM이 모자라면 `VRAM_BUSY`(재시도 가능)로 보고한다.
+- 모델을 올리기 전에 남은 VRAM이 모자라면 `VRAM_BUSY`(재시도 가능)로 보고하고, 다음 작업을 가져가기 전에 20초부터 두 배씩 최대 120초까지 기다린다(작업을 마치면 20초로 되돌린다). 서버는 바로 대기열에 되돌리므로, 기다리지 않으면 같은 작업의 임대 3번을 1초 안에 다 써서 그림 단계가 실패로 끝났다.
 - 작업 중 30초마다 heartbeat. 임대를 잃으면(409) 그 작업 결과는 버린다.
 - 작업이 없으면 2초부터 10초까지 늘려 가며 다시 묻는다.
 
