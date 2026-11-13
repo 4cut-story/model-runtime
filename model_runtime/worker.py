@@ -19,6 +19,9 @@ from .backends.speech import SpeechUnavailableError
 
 # 움직임 컷 두 번째 그림 뒤에 더 그릴 수 있는 장 수(세 번째·네 번째).
 MAX_MOTION_NEXT = 2
+# 역할 옷으로 갈아입힌 인물(crop "head")은 참조 그림의 위쪽 이만큼(얼굴·머리)만 남긴다.
+# 캐릭터 그림은 512px 상반신 그림이고 턱이 높이의 약 56%에 있다.
+HEAD_KEEP = 0.58
 
 log = logging.getLogger(__name__)
 
@@ -517,9 +520,10 @@ class Worker:
         refs = []
         for item in items:
             character = str(item["character"])
-            if character not in embeds:
-                embeds[character] = self._embed(item, computed)
-            embed = embeds[character]
+            key = character + ("#head" if item.get("crop") == "head" else "")
+            if key not in embeds:
+                embeds[key] = self._embed(item, computed)
+            embed = embeds[key]
             if embed is None:
                 continue
             region = str(item.get("region") or "full")
@@ -544,7 +548,12 @@ class Worker:
         except httpx.HTTPError as e:
             log.warning("캐릭터 참조를 받지 못해 빼고 그린다: %s (%s)", character, e)
             return None
-        embed = self.backends.encode_reference(response.content)
+        content: bytes = response.content
+        if raw_image and item.get("crop") == "head":
+            # 콘티가 역할 옷(군복, 경찰복, 의사 가운…)을 입혔다.
+            # 참조 그림의 옷을 따라 그리지 않게 얼굴·머리만 넘긴다
+            content = head_only(content)
+        embed = self.backends.encode_reference(content)
         if embed is None:
             return None
         if item.get("embedUploadUrl") and not raw_image:
@@ -584,3 +593,28 @@ def _panel_stats(image: dict[str, Any], refs: list[Reference], ms: int) -> dict[
     if refs:
         stats["references"] = len(refs)
     return stats
+
+
+def head_only(image: bytes, keep: float = HEAD_KEEP) -> bytes:
+    """참조 그림의 위쪽 keep(얼굴·머리)만 남기고 아래는 배경색으로 채운 같은 크기의 PNG.
+
+    크기를 그대로 두어 그림 모델 쪽 아래 가장자리 자르기(crop_reference)는 배경만 잘라 낸다.
+    읽지 못하면 원본 그대로.
+    """
+    import io
+
+    from PIL import Image, UnidentifiedImageError
+
+    try:
+        with Image.open(io.BytesIO(image)) as im:
+            rgb = im.convert("RGB")
+            width, height = rgb.size
+            cut = max(1, round(height * keep))
+            background = rgb.getpixel((1, 1))
+            out_im = Image.new("RGB", (width, height), background)
+            out_im.paste(rgb.crop((0, 0, width, cut)), (0, 0))
+            out = io.BytesIO()
+            out_im.save(out, format="PNG")
+            return out.getvalue()
+    except (UnidentifiedImageError, OSError):
+        return image
