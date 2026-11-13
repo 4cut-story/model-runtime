@@ -96,7 +96,7 @@ def _max(size: int) -> Any:
     return ImageFilter.MaxFilter(size)
 
 
-def load_pipes(lora: str) -> tuple[Any, Any]:
+def load_pipes(lora: str, offload: bool) -> tuple[Any, Any]:
     import torch
     from diffusers import (
         EulerDiscreteScheduler,
@@ -118,7 +118,11 @@ def load_pipes(lora: str) -> tuple[Any, Any]:
         base.scheduler.config, timestep_spacing="trailing"
     )
     base.enable_vae_tiling()
-    base.to("cuda")
+    if offload:
+        # 운영 워커가 그림 모델을 올릴 자리(약 6GB)를 남긴다
+        base.enable_model_cpu_offload()
+    else:
+        base.to("cuda")
     inpaint = StableDiffusionXLInpaintPipeline(**base.components)
     return base, inpaint
 
@@ -249,12 +253,13 @@ def main() -> None:
     ap.add_argument(
         "--lora", default="ByteDance/SDXL-Lightning:sdxl_lightning_8step_lora.safetensors"
     )
+    ap.add_argument("--offload", action="store_true")
     a = ap.parse_args()
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     live = json.loads(fetch(f"{SITE}/api/v1/posts/{a.post}/live"))
     t = Timer()
-    pipes = t.run("SDXL 올리기", lambda: load_pipes(a.lora))
+    pipes = t.run("SDXL 올리기", lambda: load_pipes(a.lora, a.offload))
     for i in [int(x) for x in a.panels.split(",")]:
         people = live["panels"][i - 1].get("people") or []
         panel(pipes, a.post, i, people[0] if people else None, out, t)
