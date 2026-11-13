@@ -156,3 +156,50 @@ def test_REQ018_참조_그림을_그대로_받는_모델은_저장한_embedding�
     assert stored.call_count == 0
     assert not any(p.endswith(".safetensors") for p in puts)
     assert backends.encoded == 1
+
+
+def _png(width: int = 8, height: int = 10) -> bytes:
+    import io
+
+    from PIL import Image
+
+    im = Image.new("RGB", (width, height), (240, 240, 240))
+    for y in range(height):
+        im.putpixel((width // 2, y), (200, 0, 0))  # 위아래로 그은 빨간 줄
+    buf = io.BytesIO()
+    im.save(buf, format="PNG")
+    return buf.getvalue()
+
+
+class RawImage(FakeBackends):
+    def encode_reference(self, image: bytes) -> bytes | None:
+        self.encoded += 1
+        return image
+
+
+def test_역할_옷을_입힌_인물은_참조_그림의_머리만_넘긴다() -> None:
+    """콘티가 역할 옷(군복 등)을 입힌 인물(crop "head")은 참조 그림 아래(옷)를 배경색으로 지운다."""
+    import io
+
+    from PIL import Image
+
+    backends = RawImage()
+    backends.reference_mode = "image"
+    w, _ = make(backends)
+    ref = {**fresh(), "crop": "head"}
+    with respx.mock:
+        respx.put(url__startswith="http://minio/put/").mock(return_value=httpx.Response(200))
+        respx.get("http://minio/get/a.png").mock(return_value=httpx.Response(200, content=_png()))
+        result = w.draw_all([image(1, [ref])])
+    assert result == {"uploaded": ["panel-1"]}
+    sent = backends.drawn[0][1][0].embed
+    with Image.open(io.BytesIO(sent)) as im:
+        assert im.size == (8, 10)
+        assert im.getpixel((4, 0)) == (200, 0, 0)
+        assert im.getpixel((4, 9)) == (240, 240, 240)
+
+
+def test_머리만_자르기는_읽지_못하는_그림이면_그대로_둔다() -> None:
+    from model_runtime.worker import head_only
+
+    assert head_only(b"not-png") == b"not-png"
