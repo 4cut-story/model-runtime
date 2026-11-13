@@ -247,7 +247,18 @@ def main() -> None:
         if not pending or a.no_describe:  # 등록만 할 때는 한 바퀴 돌고 끝낸다(바깥에서 다시 부른다)
             break
         time.sleep(a.wait)
-    note(log, "전부 끝")
+    tiers = TIERS + rest_groups()
+    left = [
+        f"{n}-{t}"
+        for n in (4, 1, 2, 3)
+        for t in range(len(tiers) + 1)
+        if not (work / f"reg-{n}-{t}.done").exists()
+    ]
+    if left:
+        note(log, f"이번 바퀴 끝, 남은 묶음 {len(left)}개")
+    else:
+        (work / "all.done").touch()
+        note(log, "전부 끝")
 
 
 if __name__ == "__main__":
