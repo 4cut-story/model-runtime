@@ -80,6 +80,8 @@ class Worker:
         device: Callable[[], str | None] = lambda: None,
         clock: Callable[[], float] = time.monotonic,
         types: list[str] | None = None,
+        busy_min: float = 20.0,
+        busy_max: float = 120.0,
     ) -> None:
         self.api = api
         # 서버가 모르는 종류를 보내면 가져가기가 거절되므로 SPEECH는 켤 때만 더한다
@@ -89,6 +91,11 @@ class Worker:
         self.heartbeat_interval = heartbeat_interval
         self.poll_min = poll_min
         self.poll_max = poll_max
+        # VRAM이 모자라 돌려보낸 뒤 다시 가져가기 전 기다림. 서버는 바로 대기열에 되돌리므로
+        # 기다리지 않으면 같은 작업의 임대 3번을 1초 안에 다 써서 그림 단계가 실패로 끝났다
+        self.busy_min = busy_min
+        self.busy_max = busy_max
+        self.busy_delay = busy_min
         self.sleep = sleep
         self.device = device
         self.clock = clock
@@ -130,6 +137,9 @@ class Worker:
             result, model = self.execute(job)
         except VramBusyError as e:
             self._report_fail(job, heartbeat, "VRAM_BUSY", str(e), retryable=True)
+            log.info("VRAM 부족: %.0f초 기다렸다가 다시 가져간다", self.busy_delay)
+            self.sleep(self.busy_delay)
+            self.busy_delay = min(self.busy_delay * 2, self.busy_max)
             return True
         except OllamaUnavailableError as e:
             self._report_fail(job, heartbeat, "OLLAMA_UNAVAILABLE", str(e), retryable=True)
@@ -148,6 +158,7 @@ class Worker:
             heartbeat.stop()
             return True
         duration = int((self.clock() - started) * 1000)
+        self.busy_delay = self.busy_min
         # 보고를 다시 보내는 동안에도 임대가 끝나지 않게 heartbeat는 보고 뒤에 멈춘다.
         try:
             self.api.result(job, result, self.model_info(model), duration)

@@ -106,6 +106,25 @@ def test_오류_종류에_따라_재시도_여부를_보고한다() -> None:
         assert api.fails == [("j", code, retryable)]
 
 
+def test_VRAM이_모자라면_점점_길게_기다렸다가_다시_가져간다() -> None:
+    waits: list[float] = []
+    api = FakeApi([Job(str(i), "LLM", "lt", {}) for i in range(4)])
+    w = worker(api, Failing(VramBusyError("부족")), sleep=waits.append)
+    for _ in range(4):
+        w.run_once()
+    assert waits == [20.0, 40.0, 80.0, 120.0]
+
+
+def test_작업을_마치면_VRAM_기다림을_처음으로_되돌린다() -> None:
+    api = FakeApi([Job("a", "LLM", "lt", {}), Job("b", "LLM", "lt", {"prompt": "p"})])
+    w = worker(api, Failing(VramBusyError("부족")), sleep=lambda s: None)
+    w.run_once()
+    assert w.busy_delay == 40.0
+    w.backends = FakeBackends()
+    w.run_once()
+    assert w.busy_delay == 20.0
+
+
 def test_모르는_작업_종류는_BAD_INPUT() -> None:
     api = FakeApi([Job("j", "VIDEO", "lt", {})])
     worker(api).run_once()
